@@ -1,6 +1,5 @@
 package com.example.netweaver.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -9,18 +8,29 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = netweaverBlue,
+    onPrimary = Color.White,
+    background = Color.Black,
+    onBackground = Color.White,
+    surface = netweaverDarkGray,
+    onSurface = Color.White,
+    secondary = Color(0xFF39434F),
+    onSecondary = netweaverMediumGray
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+    primary = netweaverBlue,
+    onPrimary = Color.White,
+    background = netweaverLightGray,
+    onBackground = Color(0xFF1F1F1F),
+    surface = Color.White,
+    onSurface = Color(0xFF1F1F1F),
+    secondary = Color(0xFFEDF3F7),
+    onSecondary = netweaverMediumGray
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
