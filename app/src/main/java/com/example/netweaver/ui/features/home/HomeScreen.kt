@@ -18,20 +18,19 @@ fun HomeScreen(
     AppScaffold(
         topBar = {
             CommonTopBar(title = "Home", showBack = false)
-        }
-
-    ) { innerPadding ->
-
-        HomeContent(
-            paddingValues = PaddingValues(
-                top = innerPadding.calculateTopPadding(),
-                bottom = innerPadding.calculateBottomPadding(),
-                start = AppPadding.medium,
-                end = AppPadding.medium
+        },
+        content = { innerPadding ->
+            HomeContent(
+                paddingValues = PaddingValues(
+                    top = innerPadding.calculateTopPadding(),
+                    bottom = innerPadding.calculateBottomPadding(),
+                    start = AppPadding.medium,
+                    end = AppPadding.medium
+                )
             )
-        )
 
-    }
+        }
+    )
 }
 
 @Composable
