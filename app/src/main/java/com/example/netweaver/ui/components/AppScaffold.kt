@@ -7,11 +7,11 @@ import androidx.compose.ui.Modifier
 
 @Composable
 fun AppScaffold(
+    content: @Composable (PaddingValues) -> Unit,
     modifier: Modifier = Modifier,
     topBar: @Composable () -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
-    floatingActionButton: @Composable () -> Unit = {},
-    content: @Composable (PaddingValues) -> Unit
+    floatingActionButton: @Composable () -> Unit = {}
 ) {
     Scaffold(
         modifier = modifier,
