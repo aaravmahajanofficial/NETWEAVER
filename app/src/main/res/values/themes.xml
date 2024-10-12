@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="Theme.NETWEAVER" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.NETWEAVER" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowSplashScreenBackground" tools:ignore="NewApi">#FF2867B2</item>
+        <item name="android:windowSplashScreenAnimatedIcon" tools:ignore="NewApi">@drawable/logo
+        </item>
+        <item name="android:windowSplashScreenAnimationDuration" tools:ignore="NewApi">3000</item>
+    </style>
 </resources>
