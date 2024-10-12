@@ -8,9 +8,9 @@ import androidx.compose.ui.Modifier
 @Composable
 fun AppScaffold(
     modifier: Modifier = Modifier,
-    topBar: @Composable () -> Unit,
-    bottomBar: @Composable () -> Unit,
-    floatingActionButton: @Composable () -> Unit,
+    topBar: @Composable () -> Unit = {},
+    bottomBar: @Composable () -> Unit = {},
+    floatingActionButton: @Composable () -> Unit = {},
     content: @Composable (PaddingValues) -> Unit
 ) {
     Scaffold(
