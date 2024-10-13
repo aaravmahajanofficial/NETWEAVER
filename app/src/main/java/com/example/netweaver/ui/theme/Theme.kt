@@ -26,11 +26,13 @@ private val LightColorScheme = lightColorScheme(
     primary = netweaverBlue,
     onPrimary = Color.White,
     background = netweaverLightGray,
-    onBackground = Color(0xFF1F1F1F),
+    onBackground = Color.Black,
     surface = Color.White,
-    onSurface = Color(0xFF1F1F1F),
-    secondary = Color(0xFFEDF3F7),
-    onSecondary = netweaverMediumGray
+    onSurface = Color.Black,
+    secondary = Color(0xFFedf3f8),
+    onSecondary = Color.Black,
+    tertiary = netweaverMediumGray,
+    onTertiary = Color(0x99000000)
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
