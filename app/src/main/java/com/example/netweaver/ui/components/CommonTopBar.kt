@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -19,6 +20,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,6 +35,7 @@ import com.example.netweaver.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommonTopBar(
+    scrollBehavior: TopAppBarScrollBehavior,
     title: String? = null,
     showBack: Boolean = true,
     actions: @Composable RowScope.() -> Unit = {},
@@ -42,6 +45,7 @@ fun CommonTopBar(
     var searchQuery by remember { mutableStateOf("") }
 
     CenterAlignedTopAppBar(
+        scrollBehavior = scrollBehavior,
         title = {
             if (title != null) {
                 Text(
@@ -50,17 +54,17 @@ fun CommonTopBar(
                 )
             } else {
 
+                // Search Bar
                 Box(
                     modifier = Modifier.padding(
                         start = 10.dp,
-                        end = 10.dp,
-                        top = 2.dp,
-                        bottom = 2.dp
-                    )
+                        end = 8.dp
+                    ),
+                    contentAlignment = Alignment.Center
                 ) {
                     Row(
                         modifier = Modifier
-                            .height(32.dp)
+                            .height(36.dp)
                             .fillMaxWidth()
                             .background(
                                 MaterialTheme.colorScheme.secondaryContainer,
@@ -73,7 +77,7 @@ fun CommonTopBar(
                         Icon(
                             painterResource(R.drawable.search),
                             contentDescription = null,
-                            modifier = Modifier.size(18.dp),
+                            modifier = Modifier.size(16.dp),
                             tint = MaterialTheme.colorScheme.tertiary
                         )
 
@@ -107,7 +111,11 @@ fun CommonTopBar(
         navigationIcon = {
             if (showBack) {
                 IconButton(onClick = {}) {
-                    Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = null)
+                    Icon(
+                        Icons.AutoMirrored.Default.ArrowBack,
+                        contentDescription = null,
+                        modifier = Modifier.padding(start = 12.dp)
+                    )
                 }
             } else {
                 Box(modifier = Modifier.padding(start = 12.dp)) {
@@ -118,7 +126,9 @@ fun CommonTopBar(
 
         actions = {
             Row(
-                modifier = Modifier.padding(end = 6.dp),
+                modifier = Modifier
+                    .padding(end = 6.dp)
+                    .fillMaxHeight(),
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically,
                 content = actions
