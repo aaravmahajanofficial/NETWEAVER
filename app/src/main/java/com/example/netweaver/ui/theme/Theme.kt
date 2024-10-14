@@ -23,8 +23,11 @@ private val DarkColorScheme = darkColorScheme(
     surface = Color(0xFF1b1f23),
     onSurface = Color(0xE6FFFFFF),
 
-    //hyperlinks, numbers etc.
+    // hyperlinks, numbers etc.
     secondary = Color(0xff71b7fb),
+
+    // search bar
+    secondaryContainer = Color(0xFF38434f),
 
     // search bar icon & placeholder text, buttons, extra details
     tertiary = Color(0xBFFFFFFF),
@@ -43,8 +46,11 @@ private val LightColorScheme = lightColorScheme(
     surface = Color.White,
     onSurface = Color(0xE6000000),
 
-    //hyperlinks, numbers etc.
+    // hyperlinks, numbers etc.
     secondary = Color(0xFF0a66c2),
+
+    // search bar
+    secondaryContainer = Color(0xFFedf3f8),
 
     // search bar icon & placeholder text, buttons, extra details
     tertiary = Color(0xBF000000),

@@ -63,7 +63,7 @@ fun CommonTopBar(
                             .height(32.dp)
                             .fillMaxWidth()
                             .background(
-                                MaterialTheme.colorScheme.secondary,
+                                MaterialTheme.colorScheme.secondaryContainer,
                                 RoundedCornerShape(4.dp)
                             )
                             .padding(horizontal = 6.dp),
