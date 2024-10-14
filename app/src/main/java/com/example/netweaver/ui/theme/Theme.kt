@@ -12,37 +12,43 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = netweaverBlue,
-    onPrimary = Color.White,
+    primary = Color(0xff0a66c2),
+    onPrimary = Color(0xE6FFFFFF),
+
+    // background of the whole container
     background = Color.Black,
-    onBackground = Color.White,
-    surface = netweaverDarkGray,
-    onSurface = Color.White,
-    secondary = Color(0xFF39434F),
-    onSecondary = netweaverMediumGray
+    onBackground = Color(0xE6FFFFFF),
+
+    // posts
+    surface = Color(0xFF1b1f23),
+    onSurface = Color(0xE6FFFFFF),
+
+    //hyperlinks, numbers etc.
+    secondary = Color(0xff71b7fb),
+
+    // search bar icon & placeholder text, buttons, extra details
+    tertiary = Color(0xBFFFFFFF),
+    onTertiary = Color(0x99FFFFFF)
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = netweaverBlue,
+    primary = Color(0xFF0a66c2),
     onPrimary = Color.White,
-    background = netweaverLightGray,
-    onBackground = Color.Black,
-    surface = Color.White,
-    onSurface = Color.Black,
-    secondary = Color(0xFFedf3f8),
-    onSecondary = Color.Black,
-    tertiary = netweaverMediumGray,
-    onTertiary = Color(0x99000000)
 
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    // background of the whole container
+    background = Color(0xFFf4f2ee),
+    onBackground = Color(0xE6000000),
+
+    // posts
+    surface = Color.White,
+    onSurface = Color(0xE6000000),
+
+    //hyperlinks, numbers etc.
+    secondary = Color(0xFF0a66c2),
+
+    // search bar icon & placeholder text, buttons, extra details
+    tertiary = Color(0xBF000000),
+    onTertiary = Color(0x99000000)
 )
 
 @Composable
