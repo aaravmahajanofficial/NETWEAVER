@@ -53,7 +53,7 @@ private val LightColorScheme = lightColorScheme(
     secondaryContainer = Color(0xFFedf3f8),
 
     // search bar icon & placeholder text, buttons, extra details
-    tertiary = Color(0xBF000000),
+    tertiary = Color(0xFF161718),
     onTertiary = Color(0x99000000)
 )
 
