@@ -28,6 +28,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.netweaver.R
 
 @Composable
@@ -125,14 +126,17 @@ fun PostCard(
                         imageVector = Icons.Sharp.Add,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(22.dp)
+                        modifier = Modifier.size(20.dp)
                     )
 
                     Spacer(modifier = Modifier.width(4.dp))
 
                     Text(
                         text = "Follow",
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.titleSmall.copy(
+                            fontWeight = FontWeight.W500,
+                            fontSize = 15.sp
+                        ),
                         color = MaterialTheme.colorScheme.primary
                     )
 
