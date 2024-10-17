@@ -2,6 +2,7 @@ package com.example.netweaver.ui.features.home.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,6 +22,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,7 +33,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.netweaver.R
 
 @Composable
@@ -60,7 +64,7 @@ fun PostCard(
             ) {
                 Row(
                     modifier = Modifier.weight(1f),
-                    verticalAlignment = Alignment.CenterVertically,
+                    verticalAlignment = Alignment.Top,
                 ) {
                     Box(
                         modifier = Modifier
@@ -71,6 +75,7 @@ fun PostCard(
 
                     Column(
                         modifier = Modifier
+                            .weight(1f)
                             .padding(start = 8.dp, end = 16.dp),
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.Start
@@ -114,42 +119,40 @@ fun PostCard(
                         }
 
                     }
+
+                    Row(
+                        modifier = Modifier,
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+
+                        Icon(
+                            imageVector = Icons.Sharp.Add,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(20.dp)
+                        )
+
+                        Spacer(modifier = Modifier.width(4.dp))
+
+                        Text(
+                            text = "Follow",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.W500
+                            ),
+                            color = MaterialTheme.colorScheme.primary
+                        )
+
+                    }
                 }
 
-                Row(
-                    modifier = Modifier,
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-
-                    Icon(
-                        imageVector = Icons.Sharp.Add,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(20.dp)
-                    )
-
-                    Spacer(modifier = Modifier.width(4.dp))
-
-                    Text(
-                        text = "Follow",
-                        style = MaterialTheme.typography.titleSmall.copy(
-                            fontWeight = FontWeight.W500,
-                            fontSize = 15.sp
-                        ),
-                        color = MaterialTheme.colorScheme.primary
-                    )
-
-                }
             }
 
             Spacer(modifier = Modifier.height(12.dp))
 
             // Content
-            Text(
-                "If Ipsum is simply dummy text of make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop shares approachable like Aldus PageMaker including versions of Lorem Ipsum.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface
+            ExpandableText(
+                text = "If Ipsum is simply dummy text of make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop shares approachable like Aldus PageMaker including versions of Lorem Ipsum."
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -269,5 +272,32 @@ fun ReactionButton(id: Int, title: String) {
         )
 
     }
+
+}
+
+@Composable
+fun ExpandableText(
+    text: String,
+) {
+
+    var isExpanded by remember { mutableStateOf(false) }
+    var needsExpansion by remember { mutableStateOf(false) }
+
+    Text(
+        text = text,
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurface,
+        maxLines = if (isExpanded) Int.MAX_VALUE else 2,
+        overflow = TextOverflow.Ellipsis,
+        onTextLayout = { textLayoutResult ->
+            needsExpansion = textLayoutResult.hasVisualOverflow
+        },
+        modifier = Modifier.clickable {
+            if (needsExpansion) {
+                isExpanded = !isExpanded
+            }
+        }
+    )
+
 
 }
