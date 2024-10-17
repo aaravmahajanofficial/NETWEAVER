@@ -41,7 +41,7 @@ private val LightColorScheme = lightColorScheme(
     onPrimary = Color.White,
 
     // background of the whole container
-    background = Color(0xFFf4f2ee),
+    background = Color(0xFFe9e5df),
     onBackground = Color(0xE6000000),
 
     // posts
@@ -58,8 +58,7 @@ private val LightColorScheme = lightColorScheme(
     tertiary = Color(0xFF161718),
     onTertiary = Color(0x99000000),
 
-    outline = Color(0xFFebebeb)
-
+    outline = Color(0xFFe8e8e8)
 
 )
 
