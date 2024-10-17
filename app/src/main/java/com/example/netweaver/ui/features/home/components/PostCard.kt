@@ -212,10 +212,10 @@ fun PostCard(
             Spacer(modifier = Modifier.height(14.dp))
 
             HorizontalDivider(
-                color = Color(0xFFebebeb)
+                color = MaterialTheme.colorScheme.outline
             )
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
             // Like, Comment, Repost, Send
             Row(
@@ -251,7 +251,7 @@ fun ReactionButton(id: Int, title: String) {
             painter = painterResource(id),
             contentDescription = null,
             tint = MaterialTheme.colorScheme.tertiary,
-            modifier = Modifier.size(18.dp)
+            modifier = Modifier.size(16.dp)
         )
 
         Spacer(modifier = Modifier.height(2.dp))

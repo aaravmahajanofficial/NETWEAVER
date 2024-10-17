@@ -31,7 +31,9 @@ private val DarkColorScheme = darkColorScheme(
 
     // search bar icon & placeholder text, buttons, extra details
     tertiary = Color(0xBFFFFFFF),
-    onTertiary = Color(0x99FFFFFF)
+    onTertiary = Color(0x99FFFFFF),
+
+    outline = Color(0xFF2a2e31)
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -54,7 +56,11 @@ private val LightColorScheme = lightColorScheme(
 
     // search bar icon & placeholder text, buttons, extra details
     tertiary = Color(0xFF161718),
-    onTertiary = Color(0x99000000)
+    onTertiary = Color(0x99000000),
+
+    outline = Color(0xFFebebeb)
+
+
 )
 
 @Composable
