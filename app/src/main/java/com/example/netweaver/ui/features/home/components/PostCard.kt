@@ -41,7 +41,7 @@ fun PostCard(
 
     Surface(
         modifier = Modifier
-            .padding(top = 6.dp)
+            .padding(top = 8.dp)
             .fillMaxWidth(),
         color = MaterialTheme.colorScheme.surface
 
@@ -64,7 +64,7 @@ fun PostCard(
             ) {
                 Row(
                     modifier = Modifier.weight(1f),
-                    verticalAlignment = Alignment.Top,
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Box(
                         modifier = Modifier
@@ -219,7 +219,8 @@ fun PostCard(
             Spacer(modifier = Modifier.height(14.dp))
 
             HorizontalDivider(
-                color = MaterialTheme.colorScheme.outline
+                color = MaterialTheme.colorScheme.outline,
+                thickness = 0.6.dp
             )
 
             Spacer(modifier = Modifier.height(6.dp))
