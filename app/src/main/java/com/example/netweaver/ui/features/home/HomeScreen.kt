@@ -1,9 +1,7 @@
 package com.example.netweaver.ui.features.home
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -35,20 +33,14 @@ private fun HomeContent(
     paddingValues: PaddingValues,
 ) {
 
-    Box(
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(paddingValues)
     ) {
-        LazyColumn(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-
-            item {
-                PostCard()
-            }
+        items(5) {
+            PostCard()
         }
     }
-
 
 }
