@@ -29,7 +29,7 @@ fun CommonBottomBar(
         )
         BottomAppBar(
             modifier = Modifier
-                .height(56.dp),
+                .height(58.dp),
             tonalElevation = 0.dp,
             containerColor = MaterialTheme.colorScheme.surface,
             actions = {
