@@ -13,7 +13,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -21,7 +20,6 @@ fun CommonBottomBar(
     actions: @Composable RowScope. () -> Unit = {}
 ) {
 
-    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -30,7 +28,8 @@ fun CommonBottomBar(
             color = MaterialTheme.colorScheme.outline,
         )
         BottomAppBar(
-            modifier = Modifier.height(screenHeight / 10.25f),
+            modifier = Modifier
+                .height(56.dp),
             tonalElevation = 0.dp,
             containerColor = MaterialTheme.colorScheme.surface,
             actions = {
