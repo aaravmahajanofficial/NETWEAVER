@@ -94,214 +94,237 @@ private fun JobsContent(paddingValues: PaddingValues) {
                         verticalArrangement = Arrangement.SpaceBetween
                     ) {
                         // Header
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            verticalAlignment = Alignment.Top,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Row(
-                                modifier = Modifier,
-                                horizontalArrangement = Arrangement.SpaceEvenly
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(64.dp)
-                                        .background(
-                                            color = Color.Black,
-                                            shape = RoundedCornerShape(4.dp)
-                                        )
-                                        .clip(RoundedCornerShape(4.dp))
-                                )
-
-                                Column(
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp),
-                                    horizontalAlignment = Alignment.Start,
-                                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
-                                    Text(
-                                        "UI/UX Designer",
-                                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
-                                        color = MaterialTheme.colorScheme.onBackground,
-                                    )
-
-                                    Text(
-                                        "Athena Infomics",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onBackground,
-                                    )
-                                }
-                            }
-
-                            Row(
-                                modifier = Modifier.padding(vertical = 8.dp),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    painterResource(R.drawable.bookmark),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(24.dp),
-                                    tint = MaterialTheme.colorScheme.tertiary
-                                )
-
-                                Icon(
-                                    painterResource(R.drawable.cancel),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(24.dp),
-                                    tint = MaterialTheme.colorScheme.tertiary
-                                )
-
-                            }
-                        }
+                        Header(title = "UI/UX Designer", companyName = "Athena Infomics")
 
                         // Body
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-
-                            Row(
-                                modifier = Modifier,
-                                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-
-                                Icon(
-                                    painterResource(R.drawable.location),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(18.dp),
-                                    tint = MaterialTheme.colorScheme.onTertiary
-                                )
-
-                                Text(
-                                    "Chennai (Remote)",
-                                    style = MaterialTheme.typography.labelMedium.copy(letterSpacing = 0.1.sp),
-                                    color = MaterialTheme.colorScheme.onTertiary,
-                                )
-
-
-                            }
-
-
-                            Row(
-                                modifier = Modifier,
-                                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-
-                                Icon(
-                                    painterResource(R.drawable.trip),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(18.dp),
-                                    tint = MaterialTheme.colorScheme.onTertiary
-                                )
-
-                                Text(
-                                    "0-1 yrs",
-                                    style = MaterialTheme.typography.labelMedium.copy(letterSpacing = 0.1.sp),
-                                    color = MaterialTheme.colorScheme.onTertiary,
-                                )
-
-                            }
-
-                            Row(
-                                modifier = Modifier,
-                                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-
-                                Icon(
-                                    painterResource(R.drawable.ruppee),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(18.dp),
-                                    tint = MaterialTheme.colorScheme.onTertiary
-                                )
-
-                                Text(
-                                    "3-8 Lacs PA",
-                                    style = MaterialTheme.typography.labelMedium.copy(letterSpacing = 0.1.sp),
-                                    color = MaterialTheme.colorScheme.onTertiary,
-                                )
-
-                            }
-
-                        }
+                        Body(
+                            location = "Chennai (Remote)",
+                            experience = "0-1 yrs",
+                            salary = "3-8 Lacs PA"
+                        )
 
                         // Footer
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-
-//                            Row(
-//                                modifier = Modifier,
-//                                horizontalArrangement = Arrangement.spacedBy(6.dp),
-//                                verticalAlignment = Alignment.CenterVertically
-//                            ) {
-//
-//                                Icon(
-//                                    painterResource(R.drawable.link),
-//                                    contentDescription = null,
-//                                    modifier = Modifier.size(18.dp),
-//                                    tint = MaterialTheme.colorScheme.onTertiary
-//                                )
-//
-//                                Text(
-//                                    "Direct Apply",
-//                                    style = MaterialTheme.typography.labelLarge.copy(
-//                                        letterSpacing = 0.1.sp,
-//                                        fontWeight = FontWeight.W600
-//                                    ),
-//                                    color = MaterialTheme.colorScheme.onTertiary,
-//                                )
-//
-//
-//                            }
-
-                            Row(
-                                modifier = Modifier,
-                                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-
-                                Image(
-                                    painterResource(R.drawable.logo),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(18.dp),
-                                )
-
-                                Text(
-                                    "Easy Apply",
-                                    style = MaterialTheme.typography.labelLarge.copy(
-                                        letterSpacing = 0.1.sp,
-                                        fontWeight = FontWeight.W600
-                                    ),
-                                    color = MaterialTheme.colorScheme.primary,
-                                )
-
-
-                            }
-
-                            Text(
-                                "1hour ago",
-                                style = MaterialTheme.typography.labelMedium.copy(
-                                    letterSpacing = 0.1.sp
-                                ),
-                                color = MaterialTheme.colorScheme.onTertiary,
-                            )
-
-
-                        }
-
+                        Footer(
+                            isEasy = false,
+                            time = "1hour ago"
+                        )
 
                     }
 
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun Header(
+    title: String,
+    companyName: String
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.Top,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Row(
+            modifier = Modifier,
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(64.dp)
+                    .background(
+                        color = Color.Black,
+                        shape = RoundedCornerShape(4.dp)
+                    )
+                    .clip(RoundedCornerShape(4.dp))
+            )
+
+            Column(
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp),
+                horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    title,
+                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
+                    color = MaterialTheme.colorScheme.onBackground,
+                )
+
+                Text(
+                    companyName,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onBackground,
+                )
+            }
+        }
+
+        Row(
+            modifier = Modifier.padding(vertical = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                painterResource(R.drawable.bookmark),
+                contentDescription = null,
+                modifier = Modifier.size(24.dp),
+                tint = MaterialTheme.colorScheme.tertiary
+            )
+
+            Icon(
+                painterResource(R.drawable.cancel),
+                contentDescription = null,
+                modifier = Modifier.size(24.dp),
+                tint = MaterialTheme.colorScheme.tertiary
+            )
+
+        }
+    }
+}
+
+
+@Composable
+private fun Body(
+    location: String,
+    experience: String,
+    salary: String
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        Row(
+            modifier = Modifier,
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            Icon(
+                painterResource(R.drawable.location),
+                contentDescription = null,
+                modifier = Modifier.size(18.dp),
+                tint = MaterialTheme.colorScheme.onTertiary
+            )
+
+            Text(
+                location,
+                style = MaterialTheme.typography.labelMedium.copy(letterSpacing = 0.1.sp),
+                color = MaterialTheme.colorScheme.onTertiary,
+            )
+
+
+        }
+
+
+        Row(
+            modifier = Modifier,
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            Icon(
+                painterResource(R.drawable.trip),
+                contentDescription = null,
+                modifier = Modifier.size(18.dp),
+                tint = MaterialTheme.colorScheme.onTertiary
+            )
+
+            Text(
+                experience,
+                style = MaterialTheme.typography.labelMedium.copy(letterSpacing = 0.1.sp),
+                color = MaterialTheme.colorScheme.onTertiary,
+            )
+
+        }
+
+        Row(
+            modifier = Modifier,
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            Icon(
+                painterResource(R.drawable.ruppee),
+                contentDescription = null,
+                modifier = Modifier.size(18.dp),
+                tint = MaterialTheme.colorScheme.onTertiary
+            )
+
+            Text(
+                salary,
+                style = MaterialTheme.typography.labelMedium.copy(letterSpacing = 0.1.sp),
+                color = MaterialTheme.colorScheme.onTertiary,
+            )
+
+        }
+
+    }
+}
+
+@Composable
+private fun Footer(
+    isEasy: Boolean,
+    time: String,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(
+            modifier = Modifier,
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            if (!isEasy) {
+                Icon(
+                    painterResource(R.drawable.link),
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp),
+                    tint = Color.Magenta
+                )
+
+                Text(
+                    "Direct Apply",
+                    style = MaterialTheme.typography.labelLarge.copy(
+                        letterSpacing = 0.1.sp,
+                        fontWeight = FontWeight.W600
+                    ),
+                    color = Color.Magenta
+                )
+
+            } else {
+                Image(
+                    painterResource(R.drawable.logo),
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp),
+                )
+                Text(
+                    "Easy Apply",
+                    style = MaterialTheme.typography.labelLarge.copy(
+                        letterSpacing = 0.1.sp,
+                        fontWeight = FontWeight.W600
+                    ),
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+
+
+        }
+
+        Text(
+            time,
+            style = MaterialTheme.typography.labelMedium.copy(
+                letterSpacing = 0.1.sp
+            ),
+            color = MaterialTheme.colorScheme.onTertiary,
+        )
+
+
     }
 }
