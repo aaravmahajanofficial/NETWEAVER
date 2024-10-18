@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -27,8 +26,7 @@ fun CommonBottomBar(
             color = MaterialTheme.colorScheme.outline,
         )
         BottomAppBar(
-            modifier = Modifier
-                .height(64.dp),
+            modifier = Modifier,
             tonalElevation = 0.dp,
             containerColor = MaterialTheme.colorScheme.surface,
             actions = {
