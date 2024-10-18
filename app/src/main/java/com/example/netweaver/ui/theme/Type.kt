@@ -143,7 +143,7 @@ val Typography = Typography(
     labelSmall = TextStyle(
         fontFamily = Inter,
         fontWeight = FontWeight.Medium,
-        fontSize = 11.sp,
+        fontSize = 10.sp,
         lineHeight = 16.sp,
         letterSpacing = 0.5.sp
     )
