@@ -1,6 +1,7 @@
 package com.example.netweaver.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -10,10 +11,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -28,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.netweaver.R
@@ -39,7 +40,7 @@ fun CommonTopBar(
     title: String? = null,
     showBack: Boolean = true,
     actions: @Composable RowScope.() -> Unit = {},
-    avatar: @Composable (() -> Unit) = {}
+    onClick: () -> Unit = {},
 ) {
 
     var searchQuery by remember { mutableStateOf("") }
@@ -57,7 +58,7 @@ fun CommonTopBar(
                 // Search Bar
                 Box(
                     modifier = Modifier.padding(
-                        start = 10.dp,
+                        start = 8.dp,
                         end = 8.dp
                     ),
                     contentAlignment = Alignment.Center
@@ -110,17 +111,32 @@ fun CommonTopBar(
         },
         navigationIcon = {
             if (showBack) {
-                IconButton(onClick = {}) {
+                IconButton(
+                    modifier = Modifier
+                        .padding(start = 12.dp)
+                        .size(24.dp),
+                    onClick = {
+                        onClick()
+                    }) {
                     Icon(
-                        Icons.AutoMirrored.Default.ArrowBack,
+                        painterResource(R.drawable.left_arrow),
                         contentDescription = null,
-                        modifier = Modifier.padding(start = 12.dp)
+                        tint = MaterialTheme.colorScheme.tertiary
                     )
                 }
             } else {
-                Box(modifier = Modifier.padding(start = 12.dp)) {
-                    avatar()
-                }
+                Box(
+                    modifier = Modifier
+                        .padding(start = 12.dp)
+                        .background(
+                            shape = CircleShape,
+                            color = colorResource(R.color.black)
+                        )
+                        .size(32.dp)
+                        .clickable {
+                            onClick()
+                        }
+                )
             }
         },
 

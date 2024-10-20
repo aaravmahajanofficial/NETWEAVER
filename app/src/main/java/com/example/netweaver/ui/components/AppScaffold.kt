@@ -35,7 +35,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,11 +48,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.example.netweaver.R
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppScaffold(
+    showBack: Boolean = false,
     content: @Composable (PaddingValues) -> Unit,
 ) {
 
@@ -91,7 +90,6 @@ fun AppScaffold(
         TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
 
     val windowInsets = WindowInsets.systemBars
 
@@ -263,36 +261,17 @@ fun AppScaffold(
             topBar = {
                 CommonTopBar(
                     scrollBehavior = scrollBehavior,
-                    showBack = false,
+                    showBack = showBack,
                     actions = {
-
                         Icon(
                             painter = painterResource(R.drawable.message),
                             contentDescription = "Message",
                             modifier = Modifier.size(24.dp),
                             tint = MaterialTheme.colorScheme.tertiary
                         )
-
                     },
-                    avatar = {
-                        Box(
-                            modifier = Modifier
-                                .background(
-                                    shape = CircleShape,
-                                    color = colorResource(R.color.black)
-                                )
-                                .size(32.dp)
-                                .clickable {
-                                    scope.launch {
-                                        drawerState.apply {
-                                            if (isClosed) open() else close()
-                                        }
-                                    }
-                                }
-                        ) {
-
-                        }
-                    })
+                    onClick = {}
+                )
             },
             bottomBar = {
                 CommonBottomBar(
