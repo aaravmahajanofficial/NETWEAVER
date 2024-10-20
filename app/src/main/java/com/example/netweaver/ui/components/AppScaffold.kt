@@ -28,9 +28,8 @@ import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberDrawerState
-import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -53,6 +52,8 @@ import com.example.netweaver.R
 @Composable
 fun AppScaffold(
     showBack: Boolean = false,
+    scrollBehavior: TopAppBarScrollBehavior,
+    showBottomAppBar: Boolean = true,
     content: @Composable (PaddingValues) -> Unit,
 ) {
 
@@ -85,9 +86,6 @@ fun AppScaffold(
     )
 
     var selectedItem by remember { mutableStateOf(navItems[0]) }
-
-    val scrollBehavior =
-        TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
@@ -274,15 +272,19 @@ fun AppScaffold(
                 )
             },
             bottomBar = {
-                CommonBottomBar(
-                    actions = {
-                        navItems.forEach { item ->
-                            CustomBarItem(item.copy(isSelected = item == selectedItem), onClick = {
-                                selectedItem = item
-                            })
+                if (showBottomAppBar) {
+                    CommonBottomBar(
+                        actions = {
+                            navItems.forEach { item ->
+                                CustomBarItem(
+                                    item.copy(isSelected = item == selectedItem),
+                                    onClick = {
+                                        selectedItem = item
+                                    })
+                            }
                         }
-                    }
-                )
+                    )
+                }
             },
             floatingActionButton = {}
         ) { paddingValues ->
