@@ -2,7 +2,6 @@ package com.example.netweaver.ui.features.home.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,10 +21,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.netweaver.R
+import com.example.netweaver.utils.ExpandableText
 
 @Composable
 fun PostCard(
@@ -276,29 +272,3 @@ fun ReactionButton(id: Int, title: String) {
 
 }
 
-@Composable
-fun ExpandableText(
-    text: String,
-) {
-
-    var isExpanded by remember { mutableStateOf(false) }
-    var needsExpansion by remember { mutableStateOf(false) }
-
-    Text(
-        text = text,
-        style = MaterialTheme.typography.bodyMedium,
-        color = MaterialTheme.colorScheme.onSurface,
-        maxLines = if (isExpanded) Int.MAX_VALUE else 2,
-        overflow = TextOverflow.Ellipsis,
-        onTextLayout = { textLayoutResult ->
-            needsExpansion = textLayoutResult.hasVisualOverflow
-        },
-        modifier = Modifier.clickable {
-            if (needsExpansion) {
-                isExpanded = !isExpanded
-            }
-        }
-    )
-
-
-}
