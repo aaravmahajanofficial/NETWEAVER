@@ -16,15 +16,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
@@ -35,8 +35,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.netweaver.R
 import com.example.netweaver.ui.components.AppScaffold
 import com.example.netweaver.utils.ExpandableText
@@ -113,7 +113,7 @@ private fun ProfileContent(paddingValues: PaddingValues) {
                                     color = MaterialTheme.colorScheme.surface
                                 )
                                 .size(120.dp)
-                                .padding(3.dp)
+                                .padding(4.dp)
                                 .clip(shape = CircleShape)
                         )
                     }
@@ -192,7 +192,10 @@ private fun ProfileContent(paddingValues: PaddingValues) {
                     ) {
                         Text(
                             "About",
-                            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.W600),
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.W600,
+                                fontSize = 20.sp
+                            ),
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Icon(
@@ -203,7 +206,7 @@ private fun ProfileContent(paddingValues: PaddingValues) {
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(18.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
 
                     ExpandableText(
                         text = "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).",
@@ -232,40 +235,97 @@ private fun ProfileContent(paddingValues: PaddingValues) {
                 ) {
 
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(
-                            "Activity",
-                            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.W600),
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        Text(
-                            "View all",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.secondary,
-                            textDecoration = TextDecoration.Underline
-                        )
+                        Column(
+                            modifier = Modifier,
+                            horizontalAlignment = Alignment.Start,
+                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Text(
+                                "Activity",
+                                style = MaterialTheme.typography.titleLarge.copy(
+                                    fontWeight = FontWeight.W600,
+                                    fontSize = 20.sp
+                                ),
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                "6,046 followers",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                        Row(
+                            modifier = Modifier,
+                            horizontalArrangement = Arrangement.spacedBy(24.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        color = MaterialTheme.colorScheme.surface,
+                                        shape = CircleShape
+                                    )
+                                    .border(
+                                        1.dp,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        shape = CircleShape
+                                    )
+                                    .height(32.dp)
+                                    .width(120.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+
+                                Text(
+                                    "Create a post",
+                                    style = MaterialTheme.typography.labelLarge,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+
+                            }
+
+                            Icon(
+                                painter = painterResource(R.drawable.pencil),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.tertiary,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
 
-                    TextButton(
-                        onClick = {},
-                        colors = ButtonDefaults.textButtonColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            contentColor = MaterialTheme.colorScheme.onPrimary
-                        ),
-                        modifier = Modifier.fillMaxWidth()
+                    HorizontalDivider(
+                        color = MaterialTheme.colorScheme.outline
+                    )
+
+                    Spacer(modifier = Modifier.height(18.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
                     ) {
-
                         Text(
-                            "Create a new post",
+                            "Show all posts",
                             style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.onBackground
                         )
 
+                        Spacer(modifier = Modifier.width(4.dp))
+
+                        Icon(
+                            painter = painterResource(R.drawable.right_arrow),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.tertiary,
+                            modifier = Modifier.size(14.dp)
+                        )
                     }
+
 
                 }
 
@@ -296,7 +356,10 @@ private fun ProfileContent(paddingValues: PaddingValues) {
 
                         Text(
                             "Experience",
-                            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.W600),
+                            style = MaterialTheme.typography.titleLarge.copy(
+                                fontWeight = FontWeight.W600,
+                                fontSize = 20.sp
+                            ),
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Row(
