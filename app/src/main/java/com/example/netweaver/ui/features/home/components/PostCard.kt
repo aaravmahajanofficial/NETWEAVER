@@ -79,13 +79,13 @@ fun PostCard(
 
                         Text(
                             text = "Deepinder Goyal",
-                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.W600),
+                            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.W600),
                             color = MaterialTheme.colorScheme.onSurface
                         )
-                        Spacer(modifier = Modifier.height(4.dp))
+                        Spacer(modifier = Modifier.height(2.dp))
 
                         Text(
-                            text = "Building Zomato",
+                            text = "LinkedIn Strategist | B2B email marketing | Working with Global",
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onTertiary,
                             maxLines = 1,
@@ -108,7 +108,7 @@ fun PostCard(
                             Icon(
                                 painter = painterResource(R.drawable.earth),
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onTertiary,
+                                tint = MaterialTheme.colorScheme.tertiary,
                                 modifier = Modifier.size(12.dp)
                             )
 
