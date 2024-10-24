@@ -16,7 +16,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -25,8 +28,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.example.netweaver.R
 import com.example.netweaver.ui.components.AppScaffold
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,6 +40,26 @@ fun MessagesScreen() {
     AppScaffold(
         showBack = true,
         showBottomAppBar = false,
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {},
+                shape = CircleShape,
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+                elevation = FloatingActionButtonDefaults.elevation(5.dp),
+                modifier = Modifier
+                    .padding(bottom = 32.dp)
+            ) {
+
+                Icon(
+                    painter = painterResource(R.drawable.create_new_message),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(24.dp)
+                )
+
+            }
+        },
         scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState()),
         content = { innerPadding ->
             MessagesContent(
@@ -61,7 +86,7 @@ private fun MessagesContent(paddingValues: PaddingValues) {
                 .padding(top = 4.dp)
                 .fillMaxSize()
         ) {
-            items(5) {
+            items(10) {
 
                 Row(
                     modifier = Modifier
@@ -97,7 +122,7 @@ private fun MessagesContent(paddingValues: PaddingValues) {
                                     .fillMaxWidth()
                                     .padding(end = 12.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
+                                verticalAlignment = Alignment.Top
                             ) {
                                 Text(
                                     "Deepinder Goyal",
@@ -109,13 +134,13 @@ private fun MessagesContent(paddingValues: PaddingValues) {
                                 Text(
                                     "Now",
                                     maxLines = 1,
-                                    style = MaterialTheme.typography.bodyMedium,
+                                    style = MaterialTheme.typography.titleSmall,
                                     color = MaterialTheme.colorScheme.onTertiary
                                 )
                             }
 
                             Text(
-                                "Building Zomato",
+                                "Sponsored • Unlock new Opportunities in the country UK, USA",
                                 style = MaterialTheme.typography.bodySmall,
                                 maxLines = 2,
                                 overflow = TextOverflow.Ellipsis,

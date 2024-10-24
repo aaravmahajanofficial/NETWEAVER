@@ -55,6 +55,7 @@ fun AppScaffold(
     scrollBehavior: TopAppBarScrollBehavior,
     showBottomAppBar: Boolean = true,
     content: @Composable (PaddingValues) -> Unit,
+    floatingActionButton: @Composable (() -> Unit) = {}
 ) {
 
     val navItems = listOf(
@@ -286,7 +287,9 @@ fun AppScaffold(
                     )
                 }
             },
-            floatingActionButton = {}
+            floatingActionButton = {
+                floatingActionButton()
+            }
         ) { paddingValues ->
             content(paddingValues)
 
