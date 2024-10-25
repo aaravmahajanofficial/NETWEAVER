@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -274,17 +275,37 @@ fun AppScaffold(
             },
             bottomBar = {
                 if (showBottomAppBar) {
-                    CommonBottomBar(
-                        actions = {
-                            navItems.forEach { item ->
-                                CustomBarItem(
-                                    item.copy(isSelected = item == selectedItem),
-                                    onClick = {
-                                        selectedItem = item
-                                    })
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ) {
+                        HorizontalDivider(
+                            color = MaterialTheme.colorScheme.outline,
+                        )
+                        BottomAppBar(
+                            modifier = Modifier
+                                .height(58.dp),
+                            tonalElevation = 0.dp,
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            actions = {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxSize(),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceAround,
+                                ) {
+                                    navItems.forEach { item ->
+                                        CustomBarItem(
+                                            item.copy(isSelected = item == selectedItem),
+                                            onClick = {
+                                                selectedItem = item
+                                            })
+                                    }
+                                }
                             }
-                        }
-                    )
+                        )
+                    }
                 }
             },
             floatingActionButton = {

@@ -61,7 +61,7 @@ fun MyNetworkScreen() {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun MyNetworkContent(
+private fun MyNetworkContent(
     paddingValues: PaddingValues
 ) {
 
