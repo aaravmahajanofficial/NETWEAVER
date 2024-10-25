@@ -43,7 +43,7 @@ import com.example.netweaver.ui.components.AppScaffold
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyNetwork() {
+fun MyNetworkScreen() {
 
     AppScaffold(
         scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState()),
