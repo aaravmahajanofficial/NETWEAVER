@@ -5,7 +5,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -35,11 +34,10 @@ import com.example.netweaver.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CommonTopBar(
+fun TopAppBar(
     scrollBehavior: TopAppBarScrollBehavior,
     title: String? = null,
     showBack: Boolean = true,
-    actions: @Composable RowScope.() -> Unit = {},
     onClick: () -> Unit = {},
 ) {
 
@@ -147,8 +145,14 @@ fun CommonTopBar(
                     .fillMaxHeight(),
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically,
-                content = actions
-            )
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.message),
+                    contentDescription = "Message",
+                    modifier = Modifier.size(24.dp),
+                    tint = MaterialTheme.colorScheme.tertiary
+                )
+            }
         },
     )
 

@@ -48,6 +48,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.example.netweaver.R
+import com.example.netweaver.navigation.Routes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,27 +64,32 @@ fun AppScaffold(
         BottomItem(
             icon = painterResource(R.drawable.home),
             selectedIcon = painterResource(R.drawable.selected_home),
-            label = "Home"
+            label = "Home",
+            route = Routes.Home.route
         ),
         BottomItem(
             icon = painterResource(R.drawable.my_network),
             selectedIcon = painterResource(R.drawable.selected_my_network),
-            label = "My Network"
+            label = "My Network",
+            route = Routes.MyNetwork.route
         ),
         BottomItem(
             icon = painterResource(R.drawable.create),
             selectedIcon = painterResource(R.drawable.create),
-            label = "Post"
+            label = "Post",
+            route = Routes.Post.route
         ),
         BottomItem(
             icon = painterResource(R.drawable.notifications),
             selectedIcon = painterResource(R.drawable.selected_notifications),
-            label = "Notifications"
+            label = "Notifications",
+            route = Routes.Notifications.route
         ),
         BottomItem(
             icon = painterResource(R.drawable.jobs),
             selectedIcon = painterResource(R.drawable.selected_jobs),
-            label = "Jobs"
+            label = "Jobs",
+            route = Routes.Jobs.route
         )
     )
 
@@ -259,17 +265,9 @@ fun AppScaffold(
         Scaffold(
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
-                CommonTopBar(
+                TopAppBar(
                     scrollBehavior = scrollBehavior,
                     showBack = showBack,
-                    actions = {
-                        Icon(
-                            painter = painterResource(R.drawable.message),
-                            contentDescription = "Message",
-                            modifier = Modifier.size(24.dp),
-                            tint = MaterialTheme.colorScheme.tertiary
-                        )
-                    },
                     onClick = {}
                 )
             },

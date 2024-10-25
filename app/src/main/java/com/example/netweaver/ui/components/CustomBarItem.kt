@@ -15,6 +15,7 @@ data class BottomItem(
     val icon: Painter,
     val selectedIcon: Painter,
     val label: String,
+    val route: String,
     val isSelected: Boolean = false
 )
 
