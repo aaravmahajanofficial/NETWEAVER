@@ -1,7 +1,9 @@
 package com.example.netweaver.ui.components
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,7 +21,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -27,28 +28,104 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.netweaver.R
+import com.example.netweaver.navigation.LocalAppNavigator
 import com.example.netweaver.navigation.Routes
+
+sealed class BottomNavItem(
+    @DrawableRes val iconRes: Int,
+    @DrawableRes val selectedIconRes: Int,
+    val route: String,
+    val label: String
+) {
+
+    object Home : BottomNavItem(
+        iconRes = R.drawable.home,
+        selectedIconRes = R.drawable.selected_home,
+        route = Routes.Home.route,
+        label = "Home"
+    )
+
+    object MyNetwork : BottomNavItem(
+        iconRes = R.drawable.my_network,
+        selectedIconRes = R.drawable.selected_my_network,
+        route = Routes.MyNetwork.route,
+        label = "My Network"
+    )
+
+    object Post : BottomNavItem(
+        iconRes = R.drawable.post,
+        selectedIconRes = R.drawable.post,
+        route = Routes.Home.route,
+        label = "Post"
+    )
+
+    object Notifications : BottomNavItem(
+        iconRes = R.drawable.notifications,
+        selectedIconRes = R.drawable.selected_notifications,
+        route = Routes.Notifications.route,
+        label = "Notifications"
+    )
+
+    object Jobs : BottomNavItem(
+        iconRes = R.drawable.jobs,
+        selectedIconRes = R.drawable.selected_jobs,
+        route = Routes.Jobs.route,
+        label = "Jobs"
+    )
+
+    companion object {
+        val items = listOf(Home, MyNetwork, Post, Notifications, Jobs)
+    }
+
+    fun navigate(navController: NavController) {
+        when (this) {
+            is Post -> {}
+            else -> {
+                navController.navigate(route) {
+                    // Pop up to the start destination of the graph to
+                    // avoid building up a large stack of destinations
+                    // on the back stack as users select items
+                    popUpTo(navController.graph.findStartDestination().id) {
+                        saveState = true
+                    }
+                    // Avoid multiple copies of the same destination when
+                    // re-selecting the same item
+                    launchSingleTop = true
+                    // Restore state when re-selecting a previously selected item
+                    restoreState = true
+                }
+            }
+        }
+    }
+
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,44 +137,9 @@ fun AppScaffold(
     floatingActionButton: @Composable (() -> Unit) = {}
 ) {
 
-    val navItems = listOf(
-        BottomItem(
-            icon = painterResource(R.drawable.home),
-            selectedIcon = painterResource(R.drawable.selected_home),
-            label = "Home",
-            route = Routes.Home.route
-        ),
-        BottomItem(
-            icon = painterResource(R.drawable.my_network),
-            selectedIcon = painterResource(R.drawable.selected_my_network),
-            label = "My Network",
-            route = Routes.MyNetwork.route
-        ),
-        BottomItem(
-            icon = painterResource(R.drawable.create),
-            selectedIcon = painterResource(R.drawable.create),
-            label = "Post",
-            route = Routes.Post.route
-        ),
-        BottomItem(
-            icon = painterResource(R.drawable.notifications),
-            selectedIcon = painterResource(R.drawable.selected_notifications),
-            label = "Notifications",
-            route = Routes.Notifications.route
-        ),
-        BottomItem(
-            icon = painterResource(R.drawable.jobs),
-            selectedIcon = painterResource(R.drawable.selected_jobs),
-            label = "Jobs",
-            route = Routes.Jobs.route
-        )
-    )
-
-    var selectedItem by remember { mutableStateOf(navItems[0]) }
-
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-
     val windowInsets = WindowInsets.systemBars
+    val navController = LocalAppNavigator.current.controller
 
     ModalNavigationDrawer(
         modifier = Modifier.windowInsetsPadding(windowInsets),
@@ -109,7 +151,10 @@ fun AppScaffold(
                 drawerContainerColor = MaterialTheme.colorScheme.surface
             ) {
 
-                Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.Start) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.Start
+                ) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -273,37 +318,68 @@ fun AppScaffold(
             },
             bottomBar = {
                 if (showBottomAppBar) {
-
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
+                    NavigationBar(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        tonalElevation = 0.dp,
+                        modifier = Modifier.height(58.dp),
                     ) {
-                        HorizontalDivider(
-                            color = MaterialTheme.colorScheme.outline,
-                        )
-                        BottomAppBar(
-                            modifier = Modifier
-                                .height(58.dp),
-                            tonalElevation = 0.dp,
-                            containerColor = MaterialTheme.colorScheme.surface,
-                            actions = {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxSize(),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceAround,
-                                ) {
-                                    navItems.forEach { item ->
-                                        CustomBarItem(
-                                            item.copy(isSelected = item == selectedItem),
-                                            onClick = {
-                                                selectedItem = item
-                                            })
+                        val navBackStackEntry = navController.currentBackStackEntryAsState()
+                        val currentRoute = navBackStackEntry.value?.destination?.route
+
+                        BottomNavItem.items.forEach { item ->
+                            NavigationBarItem(
+                                alwaysShowLabel = true,
+                                icon = {
+                                    Column(
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = Arrangement.Center,
+                                        modifier = Modifier.clickable(
+                                            indication = null,
+                                            interactionSource = remember {
+                                                MutableInteractionSource()
+                                            }) {
+                                            item.navigate(
+                                                navController
+                                            )
+                                        }
+                                    ) {
+                                        Icon(
+                                            painter = if (currentRoute == item.route) painterResource(
+                                                item.selectedIconRes
+                                            ) else painterResource(item.iconRes),
+                                            modifier = Modifier
+                                                .size(24.dp),
+                                            contentDescription = null,
+                                        )
+
+                                        Text(
+                                            text = item.label,
+                                            style = MaterialTheme.typography.labelSmall.copy(
+                                                fontSize = 9.sp
+                                            ),
+                                            overflow = TextOverflow.Ellipsis,
+                                            maxLines = 1,
+                                            textAlign = TextAlign.Center,
+                                        )
                                     }
-                                }
-                            }
-                        )
+
+                                },
+                                label = {},
+                                colors = NavigationBarItemDefaults.colors(
+                                    unselectedIconColor = MaterialTheme.colorScheme.onTertiary,
+                                    unselectedTextColor = MaterialTheme.colorScheme.onTertiary,
+                                    selectedTextColor = MaterialTheme.colorScheme.onBackground,
+                                    selectedIconColor = MaterialTheme.colorScheme.onBackground,
+                                    indicatorColor = Color.Transparent
+                                ),
+                                selected = currentRoute == item.route,
+                                onClick = {}
+                            )
+
+                        }
+
                     }
+
                 }
             },
             floatingActionButton = {

@@ -14,8 +14,7 @@ import com.example.netweaver.ui.features.home.components.PostCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(
-) {
+fun HomeScreen() {
 
     AppScaffold(
         scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState()),
