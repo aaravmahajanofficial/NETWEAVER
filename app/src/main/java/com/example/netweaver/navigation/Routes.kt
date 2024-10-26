@@ -5,9 +5,9 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed class Routes(val route: String) {
 
-    data object Home : Routes("home")
-    data object MyNetwork : Routes("myNetwork")
-    data object Post : Routes("post")
-    data object Notifications : Routes("notifications")
-    data object Jobs : Routes("jobs")
+    object Home : Routes("home")
+    object MyNetwork : Routes("myNetwork")
+    object Post : Routes("post")
+    object Notifications : Routes("notifications")
+    object Jobs : Routes("jobs")
 }
