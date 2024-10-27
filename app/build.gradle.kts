@@ -76,9 +76,10 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.serialization.json.v173)
 
+    //noinspection UseTomlInstead
     implementation(platform("io.github.jan-tennert.supabase:bom:3.0.1"))
-    implementation("io.github.jan-tennert.supabase:postgrest-kt")
-    implementation("io.ktor:ktor-client-android:3.0.0")
+    implementation(libs.github.postgrest.kt)
+    implementation(libs.ktor.client.android)
 
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
