@@ -27,6 +27,7 @@ android {
         val properties = Properties()
         val localPropertiesFile = rootProject.file("local.properties")
         properties.load(FileInputStream(localPropertiesFile))
+        buildConfigField("String", "URL", "\"${properties.getProperty("SUPABASE_URL")}\"")
         buildConfigField("String", "API_KEY", "\"${properties.getProperty("SUPABASE_KEY")}\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

@@ -20,8 +20,8 @@ object SupabaseModule {
     @Singleton
     fun provideSupabaseClient(): SupabaseClient {
         return createSupabaseClient(
-            supabaseUrl = BuildConfig.API_KEY,
-            supabaseKey = "public-anon-key"
+            supabaseUrl = BuildConfig.URL,
+            supabaseKey = BuildConfig.API_KEY
         ) {
             install(Postgrest)
         }
