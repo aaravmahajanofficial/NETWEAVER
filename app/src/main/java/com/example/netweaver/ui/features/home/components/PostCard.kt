@@ -1,7 +1,6 @@
 package com.example.netweaver.ui.features.home.components
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,11 +22,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import com.example.netweaver.R
 import com.example.netweaver.domain.model.Post
 import com.example.netweaver.utils.ExpandableText
@@ -66,8 +67,14 @@ fun PostCard(post: Post) {
                         modifier = Modifier
                             .align(alignment = Alignment.Top)
                             .size(46.dp)
-                            .background(color = Color.Blue, shape = CircleShape),
-                    )
+                            .clip(shape = CircleShape)
+                    ) {
+                        AsyncImage(
+                            model = post.user?.profileImageUrl,
+                            contentDescription = "${post.user?.fullName} Profile Picture",
+                            contentScale = ContentScale.Fit
+                        )
+                    }
 
                     Column(
                         modifier = Modifier
