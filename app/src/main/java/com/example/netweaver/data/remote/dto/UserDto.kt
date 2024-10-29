@@ -34,6 +34,8 @@ data class UserDto(
 
 fun UserDto.toDomain() = User(
     userId = userId,
+    firstName = firstName,
+    lastName = lastName,
     fullName = fullName,
     headline = headline,
     location = headline,
