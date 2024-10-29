@@ -9,6 +9,7 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.postgrest.postgrest
 import javax.inject.Singleton
 
 @Module
@@ -26,5 +27,10 @@ object SupabaseModule {
             install(Postgrest)
         }
     }
+
+    @Provides
+    @Singleton
+    fun provideSupabaseDatabase(supabaseClient: SupabaseClient): Postgrest =
+        supabaseClient.postgrest
 
 }

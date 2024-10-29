@@ -29,11 +29,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.netweaver.R
+import com.example.netweaver.domain.model.Post
 import com.example.netweaver.utils.ExpandableText
 
 @Composable
-fun PostCard(
-) {
+fun PostCard(post: Post) {
 
     Surface(
         modifier = Modifier
@@ -78,14 +78,14 @@ fun PostCard(
                     ) {
 
                         Text(
-                            text = "Deepinder Goyal",
+                            text = post.user?.fullName ?: "User",
                             style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.W600),
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Spacer(modifier = Modifier.height(2.dp))
 
                         Text(
-                            text = "LinkedIn Strategist | B2B email marketing | Working with Global",
+                            text = post.user?.headline ?: "Headline",
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onTertiary,
                             maxLines = 1,
@@ -148,7 +148,7 @@ fun PostCard(
 
             // Content
             ExpandableText(
-                text = "If Ipsum is simply dummy text of make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop shares approachable like Aldus PageMaker including versions of Lorem Ipsum."
+                text = post.content
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -201,7 +201,7 @@ fun PostCard(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        "20 comments • 20 reposts",
+                        "${post.commentsCount} comments • 20 reposts",
                         style = MaterialTheme.typography.labelLarge.copy(
                             fontWeight = FontWeight.W400
                         ),
