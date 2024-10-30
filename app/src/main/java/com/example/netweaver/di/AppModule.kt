@@ -13,6 +13,7 @@ import com.example.netweaver.domain.usecase.GetPostsUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import io.github.jan.supabase.postgrest.Postgrest
 import javax.inject.Singleton
@@ -39,7 +40,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideDataStore(context: Context): DataStore<Preferences> =
+    fun provideDataStore(@ApplicationContext context: Context): DataStore<Preferences> =
         context.datastore
 
     @Provides
