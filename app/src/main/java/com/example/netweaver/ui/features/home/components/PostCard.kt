@@ -34,7 +34,7 @@ import com.example.netweaver.domain.model.Post
 import com.example.netweaver.utils.ExpandableText
 
 @Composable
-fun PostCard(post: Post) {
+fun PostCard(post: Post? = null) {
 
     Surface(
         modifier = Modifier
@@ -69,11 +69,19 @@ fun PostCard(post: Post) {
                             .size(46.dp)
                             .clip(shape = CircleShape)
                     ) {
-                        AsyncImage(
-                            model = post.user?.profileImageUrl,
-                            contentDescription = "${post.user?.fullName} Profile Picture",
-                            contentScale = ContentScale.Fit
-                        )
+                        if (post != null) {
+                            AsyncImage(
+                                model = post?.user?.profileImageUrl,
+                                contentDescription = "${post?.user?.fullName} Profile Picture",
+                                contentScale = ContentScale.Fit
+                            )
+                        } else {
+                            Image(
+                                painter = painterResource(R.drawable.logo),
+                                contentDescription = "${post?.user?.fullName} Profile Picture",
+                                contentScale = ContentScale.Fit
+                            )
+                        }
                     }
 
                     Column(
@@ -85,14 +93,14 @@ fun PostCard(post: Post) {
                     ) {
 
                         Text(
-                            text = post.user?.fullName ?: "User",
+                            text = post?.user?.fullName ?: "User",
                             style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.W600),
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Spacer(modifier = Modifier.height(2.dp))
 
                         Text(
-                            text = post.user?.headline ?: "Headline",
+                            text = post?.user?.headline ?: "Headline",
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onTertiary,
                             maxLines = 1,
@@ -155,7 +163,7 @@ fun PostCard(post: Post) {
 
             // Content
             ExpandableText(
-                text = post.content
+                text = post?.content ?: "Example Text"
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -208,7 +216,7 @@ fun PostCard(post: Post) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        "${post.commentsCount} comments • 20 reposts",
+                        "${post?.commentsCount} comments • 20 reposts",
                         style = MaterialTheme.typography.labelLarge.copy(
                             fontWeight = FontWeight.W400
                         ),
@@ -223,10 +231,10 @@ fun PostCard(post: Post) {
 
             HorizontalDivider(
                 color = MaterialTheme.colorScheme.outline,
-                thickness = 0.6.dp
+                thickness = 1.dp
             )
 
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Like, Comment, Repost, Send
             Row(
@@ -237,8 +245,8 @@ fun PostCard(post: Post) {
 
                 ReactionButton(id = R.drawable.like, title = "Like")
                 ReactionButton(id = R.drawable.comment, title = "Comment")
-                ReactionButton(id = R.drawable.repost, title = "Repost")
-                ReactionButton(id = R.drawable.send, title = "Send")
+                ReactionButton(id = R.drawable.share, title = "Share")
+                ReactionButton(id = R.drawable.save, title = "Save")
 
             }
 
@@ -262,10 +270,10 @@ fun ReactionButton(id: Int, title: String) {
             painter = painterResource(id),
             contentDescription = null,
             tint = MaterialTheme.colorScheme.tertiary,
-            modifier = Modifier.size(16.dp)
+            modifier = Modifier.size(18.dp)
         )
 
-        Spacer(modifier = Modifier.height(2.dp))
+        Spacer(modifier = Modifier.height(1.5.dp))
 
         Text(
             title,

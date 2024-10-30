@@ -8,4 +8,9 @@ interface Repository {
 
     suspend fun getFeedPosts(): Flow<Result<List<Post>>>
 
+//    suspend fun likePost(postId: String): Result<Unit>
+//
+//    suspend fun unlikePost(postId: String): Result<Unit>
+//
+//    suspend fun sharePost(postId: String): Result<Unit>
 }
