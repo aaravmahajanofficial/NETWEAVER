@@ -34,7 +34,7 @@ import com.example.netweaver.domain.model.Post
 import com.example.netweaver.utils.ExpandableText
 
 @Composable
-fun PostCard(post: Post? = null) {
+fun PostCard(post: Post) {
 
     Surface(
         modifier = Modifier
@@ -69,19 +69,11 @@ fun PostCard(post: Post? = null) {
                             .size(46.dp)
                             .clip(shape = CircleShape)
                     ) {
-                        if (post != null) {
-                            AsyncImage(
-                                model = post?.user?.profileImageUrl,
-                                contentDescription = "${post?.user?.fullName} Profile Picture",
-                                contentScale = ContentScale.Fit
-                            )
-                        } else {
-                            Image(
-                                painter = painterResource(R.drawable.logo),
-                                contentDescription = "${post?.user?.fullName} Profile Picture",
-                                contentScale = ContentScale.Fit
-                            )
-                        }
+                        AsyncImage(
+                            model = post.user?.profileImageUrl,
+                            contentDescription = "${post.user?.fullName} Profile Picture",
+                            contentScale = ContentScale.Fit
+                        )
                     }
 
                     Column(
@@ -93,14 +85,14 @@ fun PostCard(post: Post? = null) {
                     ) {
 
                         Text(
-                            text = post?.user?.fullName ?: "User",
+                            text = post.user?.fullName ?: "User",
                             style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.W600),
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Spacer(modifier = Modifier.height(2.dp))
 
                         Text(
-                            text = post?.user?.headline ?: "Headline",
+                            text = post.user?.headline ?: "Headline",
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onTertiary,
                             maxLines = 1,
@@ -163,7 +155,7 @@ fun PostCard(post: Post? = null) {
 
             // Content
             ExpandableText(
-                text = post?.content ?: "Example Text"
+                text = post.content ?: "Example Text"
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -216,7 +208,7 @@ fun PostCard(post: Post? = null) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        "${post?.commentsCount} comments • 20 reposts",
+                        "${post.commentsCount} comments • 20 reposts",
                         style = MaterialTheme.typography.labelLarge.copy(
                             fontWeight = FontWeight.W400
                         ),

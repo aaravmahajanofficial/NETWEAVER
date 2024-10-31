@@ -40,7 +40,7 @@ class RepositoryImplementation @Inject constructor(
 
                     try {
 
-                        launch {   // Fetch all the posts from the Firebase
+                        launch(Dispatchers.IO) {   // Fetch all the posts from the Firebase
 
                             val posts =
                                 snapshot.documents.mapNotNull { doc ->
@@ -53,18 +53,6 @@ class RepositoryImplementation @Inject constructor(
                             getUsersByIds(userIds).collect { response ->
                                 when (response) {
                                     is Result.Success -> {
-
-                                        // // Let's say response.data has these users:
-                                        //[
-                                        //    User(userId: "123", name: "John"),
-                                        //    User(userId: "456", name: "Jane")
-                                        //]
-                                        //
-                                        //// associateBy { it.userId } converts it to:
-                                        //{
-                                        //    "123" -> User(userId: "123", name: "John"),
-                                        //    "456" -> User(userId: "456", name: "Jane")
-                                        //}
 
                                         val usersMap = response.data.associateBy { it.userId }
 
@@ -108,3 +96,15 @@ class RepositoryImplementation @Inject constructor(
     }
 
 }
+
+// // Let's say response.data has these users:
+//[
+//    User(userId: "123", name: "John"),
+//    User(userId: "456", name: "Jane")
+//]
+//
+//// associateBy { it.userId } converts it to:
+//{
+//    "123" -> User(userId: "123", name: "John"),
+//    "456" -> User(userId: "456", name: "Jane")
+//}

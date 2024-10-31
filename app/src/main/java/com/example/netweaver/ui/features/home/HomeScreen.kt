@@ -1,6 +1,7 @@
 package com.example.netweaver.ui.features.home
 
 import android.util.Log
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -16,16 +17,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.netweaver.domain.model.Post
 import com.example.netweaver.ui.components.AppScaffold
 import com.example.netweaver.ui.features.home.components.PostCard
-import com.example.netweaver.ui.model.UiState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(viewModel: HomeScreenViewModel = hiltViewModel()) {
 
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.homeUiState.collectAsStateWithLifecycle()
 
     AppScaffold(
         scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState()),
@@ -44,16 +43,20 @@ fun HomeScreen(viewModel: HomeScreenViewModel = hiltViewModel()) {
 
 @Composable
 private fun HomeContent(
-    uiState: UiState<List<Post>>,
+    uiState: HomeUiState,
     paddingValues: PaddingValues,
 ) {
 
     when (uiState) {
-        UiState.Loading -> CircularProgressIndicator(
-            color = MaterialTheme.colorScheme.primary
-        )
+        is HomeUiState.Loading -> {
+            Box(modifier = Modifier.fillMaxSize()) {
+                CircularProgressIndicator(
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
 
-        is UiState.Success -> {
+        is HomeUiState.Success -> {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -65,8 +68,8 @@ private fun HomeContent(
             }
         }
 
-        is UiState.Error -> {
-            Log.d("ERROR: UIState", uiState.message.toString())
+        is HomeUiState.Error -> {
+            Log.d("ERROR: UIState", uiState.exception.toString())
         }
     }
 
