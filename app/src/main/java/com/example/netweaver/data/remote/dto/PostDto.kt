@@ -1,29 +1,18 @@
 package com.example.netweaver.data.remote.dto
 
 import com.example.netweaver.domain.model.Post
+import com.google.firebase.Timestamp
 import kotlinx.datetime.Instant
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 
-@Serializable
 data class PostDto(
-    @SerialName("id")
-    val id: String,
-    @SerialName("user_id")
-    val userId: String,
-    @SerialName("content")
-    val content: String,
-    @SerialName("media_url")
-    val mediaUrl: List<String>,
-    @SerialName("likes_count")
-    val likesCount: Int,
-    @SerialName("comments_count")
-    val commentsCount: Int,
-    @SerialName("created_at")
-    val createdAt: Instant,
-    @SerialName("updated_at")
-    val updatedAt: Instant,
-    val user: UserDto? = null,
+    val id: String = "",
+    val userId: String = "",
+    val content: String? = "",
+    val mediaUrl: List<String>? = emptyList<String>(),
+    val likesCount: Long? = 0L,
+    val commentsCount: Long? = 0L,
+    val createdAt: Timestamp? = Timestamp.now(),
+    val updatedAt: Timestamp? = Timestamp.now()
 )
 
 fun PostDto.toDomain() = Post(
@@ -32,7 +21,7 @@ fun PostDto.toDomain() = Post(
     mediaUrl = mediaUrl,
     likesCount = likesCount,
     commentsCount = commentsCount,
-    createdAt = createdAt,
-    updatedAt = updatedAt,
+    createdAt = createdAt?.toDate()?.time?.let { Instant.fromEpochMilliseconds(it) },
+    updatedAt = updatedAt?.toDate()?.time?.let { Instant.fromEpochMilliseconds(it) },
     user = null
 )

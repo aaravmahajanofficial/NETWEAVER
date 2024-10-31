@@ -10,6 +10,7 @@ import com.example.netweaver.data.repository.RepositoryImplementation
 import com.example.netweaver.domain.repository.AuthRepository
 import com.example.netweaver.domain.repository.Repository
 import com.example.netweaver.domain.usecase.GetPostsUseCase
+import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -27,9 +28,14 @@ object AppModule {
     @Provides
     @Singleton
     fun provideRepository(
-        postgrest: Postgrest
+        postgrest: Postgrest,
+        firestore: FirebaseFirestore
     ): Repository =
-        RepositoryImplementation(postgrest = postgrest)
+        RepositoryImplementation(postgrest = postgrest, firestore = firestore)
+
+    @Provides
+    @Singleton
+    fun provideFireStore(): FirebaseFirestore = FirebaseFirestore.getInstance()
 
     @Provides
     @Singleton

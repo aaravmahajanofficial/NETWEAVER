@@ -3,19 +3,22 @@ agp = "8.7.1"
 coilCompose = "3.0.0-rc02"
 coreSplashscreen = "1.0.1"
 datastorePreferences = "1.1.1"
+firebaseBom = "33.5.1"
 hiltAndroid = "2.51.1"
 hiltNavigationCompose = "1.2.0"
 jetbrainsKotlinxSerializationJson = "1.7.3"
 kotlin = "2.0.0"
-coreKtx = "1.13.1"
+coreKtx = "1.15.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 ktorClientAndroid = "3.0.0"
-lifecycleRuntimeKtx = "2.8.6"
+lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.9.3"
-composeBom = "2024.10.00"
+composeBom = "2024.10.01"
 navVersion = "2.8.3"
+googleGmsGoogleServices = "4.4.2"
+firebaseFirestore = "25.1.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -25,6 +28,7 @@ androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-com
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navVersion" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilCompose" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 github-postgrest-kt = { module = "io.github.jan-tennert.supabase:postgrest-kt" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroid" }
@@ -43,9 +47,11 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 kotlinx-serialization-json-v173 = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "jetbrainsKotlinxSerializationJson" }
 ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktorClientAndroid" }
+firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+google-gms-google-services = { id = "com.google.gms.google-services", version.ref = "googleGmsGoogleServices" }
 

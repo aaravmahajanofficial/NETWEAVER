@@ -94,14 +94,14 @@ fun PostCard(post: Post? = null) {
 
                         Text(
                             text = post?.user?.fullName ?: "User",
-                            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.W600),
+                            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.W600),
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Spacer(modifier = Modifier.height(2.dp))
 
                         Text(
                             text = post?.user?.headline ?: "Headline",
-                            style = MaterialTheme.typography.labelSmall,
+                            style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onTertiary,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis

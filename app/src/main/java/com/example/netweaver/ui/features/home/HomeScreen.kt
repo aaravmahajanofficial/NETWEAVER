@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -58,11 +59,8 @@ private fun HomeContent(
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
-//                items(uiState.data, key = { post -> post.id }) { post ->
-//                    PostCard(post = post)
-//                }
-                items(10) {
-                    PostCard()
+                items(uiState.data, key = { post -> post.id }) { post ->
+                    PostCard(post = post)
                 }
             }
         }

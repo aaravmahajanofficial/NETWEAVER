@@ -10,16 +10,17 @@ plugins {
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
     kotlin("plugin.serialization") version "2.0.0"
+    id("com.google.gms.google-services")
 }
 
 android {
     namespace = "com.example.netweaver"
-    compileSdk = 34
+    compileSdk = 35
 
 
     defaultConfig {
         applicationId = "com.example.netweaver"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -65,6 +66,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.firebase.firestore)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -75,6 +77,8 @@ dependencies {
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.serialization.json.v173)
+
+    implementation(platform(libs.firebase.bom))
 
     //noinspection UseTomlInstead
     implementation(platform("io.github.jan-tennert.supabase:bom:3.0.1"))
