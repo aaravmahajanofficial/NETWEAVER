@@ -1,5 +1,6 @@
 package com.example.netweaver.domain.model
 
+import kotlinx.datetime.Clock.System.now
 import kotlinx.datetime.Instant
 
 data class Post(
@@ -9,6 +10,6 @@ data class Post(
     val mediaUrl: List<String>? = emptyList(),
     val likesCount: Long? = 0,
     val commentsCount: Long? = 0,
-    val createdAt: Instant?,
-    val updatedAt: Instant?
+    val createdAt: Instant? = now(),
+    val updatedAt: Instant? = now()
 )

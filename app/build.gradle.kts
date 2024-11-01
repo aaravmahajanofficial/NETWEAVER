@@ -82,6 +82,7 @@ dependencies {
 
     //noinspection UseTomlInstead
     implementation(platform("io.github.jan-tennert.supabase:bom:3.0.1"))
+    implementation(libs.storage.kt)
     implementation(libs.github.postgrest.kt)
     implementation(libs.ktor.client.android)
 

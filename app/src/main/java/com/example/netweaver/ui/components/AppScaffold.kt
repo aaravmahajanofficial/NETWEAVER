@@ -310,7 +310,7 @@ fun AppScaffold(
         Scaffold(
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
-                TopAppBar(
+                CustomTopAppBar(
                     scrollBehavior = scrollBehavior,
                     showBack = showBack,
                     onClick = {}

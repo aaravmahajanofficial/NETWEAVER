@@ -11,6 +11,17 @@ interface Repository {
 
     suspend fun getFeedPosts(): Flow<Result<List<Post>>>
 
+    suspend fun createPost(
+        content: String,
+        byteArrayList: List<ByteArray?>?,
+        fileExtensions: List<String?>
+    ): Result<Unit>
+
+    suspend fun storeToBucket(
+        byteArray: List<ByteArray?>?,
+        fileExtensions: List<String?>
+    ): Result<List<String>?>
+
 //    suspend fun likePost(postId: String): Result<Unit>
 //
 //    suspend fun unlikePost(postId: String): Result<Unit>

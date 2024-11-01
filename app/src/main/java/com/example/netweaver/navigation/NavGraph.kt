@@ -12,6 +12,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.netweaver.ui.features.createPost.CreatePostScreen
 import com.example.netweaver.ui.features.home.HomeScreen
 import com.example.netweaver.ui.features.jobs.JobsScreen
 import com.example.netweaver.ui.features.messages.MessagesScreen
@@ -119,6 +120,14 @@ fun NavGraph() {
 
             composable(route = Routes.Profile.route) {
                 ProfileScreen()
+            }
+
+            composable(route = Routes.CreatePost.route) {
+                CreatePostScreen(
+                    onNavigateBack = {
+                        navController.navigate(route = Routes.Home.route)
+                    }
+                )
             }
 
 

@@ -34,11 +34,11 @@ import com.example.netweaver.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopAppBar(
+fun CustomTopAppBar(
     scrollBehavior: TopAppBarScrollBehavior,
     title: String? = null,
     showBack: Boolean = true,
-    onClick: () -> Unit = {},
+    onClick: () -> Unit? = {},
 ) {
 
     var searchQuery by remember { mutableStateOf("") }
