@@ -26,11 +26,11 @@ private val DarkColorScheme = darkColorScheme(
     onBackground = Color(0xE6FFFFFF),
 
     // posts
-    surface = Color(0xFF1b1f23),
+    surface = Color(0xFF1d2226),
     onSurface = Color(0xE6FFFFFF),
 
     // hyperlinks, numbers etc.
-    secondary = Color(0xff71b7fb),
+    secondary = Color(0xFF71b7fc),
 
     // search bar
     secondaryContainer = Color(0xFF38434f),
