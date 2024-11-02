@@ -5,13 +5,19 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.netweaver.ui.features.auth.AuthState
+import com.example.netweaver.ui.features.auth.AuthViewModel
 import com.example.netweaver.ui.features.createPost.CreatePostScreen
 import com.example.netweaver.ui.features.home.HomeScreen
 import com.example.netweaver.ui.features.jobs.JobsScreen
@@ -54,11 +60,15 @@ val LocalAppNavigator = compositionLocalOf<AppNavigator> {
 }
 
 @Composable
-fun NavGraph() {
+fun NavGraph(
+    viewModel: AuthViewModel = hiltViewModel()
+) {
 
     val navController = rememberNavController()
 
     val appNavigator = remember { AppNavigator(navController) }
+
+    val authState by viewModel.authState.collectAsStateWithLifecycle()
 
     CompositionLocalProvider(LocalAppNavigator provides appNavigator) {
         NavHost(
@@ -131,6 +141,22 @@ fun NavGraph() {
             }
 
 
+        }
+    }
+
+    LaunchedEffect(authState) {
+        when (authState) {
+            is AuthState.Success -> {
+                if ((authState as AuthState.Success).user != null) {
+                    navController.navigate(route = Routes.Home.route) {
+                        popUpTo(route = Routes.Home.route) {
+                            inclusive = true
+                        }
+                    }
+                }
+            }
+
+            else -> {}
         }
     }
 }

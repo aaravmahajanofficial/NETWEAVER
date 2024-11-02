@@ -4,18 +4,17 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
-import com.example.netweaver.data.local.datastore.UserPreferencesRepository
 import com.example.netweaver.data.repository.AuthRepositoryImplementation
 import com.example.netweaver.data.repository.RepositoryImplementation
 import com.example.netweaver.domain.repository.AuthRepository
 import com.example.netweaver.domain.repository.Repository
 import com.example.netweaver.domain.usecase.CreatePostUseCase
 import com.example.netweaver.domain.usecase.GetPostsUseCase
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.storage.Storage
@@ -51,20 +50,21 @@ object AppModule {
     ): GetPostsUseCase =
         GetPostsUseCase(repository = repository)
 
-    @Provides
-    @Singleton
-    fun provideDataStore(@ApplicationContext context: Context): DataStore<Preferences> =
-        context.datastore
+//    @Provides
+//    @Singleton
+//    fun provideUserPreferencesRepository(@ApplicationContext context: Context): UserPreferencesRepository =
+//        UserPreferencesRepository(context.datastore)
 
     @Provides
     @Singleton
-    fun provideUserPreferencesRepository(datastore: DataStore<Preferences>): UserPreferencesRepository =
-        UserPreferencesRepository(datastore = datastore)
+
+    fun provideFirebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()
 
     @Provides
     @Singleton
-    fun provideAuthRepository(userPreferencesRepository: UserPreferencesRepository): AuthRepository =
-        AuthRepositoryImplementation(userPreferencesRepository = userPreferencesRepository)
+    fun provideAuthRepository(firebaseAuth: FirebaseAuth): AuthRepository =
+        AuthRepositoryImplementation(firebaseAuth = firebaseAuth)
+
 
     @Provides
     @Singleton

@@ -6,8 +6,11 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class UserPreferencesRepository(private val datastore: DataStore<Preferences>) {
+@Singleton
+class UserPreferencesRepository @Inject constructor(private val datastore: DataStore<Preferences>) {
     private object PreferencesKeys {
         val USER_ID = stringPreferencesKey("user_id")
         val TOKEN = stringPreferencesKey("token")
