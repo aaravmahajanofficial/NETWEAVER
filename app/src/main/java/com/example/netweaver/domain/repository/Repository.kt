@@ -22,6 +22,10 @@ interface Repository {
         fileExtensions: List<String?>
     ): Result<List<String>?>
 
+    suspend fun getUserById(userId: String): Result<User>
+
+    suspend fun upsertUser(user: User): Result<User>
+
 //    suspend fun likePost(postId: String): Result<Unit>
 //
 //    suspend fun unlikePost(postId: String): Result<Unit>

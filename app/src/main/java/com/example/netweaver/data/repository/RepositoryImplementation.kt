@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.Clock.System.now
 import java.util.UUID
 import javax.inject.Inject
 
@@ -178,6 +179,38 @@ class RepositoryImplementation @Inject constructor(
             Result.Error(e)
         }
 
+    override suspend fun getUserById(userId: String): Result<User> = try {
+        withContext(Dispatchers.IO) {
+            val response = postgrest.from("Users")
+                .select { filter { eq("id", userId) } }
+                .decodeSingle<UserDto>()
+
+            Result.Success(response.toDomain())
+        }
+    } catch (e: Exception) {
+        Result.Error(e)
+    }
+
+    override suspend fun upsertUser(user: User): Result<User> = try {
+
+        withContext(Dispatchers.IO) {
+            val response = postgrest.from("Users").upsert(
+                UserDto(
+                    userId = user.userId
+                        ?: return@withContext Result.Error(Exception("User ID not found")),
+                    email = user.email,
+                    profileImageUrl = "",
+                    createdAt = now(),
+                    updatedAt = now(),
+                )
+            ) { select() }.decodeSingle<UserDto>()
+
+            Result.Success(response.toDomain())
+        }
+
+    } catch (e: Exception) {
+        Result.Error(e)
+    }
 
 }
 

@@ -18,8 +18,10 @@ class AuthViewModel @Inject constructor(private val authRepository: AuthReposito
     val authState = _authState.asStateFlow()
 
     init {
-        val currentUser = authRepository.getCurrentUser()
-        _authState.value = AuthState.Success(currentUser)
+        viewModelScope.launch {
+            val currentUser = authRepository.isUserLoggedIn()
+            _authState.value = AuthState.Success(currentUser)
+        }
     }
 
     fun signInWithEmail(email: String, password: String) {
