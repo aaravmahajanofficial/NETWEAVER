@@ -13,4 +13,7 @@ sealed class Routes(val route: String) {
     object Messages : Routes("messages")
     object Profile : Routes("profile")
     object CreatePost : Routes("createPost")
+    object Login : Routes("loginPage")
+    object Register : Routes("registerPage")
+    object ForgotPassword : Routes("forgotPassword")
 }

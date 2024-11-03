@@ -18,6 +18,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.netweaver.ui.features.auth.AuthState
 import com.example.netweaver.ui.features.auth.AuthViewModel
+import com.example.netweaver.ui.features.auth.ForgotPasswordScreen
+import com.example.netweaver.ui.features.auth.LoginScreen
+import com.example.netweaver.ui.features.auth.RegisterScreen
 import com.example.netweaver.ui.features.createPost.CreatePostScreen
 import com.example.netweaver.ui.features.home.HomeScreen
 import com.example.netweaver.ui.features.jobs.JobsScreen
@@ -73,7 +76,7 @@ fun NavGraph(
     CompositionLocalProvider(LocalAppNavigator provides appNavigator) {
         NavHost(
             navController = navController,
-            startDestination = Routes.Home.route,
+            startDestination = Routes.ForgotPassword.route,
             enterTransition = {
                 fadeIn(
                     animationSpec = tween(durationMillis = 150)
@@ -138,6 +141,18 @@ fun NavGraph(
                         navController.navigate(route = Routes.Home.route)
                     }
                 )
+            }
+
+            composable(route = Routes.Login.route) {
+                LoginScreen()
+            }
+
+            composable(route = Routes.Register.route) {
+                RegisterScreen()
+            }
+
+            composable(route = Routes.ForgotPassword.route) {
+                ForgotPasswordScreen()
             }
 
 
