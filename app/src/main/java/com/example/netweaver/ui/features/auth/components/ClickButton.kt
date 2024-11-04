@@ -22,17 +22,21 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun ClickButton(button: Button) {
     OutlinedButton(
-        onClick = {},
+        onClick = { button.onClick() },
         border = if (button.filled == false) BorderStroke(
             width = 0.8.dp,
             color = MaterialTheme.colorScheme.onBackground
         ) else null,
         colors = ButtonDefaults.outlinedButtonColors(
             containerColor = if (button.filled == true) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.surface,
+            contentColor = if (button.filled == true) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.onBackground,
+            disabledContainerColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.1f),
+            disabledContentColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.38f)
         ),
         modifier = Modifier
             .fillMaxWidth()
             .height(48.dp),
+        enabled = button.enabled == true
     ) {
 
         Row(
@@ -57,7 +61,6 @@ fun ClickButton(button: Button) {
                     fontWeight = FontWeight.Medium,
                     fontSize = 18.75.sp
                 ),
-                color = if (button.filled == true) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.onBackground
             )
         }
 

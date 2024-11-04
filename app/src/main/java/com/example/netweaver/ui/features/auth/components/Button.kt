@@ -7,4 +7,5 @@ data class Button(
     val icon: Painter? = null,
     val onClick: () -> Unit,
     val filled: Boolean? = false,
+    val enabled: Boolean? = true
 )

@@ -10,6 +10,9 @@ import com.example.netweaver.domain.repository.AuthRepository
 import com.example.netweaver.domain.repository.Repository
 import com.example.netweaver.domain.usecase.CreatePostUseCase
 import com.example.netweaver.domain.usecase.GetPostsUseCase
+import com.example.netweaver.domain.usecase.SignInWithEmailUseCase
+import com.example.netweaver.domain.usecase.ValidateEmailUseCase
+import com.example.netweaver.domain.usecase.ValidatePasswordUseCase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
@@ -70,4 +73,17 @@ object AppModule {
     @Singleton
     fun provideCreatePostUseCase(repository: Repository) =
         CreatePostUseCase(repository = repository)
+
+    @Provides
+    @Singleton
+    fun provideValidateEmailUseCase() = ValidateEmailUseCase()
+
+    @Provides
+    @Singleton
+    fun provideValidatePasswordUseCase() = ValidatePasswordUseCase()
+
+    @Provides
+    @Singleton
+    fun provideSignInWithEmailUseCase(authRepository: AuthRepository) =
+        SignInWithEmailUseCase(authRepository = authRepository)
 }

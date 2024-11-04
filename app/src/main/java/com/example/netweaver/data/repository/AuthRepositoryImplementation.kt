@@ -79,10 +79,6 @@ class AuthRepositoryImplementation @Inject constructor(
         password: String
     ): Result<FirebaseUser?> = try {
 
-        if (email.isBlank() || password.isBlank()) {
-            Result.Error(IllegalArgumentException("Email and password cannot be empty"))
-        }
-
         withContext(Dispatchers.IO) {
             val result = firebaseAuth.signInWithEmailAndPassword(email, password).await()
 
