@@ -19,7 +19,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.netweaver.ui.features.auth.AuthState
 import com.example.netweaver.ui.features.auth.AuthViewModel
 import com.example.netweaver.ui.features.auth.ForgotPasswordScreen
-import com.example.netweaver.ui.features.auth.LoginScreen
+import com.example.netweaver.ui.features.auth.Login.LoginScreen
 import com.example.netweaver.ui.features.auth.RegisterScreen
 import com.example.netweaver.ui.features.createPost.CreatePostScreen
 import com.example.netweaver.ui.features.home.HomeScreen

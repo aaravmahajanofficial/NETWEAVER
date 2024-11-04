@@ -118,12 +118,9 @@ class RepositoryImplementation @Inject constructor(
                 is Result.Success -> {
 
                     val postDto = PostDto(
-                        id = UUID.randomUUID().toString(),
                         userId = UUID.randomUUID().toString(),
                         content = content.trim(),
                         mediaUrl = response.data,
-                        likesCount = 0,
-                        commentsCount = 0,
                         createdAt = Timestamp.now(),
                         updatedAt = Timestamp.now()
                     )
