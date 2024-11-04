@@ -8,7 +8,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -19,7 +19,7 @@ class AuthRepositoryImplementation @Inject constructor(
 ) : AuthRepository {
 
     private val _currentUser = MutableStateFlow<User?>(null)
-    val currentUser = _currentUser.asStateFlow()
+    val currentUser: StateFlow<User?> = _currentUser
 
     override suspend fun isUserLoggedIn(): FirebaseUser? {
         fetchGetUserDetails()
