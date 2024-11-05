@@ -1,6 +1,5 @@
 package com.example.netweaver.ui.features.auth.login
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.netweaver.domain.usecase.SignInWithEmailUseCase
@@ -8,7 +7,6 @@ import com.example.netweaver.domain.usecase.ValidateEmailUseCase
 import com.example.netweaver.domain.usecase.ValidatePasswordUseCase
 import com.example.netweaver.ui.model.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -56,7 +54,6 @@ class LoginViewModel @Inject constructor(
                 _loginUiState.update { it.copy(isLoading = true) }
 
                 viewModelScope.launch {
-                    delay(10000)
                     try {
                         when (val result = signInWithEmailUseCase(
                             email = _loginUiState.value.email,
@@ -83,7 +80,6 @@ class LoginViewModel @Inject constructor(
                         }
 
                     } catch (e: Exception) {
-                        Log.d("FIREBASE AUTH FROM CATCH UI", e.message.toString())
                         _loginUiState.update {
                             it.copy(
                                 isLoading = false,
