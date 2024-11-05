@@ -6,7 +6,13 @@ import com.google.firebase.auth.FirebaseUser
 interface AuthRepository {
 
     suspend fun isUserLoggedIn(): FirebaseUser?
-    suspend fun registerWithEmail(email: String, password: String): Result<FirebaseUser?>
+    suspend fun registerWithEmail(
+        email: String,
+        password: String,
+        firstName: String,
+        lastName: String
+    ): Result<FirebaseUser?>
+
     suspend fun signInWithEmail(email: String, password: String): Result<FirebaseUser?>
     fun signOut()
 }

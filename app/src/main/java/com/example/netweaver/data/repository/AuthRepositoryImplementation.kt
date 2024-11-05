@@ -47,7 +47,9 @@ class AuthRepositoryImplementation @Inject constructor(
 
     override suspend fun registerWithEmail(
         email: String,
-        password: String
+        password: String,
+        firstName: String,
+        lastName: String
     ): Result<FirebaseUser?> = try {
         withContext(Dispatchers.IO) {
 
@@ -55,8 +57,10 @@ class AuthRepositoryImplementation @Inject constructor(
 
             when (val response = repository.upsertUser(
                 user = User(
-                    userId = result.user?.uid,
-                    email = result.user?.email
+                    userId = result.user?.uid!!,
+                    email = result.user?.email!!,
+                    firstName = firstName,
+                    lastName = lastName
                 )
             )) {
                 is Result.Success -> {

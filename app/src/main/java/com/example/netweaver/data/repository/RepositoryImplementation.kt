@@ -193,10 +193,10 @@ class RepositoryImplementation @Inject constructor(
         withContext(Dispatchers.IO) {
             val response = postgrest.from("Users").upsert(
                 UserDto(
-                    userId = user.userId
-                        ?: return@withContext Result.Error(Exception("User ID not found")),
+                    userId = user.userId,
                     email = user.email,
-                    profileImageUrl = "",
+                    firstName = user.firstName,
+                    lastName = user.lastName,
                     createdAt = now(),
                     updatedAt = now(),
                 )
