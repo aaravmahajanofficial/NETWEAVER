@@ -15,7 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -28,8 +28,8 @@ fun ClickButton(button: Button) {
             color = MaterialTheme.colorScheme.onBackground
         ) else null,
         colors = ButtonDefaults.outlinedButtonColors(
-            containerColor = if (button.filled == true) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.surface,
-            contentColor = if (button.filled == true) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.onBackground,
+            containerColor = if (button.filled == true) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
+            contentColor = if (button.filled == true) Color.White else MaterialTheme.colorScheme.onBackground,
             disabledContainerColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.1f),
             disabledContentColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.38f)
         ),
@@ -58,8 +58,7 @@ fun ClickButton(button: Button) {
             Text(
                 button.text,
                 style = MaterialTheme.typography.titleLarge.copy(
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 18.75.sp
+                    fontSize = 20.sp
                 ),
             )
         }
