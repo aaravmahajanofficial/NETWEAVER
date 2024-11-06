@@ -10,8 +10,10 @@ import com.example.netweaver.domain.repository.AuthRepository
 import com.example.netweaver.domain.repository.Repository
 import com.example.netweaver.domain.usecase.CreatePostUseCase
 import com.example.netweaver.domain.usecase.GetPostsUseCase
+import com.example.netweaver.domain.usecase.RegisterWithEmailUseCase
 import com.example.netweaver.domain.usecase.SignInWithEmailUseCase
 import com.example.netweaver.domain.usecase.ValidateEmailUseCase
+import com.example.netweaver.domain.usecase.ValidateNameUseCase
 import com.example.netweaver.domain.usecase.ValidatePasswordUseCase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -80,10 +82,19 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideValidateNameUseCase() = ValidateNameUseCase()
+
+    @Provides
+    @Singleton
     fun provideValidatePasswordUseCase() = ValidatePasswordUseCase()
 
     @Provides
     @Singleton
     fun provideSignInWithEmailUseCase(authRepository: AuthRepository) =
         SignInWithEmailUseCase(authRepository = authRepository)
+
+    @Provides
+    @Singleton
+    fun provideRegisterWithEmailUseCase(authRepository: AuthRepository) =
+        RegisterWithEmailUseCase(authRepository = authRepository)
 }
