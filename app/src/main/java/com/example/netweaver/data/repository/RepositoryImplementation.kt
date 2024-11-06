@@ -11,6 +11,7 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.SetOptions
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.storage.Storage
 import kotlinx.coroutines.Dispatchers
@@ -23,6 +24,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock.System.now
+import java.util.Date
 import java.util.UUID
 import javax.inject.Inject
 
@@ -208,6 +210,32 @@ class RepositoryImplementation @Inject constructor(
         } catch (e: Exception) {
             Result.Error(e)
         }
+
+    override suspend fun likePost(post: Post): Result<Unit> = withContext(Dispatchers.IO) {
+
+        val postDto = PostDto(
+            id = post.id,
+            userId = post.user?.userId
+                ?: return@withContext Result.Error(IllegalArgumentException("User cannot be null")),
+            content = post.content,
+            mediaUrl = post.mediaUrl,
+            likesCount = post.likesCount + 1,
+            commentsCount = post.commentsCount,
+            createdAt = Timestamp(Date(post.createdAt.toEpochMilliseconds())),
+            updatedAt = Timestamp(Date(post.updatedAt.toEpochMilliseconds()))
+        )
+
+        try {
+
+            firestore.collection("posts").document(postDto.id)
+                .set(postDto, SetOptions.merge()).await()
+
+            Result.Success(Unit)
+
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+    }
 }
 
 

@@ -26,7 +26,7 @@ interface Repository {
         fileExtensions: List<String?>
     ): Result<Unit>
 
-//    suspend fun likePost(postId: String): Result<Unit>
+    suspend fun likePost(post: Post): Result<Unit>
 //
 //    suspend fun unlikePost(postId: String): Result<Unit>
 //
