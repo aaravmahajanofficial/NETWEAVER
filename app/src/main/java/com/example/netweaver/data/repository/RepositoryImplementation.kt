@@ -103,45 +103,6 @@ class RepositoryImplementation @Inject constructor(
 
     }.flowOn(Dispatchers.IO)
 
-    override suspend fun createPost(
-        content: String,
-        byteArrayList: List<ByteArray?>?,
-        fileExtensions: List<String?>
-    ): Result<Unit> =
-        try {
-            when (val response =
-                storeToBucket(byteArrayList = byteArrayList, fileExtensions = fileExtensions)) {
-                is Result.Error -> {
-                    response.exception
-                }
-
-                is Result.Success -> {
-
-                    val postDto = PostDto(
-                        userId = UUID.randomUUID().toString(),
-                        content = content.trim(),
-                        mediaUrl = response.data,
-                        createdAt = Timestamp.now(),
-                        updatedAt = Timestamp.now()
-                    )
-
-                    withContext(Dispatchers.IO) {
-                        firestore.collection("posts").add(postDto).await()
-                    }
-                }
-
-            }
-
-            Result.Success(Unit)
-
-        } catch (e: IllegalArgumentException) {
-            Result.Error(e)
-        } catch (e: FirebaseFirestoreException) {
-            Result.Error(e)
-        } catch (e: Exception) {
-            Result.Error(e)
-        }
-
     override suspend fun storeToBucket(
         byteArrayList: List<ByteArray?>?,
         fileExtensions: List<String?>
@@ -209,6 +170,44 @@ class RepositoryImplementation @Inject constructor(
         Result.Error(e)
     }
 
+    override suspend fun createPost(
+        content: String,
+        byteArrayList: List<ByteArray?>?,
+        fileExtensions: List<String?>
+    ): Result<Unit> =
+        try {
+            when (val response =
+                storeToBucket(byteArrayList = byteArrayList, fileExtensions = fileExtensions)) {
+                is Result.Error -> {
+                    response.exception
+                }
+
+                is Result.Success -> {
+
+                    val postDto = PostDto(
+                        userId = UUID.randomUUID().toString(),
+                        content = content.trim(),
+                        mediaUrl = response.data,
+                        createdAt = Timestamp.now(),
+                        updatedAt = Timestamp.now()
+                    )
+
+                    withContext(Dispatchers.IO) {
+                        firestore.collection("posts").add(postDto).await()
+                    }
+                }
+
+            }
+
+            Result.Success(Unit)
+
+        } catch (e: IllegalArgumentException) {
+            Result.Error(e)
+        } catch (e: FirebaseFirestoreException) {
+            Result.Error(e)
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
 }
 
 
