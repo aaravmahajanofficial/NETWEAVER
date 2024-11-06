@@ -3,7 +3,6 @@ package com.example.netweaver.ui.features.auth
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.netweaver.domain.repository.AuthRepository
-import com.example.netweaver.ui.model.Result
 import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,43 +20,6 @@ class AuthViewModel @Inject constructor(private val authRepository: AuthReposito
         viewModelScope.launch {
             val currentUser = authRepository.isUserLoggedIn()
             _authState.value = AuthState.Success(currentUser)
-        }
-    }
-
-    fun signInWithEmail(email: String, password: String) {
-
-        viewModelScope.launch {
-            _authState.value = AuthState.Loading
-
-            when (val result = authRepository.signInWithEmail(email, password)) {
-                is Result.Success -> {
-                    _authState.value = AuthState.Success(result.data)
-                }
-
-                is Result.Error -> {
-                    _authState.value = AuthState.Error(result.exception)
-                }
-            }
-
-        }
-    }
-
-    fun registerWithEmail(email: String, password: String) {
-
-        viewModelScope.launch {
-            _authState.value = AuthState.Loading
-
-            when (val result = authRepository.registerWithEmail(email, password)) {
-                is Result.Success -> {
-                    _authState.value = AuthState.Success(result.data)
-                }
-
-                is Result.Error -> {
-                    _authState.value =
-                        AuthState.Error(result.exception)
-                }
-            }
-
         }
     }
 
