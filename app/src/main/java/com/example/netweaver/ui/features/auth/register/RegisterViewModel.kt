@@ -112,21 +112,9 @@ class RegisterViewModel @Inject constructor(
 
             }
 
-            is RegisterEvent.ClearErrorsForNextPage -> {
-                _registerUiState.update {
-                    it.copy(
-                        emailError = null,
-                        passwordError = null,
-                        firstNameError = null,
-                        lastNameError = null
-                    )
-                }
-            }
-
             is RegisterEvent.ClearError -> {
                 _registerUiState.update { it.copy(error = null) }
             }
-
 
         }
     }
@@ -155,5 +143,4 @@ sealed class RegisterEvent {
     data class LastNameChanged(val name: String) : RegisterEvent()
     object Register : RegisterEvent()
     object ClearError : RegisterEvent()
-    object ClearErrorsForNextPage : RegisterEvent()
 }
