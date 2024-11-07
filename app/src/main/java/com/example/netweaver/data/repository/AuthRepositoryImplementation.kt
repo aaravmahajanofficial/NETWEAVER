@@ -47,9 +47,9 @@ class AuthRepositoryImplementation @Inject constructor(
         password: String,
         firstName: String,
         lastName: String
-    ): Result<Unit> = try {
-        withContext(Dispatchers.IO) {
+    ): Result<Unit> = withContext(Dispatchers.IO) {
 
+        try {
             val result = firebaseAuth.createUserWithEmailAndPassword(email, password).await()
 
             when (val response = repository.upsertUser(
@@ -70,9 +70,10 @@ class AuthRepositoryImplementation @Inject constructor(
                     throw response.exception
                 }
             }
+        } catch (e: Exception) {
+            Result.Error(e)
         }
-    } catch (e: Exception) {
-        Result.Error(e)
+
     }
 
     override suspend fun signInWithEmail(
