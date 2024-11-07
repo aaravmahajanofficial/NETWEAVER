@@ -2,9 +2,9 @@ package com.example.netweaver.ui.features.auth.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.netweaver.domain.usecase.SignInWithEmailUseCase
-import com.example.netweaver.domain.usecase.ValidateEmailUseCase
-import com.example.netweaver.domain.usecase.ValidatePasswordUseCase
+import com.example.netweaver.domain.usecase.user.SignInWithEmailUseCase
+import com.example.netweaver.domain.usecase.validation.ValidateEmailUseCase
+import com.example.netweaver.domain.usecase.validation.ValidatePasswordUseCase
 import com.example.netweaver.ui.model.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

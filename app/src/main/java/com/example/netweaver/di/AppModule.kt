@@ -1,20 +1,17 @@
 package com.example.netweaver.di
 
-import android.content.Context
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.preferencesDataStore
 import com.example.netweaver.data.repository.AuthRepositoryImplementation
 import com.example.netweaver.data.repository.RepositoryImplementation
 import com.example.netweaver.domain.repository.AuthRepository
 import com.example.netweaver.domain.repository.Repository
-import com.example.netweaver.domain.usecase.CreatePostUseCase
-import com.example.netweaver.domain.usecase.GetPostsUseCase
-import com.example.netweaver.domain.usecase.RegisterWithEmailUseCase
-import com.example.netweaver.domain.usecase.SignInWithEmailUseCase
-import com.example.netweaver.domain.usecase.ValidateEmailUseCase
-import com.example.netweaver.domain.usecase.ValidateNameUseCase
-import com.example.netweaver.domain.usecase.ValidatePasswordUseCase
+import com.example.netweaver.domain.usecase.posts.CreatePostUseCase
+import com.example.netweaver.domain.usecase.posts.GetPostsUseCase
+import com.example.netweaver.domain.usecase.posts.LikePostUseCase
+import com.example.netweaver.domain.usecase.user.RegisterWithEmailUseCase
+import com.example.netweaver.domain.usecase.user.SignInWithEmailUseCase
+import com.example.netweaver.domain.usecase.validation.ValidateEmailUseCase
+import com.example.netweaver.domain.usecase.validation.ValidateNameUseCase
+import com.example.netweaver.domain.usecase.validation.ValidatePasswordUseCase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
@@ -25,7 +22,7 @@ import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.storage.Storage
 import javax.inject.Singleton
 
-private val Context.datastore: DataStore<Preferences> by preferencesDataStore(name = "user_preferences")
+//private val Context.datastore: DataStore<Preferences> by preferencesDataStore(name = "user_preferences")
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -75,6 +72,11 @@ object AppModule {
     @Singleton
     fun provideCreatePostUseCase(repository: Repository) =
         CreatePostUseCase(repository = repository)
+
+    @Provides
+    @Singleton
+    fun provideLikePostUseCase(repository: Repository) =
+        LikePostUseCase(repository = repository)
 
     @Provides
     @Singleton

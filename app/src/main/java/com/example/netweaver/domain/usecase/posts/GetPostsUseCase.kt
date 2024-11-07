@@ -1,4 +1,4 @@
-package com.example.netweaver.domain.usecase
+package com.example.netweaver.domain.usecase.posts
 
 import com.example.netweaver.domain.model.Post
 import com.example.netweaver.domain.repository.Repository

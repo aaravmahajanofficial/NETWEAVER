@@ -2,7 +2,7 @@ package com.example.netweaver.ui.features.createPost
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.netweaver.domain.usecase.CreatePostUseCase
+import com.example.netweaver.domain.usecase.posts.CreatePostUseCase
 import com.example.netweaver.ui.model.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

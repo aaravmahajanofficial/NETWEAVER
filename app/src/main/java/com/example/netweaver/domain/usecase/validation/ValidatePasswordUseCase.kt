@@ -1,4 +1,4 @@
-package com.example.netweaver.domain.usecase
+package com.example.netweaver.domain.usecase.validation
 
 class ValidatePasswordUseCase {
 

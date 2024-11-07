@@ -1,4 +1,4 @@
-package com.example.netweaver.domain.usecase
+package com.example.netweaver.domain.usecase.user
 
 import com.example.netweaver.domain.repository.AuthRepository
 import com.example.netweaver.ui.model.Result
