@@ -5,10 +5,10 @@ import com.example.netweaver.domain.repository.AuthRepository
 import com.example.netweaver.domain.repository.Repository
 import com.example.netweaver.ui.model.Result
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -18,30 +18,27 @@ class AuthRepositoryImplementation @Inject constructor(
     private val repository: Repository
 ) : AuthRepository {
 
-    private val _currentUser = MutableStateFlow<User?>(null)
-    val currentUser: StateFlow<User?> = _currentUser
+    private val _currentUserDetails = MutableStateFlow<User?>(null)
+    override val currentUserDetails: StateFlow<User?> = _currentUserDetails.asStateFlow()
 
-    override suspend fun isUserLoggedIn(): FirebaseUser? {
-        fetchGetUserDetails()
-        return firebaseAuth.currentUser
-    }
+    override suspend fun fetchUserDetails(): Result<Boolean> {
 
-    private suspend fun fetchGetUserDetails() {
+        val firebaseUser =
+            firebaseAuth.currentUser ?: return Result.Error(Exception("User not logged in"))
 
-        firebaseAuth.currentUser?.let {
+        return when (val result = repository.getUserById(firebaseUser.uid)) {
 
-            when (val result = repository.getUserById(it.uid)) {
-
-                is Result.Success -> {
-                    _currentUser.value = result.data
-                }
-
-                is Result.Error -> {
-                    _currentUser.value = null
-                }
+            is Result.Success -> {
+                _currentUserDetails.value = result.data
+                Result.Success(true)
             }
 
+            is Result.Error -> {
+                _currentUserDetails.value = null
+                Result.Error(result.exception)
+            }
         }
+
     }
 
 
@@ -50,7 +47,7 @@ class AuthRepositoryImplementation @Inject constructor(
         password: String,
         firstName: String,
         lastName: String
-    ): Result<FirebaseUser?> = try {
+    ): Result<Unit> = try {
         withContext(Dispatchers.IO) {
 
             val result = firebaseAuth.createUserWithEmailAndPassword(email, password).await()
@@ -64,8 +61,8 @@ class AuthRepositoryImplementation @Inject constructor(
                 )
             )) {
                 is Result.Success -> {
-                    _currentUser.value = response.data
-                    Result.Success(result.user)
+                    _currentUserDetails.value = response.data
+                    Result.Success(Unit)
                 }
 
                 is Result.Error -> {
@@ -81,22 +78,14 @@ class AuthRepositoryImplementation @Inject constructor(
     override suspend fun signInWithEmail(
         email: String,
         password: String
-    ): Result<FirebaseUser?> = try {
+    ): Result<Unit> = try {
 
         withContext(Dispatchers.IO) {
             val result = firebaseAuth.signInWithEmailAndPassword(email, password).await()
 
             result.user?.let {
-                when (val response = repository.getUserById(userId = it.uid)) {
-                    is Result.Success -> {
-                        _currentUser.value = response.data
-                        Result.Success(result.user)
-                    }
-
-                    is Result.Error -> {
-                        Result.Error(response.exception)
-                    }
-                }
+                fetchUserDetails()
+                Result.Success(Unit)
             } ?: Result.Error(Exception("User not found"))
         }
     } catch (e: Exception) {
@@ -105,8 +94,7 @@ class AuthRepositoryImplementation @Inject constructor(
 
     override fun signOut() {
         firebaseAuth.signOut()
-        _currentUser.value = null
+        _currentUserDetails.value = null
     }
-
 
 }

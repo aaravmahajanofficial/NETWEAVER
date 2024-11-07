@@ -8,7 +8,7 @@ class SignInWithEmailUseCase @Inject constructor(private val authRepository: Aut
     suspend operator fun invoke(
         email: String,
         password: String
-    ): Result<String> {
+    ): Result<Unit> {
 
         return try {
             when (val result = authRepository.signInWithEmail(email = email, password = password)) {
@@ -17,7 +17,7 @@ class SignInWithEmailUseCase @Inject constructor(private val authRepository: Aut
                 }
 
                 is Result.Success -> {
-                    Result.Success(result.data?.uid.toString())
+                    Result.Success(Unit)
                 }
             }
         } catch (e: Exception) {

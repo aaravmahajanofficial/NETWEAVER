@@ -10,7 +10,7 @@ class RegisterWithEmailUseCase @Inject constructor(private val authRepository: A
         password: String,
         firstName: String,
         lastName: String
-    ): Result<String> {
+    ): Result<Unit> {
 
         return try {
 
@@ -22,7 +22,7 @@ class RegisterWithEmailUseCase @Inject constructor(private val authRepository: A
                     lastName = lastName
                 )) {
                 is Result.Success -> {
-                    Result.Success(result.data?.uid.toString())
+                    Result.Success(Unit)
                 }
 
                 is Result.Error -> {

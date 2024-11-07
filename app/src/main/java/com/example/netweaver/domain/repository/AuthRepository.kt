@@ -1,18 +1,23 @@
 package com.example.netweaver.domain.repository
 
+import com.example.netweaver.domain.model.User
 import com.example.netweaver.ui.model.Result
-import com.google.firebase.auth.FirebaseUser
+import kotlinx.coroutines.flow.StateFlow
 
 interface AuthRepository {
 
-    suspend fun isUserLoggedIn(): FirebaseUser?
+    val currentUserDetails: StateFlow<User?>
+
+    suspend fun fetchUserDetails(): Result<Boolean>
+
     suspend fun registerWithEmail(
         email: String,
         password: String,
         firstName: String,
         lastName: String
-    ): Result<FirebaseUser?>
+    ): Result<Unit>
 
-    suspend fun signInWithEmail(email: String, password: String): Result<FirebaseUser?>
+
+    suspend fun signInWithEmail(email: String, password: String): Result<Unit>
     fun signOut()
 }
