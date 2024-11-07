@@ -66,7 +66,7 @@ class AuthRepositoryImplementation @Inject constructor(
                 }
 
                 is Result.Error -> {
-                    result?.user?.delete()?.await()
+                    result.user?.delete()?.await()
                     throw response.exception
                 }
             }
@@ -78,18 +78,24 @@ class AuthRepositoryImplementation @Inject constructor(
     override suspend fun signInWithEmail(
         email: String,
         password: String
-    ): Result<Unit> = try {
-
-        withContext(Dispatchers.IO) {
+    ): Result<Unit> = withContext(Dispatchers.IO) {
+        try {
             val result = firebaseAuth.signInWithEmailAndPassword(email, password).await()
-
             result.user?.let {
-                fetchUserDetails()
-                Result.Success(Unit)
-            } ?: Result.Error(Exception("User not found"))
+                when (fetchUserDetails()) {
+                    is Result.Error -> {
+                        Result.Error(Exception("Error fetching user details"))
+                    }
+
+                    is Result.Success -> {
+                        Result.Success(Unit)
+                    }
+                }
+
+            } ?: Result.Error(Exception("User does not exist"))
+        } catch (e: Exception) {
+            Result.Error(e)
         }
-    } catch (e: Exception) {
-        Result.Error(e)
     }
 
     override fun signOut() {
