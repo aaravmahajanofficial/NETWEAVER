@@ -1,6 +1,5 @@
 package com.example.netweaver.ui.features.home
 
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,13 +9,16 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.netweaver.domain.model.Post
 import com.example.netweaver.ui.components.AppScaffold
 import com.example.netweaver.ui.features.home.components.PostCard
 
@@ -34,7 +36,10 @@ fun HomeScreen(viewModel: HomeScreenViewModel = hiltViewModel()) {
                 paddingValues = PaddingValues(
                     top = innerPadding.calculateTopPadding(),
                     bottom = innerPadding.calculateBottomPadding(),
-                )
+                ),
+                onLike = { post ->
+                    viewModel.onEvent(HomeEvent.LikePost(post))
+                }
             )
 
         }
@@ -43,12 +48,13 @@ fun HomeScreen(viewModel: HomeScreenViewModel = hiltViewModel()) {
 
 @Composable
 private fun HomeContent(
-    uiState: HomeUiState,
+    uiState: HomeState,
+    onLike: (Post) -> Unit,
     paddingValues: PaddingValues,
 ) {
 
-    when (uiState) {
-        is HomeUiState.Loading -> {
+    when {
+        uiState.isLoading -> {
             Box(modifier = Modifier.fillMaxSize()) {
                 CircularProgressIndicator(
                     color = MaterialTheme.colorScheme.primary
@@ -56,20 +62,28 @@ private fun HomeContent(
             }
         }
 
-        is HomeUiState.Success -> {
+        uiState.error != null -> {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(
+                    uiState.error,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onError
+                )
+            }
+        }
+
+        else -> {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
-                items(uiState.data, key = { post -> post.id }) { post ->
-                    PostCard(post = post)
+                items(uiState.posts.orEmpty(), key = { post -> post.docId }) { post ->
+                    // Creating a function that will call `onButtonClick`
+                    // "When the button is clicked, call the onLikePost function and give it the post as input."
+                    PostCard(post = post, onLikePost = { onLike(post) })
                 }
             }
-        }
-
-        is HomeUiState.Error -> {
-            Log.d("ERROR: UIState", uiState.exception.toString())
         }
     }
 

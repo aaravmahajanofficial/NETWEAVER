@@ -1,6 +1,7 @@
 package com.example.netweaver.ui.features.home.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,6 +24,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -34,7 +37,7 @@ import com.example.netweaver.domain.model.Post
 import com.example.netweaver.utils.ExpandableText
 
 @Composable
-fun PostCard(post: Post) {
+fun PostCard(post: Post, onLikePost: () -> Unit) {
 
     Surface(
         modifier = Modifier
@@ -155,7 +158,7 @@ fun PostCard(post: Post) {
 
             // Content
             ExpandableText(
-                text = post.content ?: "Example Text"
+                text = post.content
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -208,7 +211,7 @@ fun PostCard(post: Post) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        "${post.commentsCount} comments • 20 reposts",
+                        "${post.likesCount} comments • 20 reposts",
                         style = MaterialTheme.typography.labelLarge.copy(
                             fontWeight = FontWeight.W400
                         ),
@@ -235,10 +238,25 @@ fun PostCard(post: Post) {
                 horizontalArrangement = Arrangement.SpaceAround
             ) {
 
-                ReactionButton(id = R.drawable.like, title = "Like")
-                ReactionButton(id = R.drawable.comment, title = "Comment")
-                ReactionButton(id = R.drawable.share, title = "Share")
-                ReactionButton(id = R.drawable.save, title = "Save")
+                ReactionButton(
+                    icon = painterResource(R.drawable.like),
+                    pressedIcon = painterResource(R.drawable.like_count),
+                    title = "Like",
+                    onClick = onLikePost,
+                    isPressed = post.isLiked
+                )
+                ReactionButton(
+                    icon = painterResource(R.drawable.comment),
+                    title = "Comment",
+                    onClick = {})
+                ReactionButton(
+                    icon = painterResource(R.drawable.share),
+                    title = "Share",
+                    onClick = {})
+                ReactionButton(
+                    icon = painterResource(R.drawable.save),
+                    title = "Save",
+                    onClick = {})
 
             }
 
@@ -251,28 +269,36 @@ fun PostCard(post: Post) {
 }
 
 @Composable
-fun ReactionButton(id: Int, title: String) {
+fun ReactionButton(
+    icon: Painter,
+    pressedIcon: Painter? = null,
+    title: String,
+    onClick: () -> Unit,
+    isPressed: Boolean = false
+) {
 
     Column(
         modifier = Modifier,
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Icon(
-            painter = painterResource(id),
+        Image(
+            painter = if (isPressed == true) pressedIcon!! else icon,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.tertiary,
-            modifier = Modifier.size(18.dp)
+            colorFilter = if (isPressed == true) null else ColorFilter.tint(MaterialTheme.colorScheme.tertiary),
+            modifier = Modifier
+                .size(16.dp)
+                .clickable {
+                    onClick()
+                }
         )
 
-        Spacer(modifier = Modifier.height(1.5.dp))
+        Spacer(modifier = Modifier.height(2.dp))
 
         Text(
             title,
-            style = MaterialTheme.typography.labelSmall.copy(
-                fontWeight = FontWeight.W400
-            ),
-            color = MaterialTheme.colorScheme.tertiary
+            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.W500),
+            color = if (isPressed == true) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.tertiary
         )
 
     }

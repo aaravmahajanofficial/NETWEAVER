@@ -1,5 +1,6 @@
 package com.example.netweaver.data.repository
 
+import android.util.Log
 import com.example.netweaver.data.remote.dto.PostDto
 import com.example.netweaver.data.remote.dto.UserDto
 import com.example.netweaver.data.remote.dto.toDomain
@@ -13,12 +14,12 @@ import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.SetOptions
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.storage.Storage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -43,6 +44,7 @@ class RepositoryImplementation @Inject constructor(
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
                     trySend(Result.Error(error))
+                    close(error)
                     return@addSnapshotListener
                 }
 
@@ -50,38 +52,51 @@ class RepositoryImplementation @Inject constructor(
 
                     try {
 
-                        launch(Dispatchers.IO) {   // Fetch all the posts from the Firebase
+                        launch(Dispatchers.IO) {
 
+                            // Fetch all the posts from the Firebase
                             val posts =
                                 snapshot.documents.mapNotNull { doc ->
-                                    doc.toObject(PostDto::class.java)?.copy(id = doc.id)
+                                    doc.toObject(PostDto::class.java)?.copy(docId = doc.id)
                                 }
+
                             // get the user ids from posts
                             val userIds = posts.map { it.userId }.distinct()
+                            val userResponse = getUsersByIds(userIds)
 
-                            // get the user models and merge each post with user
-                            getUsersByIds(userIds).collect { response ->
-                                when (response) {
-                                    is Result.Success -> {
+                            // fetch like statuses for the posts for the current user
+                            val postIds = posts.map { it.id }.distinct()
+                            val likedPostsResponse =
+                                getLikesForPosts("0f07b4e0-4eb8-4a9a-be40-07ae8f608b0e", postIds)
 
-                                        val usersMap = response.data.associateBy { it.userId }
+                            if (userResponse is Result.Success && likedPostsResponse is Result.Success) {
 
-                                        trySend(Result.Success(posts.map { post ->
-                                            post.toDomain()
-                                                .copy(user = usersMap[post.userId])
-                                        }))
-                                    }
+                                val usersMap = userResponse.data.associateBy { it.userId }
+                                val likedPostsIds = likedPostsResponse.data
 
-                                    is Result.Error -> {
-                                        trySend(Result.Error(response.exception))
-                                    }
+                                Log.d("Liked POSTS ID", likedPostsIds.toString())
+                                Log.d("POSTS ID", postIds.toString())
+
+                                val finalPosts = posts.map { post ->
+                                    post.toDomain().copy(
+                                        user = usersMap[post.userId],
+                                        isLiked = likedPostsIds.contains(post.id)
+                                    )
                                 }
 
+                                Log.d("Final POSTS", finalPosts.toString())
+
+                                trySend(Result.Success(finalPosts))
+                            } else {
+                                val error = (userResponse as Result.Error).exception
+                                close(error)
                             }
                         }
 
                     } catch (e: Exception) {
+                        Log.d("getPosts", e.toString())
                         trySend(Result.Error(e))
+                        close(e)
                     }
                 }
 
@@ -90,20 +105,51 @@ class RepositoryImplementation @Inject constructor(
         awaitClose { subscription.remove() }
     }.flowOn(Dispatchers.IO)
 
-    override suspend fun getUsersByIds(userIds: List<String>): Flow<Result<List<User>>> = flow {
+    override suspend fun getUsersByIds(userIds: List<String>): Result<List<User>> =
+        withContext(Dispatchers.IO) {
+            try {
+                val response =
+                    postgrest.from("Users").select {
+                        { ("id" in userIds) }
+                    }.decodeList<UserDto>()
 
-        try {
-            val response =
-                postgrest.from("Users").select {
-                    { ("id" in userIds) }
-                }.decodeList<UserDto>()
+                Result.Success(response.map { it.toDomain() })
+            } catch (e: Exception) {
+                Result.Error(e)
+            }
 
-            emit(Result.Success(response.map { it.toDomain() }))
-        } catch (e: Exception) {
-            emit(Result.Error(e))
         }
 
-    }.flowOn(Dispatchers.IO)
+    override suspend fun getLikesForPosts(
+        userId: String,
+        postIds: List<String>
+    ): Result<Set<String>> =
+
+        withContext(Dispatchers.IO) {
+            try {
+
+                val result =
+                    postgrest.from("Likes").select(columns = Columns.list("post_id")) {
+                        filter {
+                            eq("user_id", userId)
+                        }
+                        filter {
+                            "post_Id" in postIds
+                        }
+                    }.decodeList<Map<String, String>>()
+
+                Log.d("TAG", "Successful $result")
+
+                val likedPostIds = result.map { it["post_id"] as String }.toSet()
+
+                Result.Success(likedPostIds)
+
+            } catch (e: Exception) {
+                Log.d("TAG ERROR", e.toString())
+                Result.Error(e)
+            }
+
+        }
 
     override suspend fun storeToBucket(
         byteArrayList: List<ByteArray?>?,
@@ -222,7 +268,7 @@ class RepositoryImplementation @Inject constructor(
             likesCount = post.likesCount + 1,
             commentsCount = post.commentsCount,
             createdAt = Timestamp(Date(post.createdAt.toEpochMilliseconds())),
-            updatedAt = Timestamp(Date(post.updatedAt.toEpochMilliseconds()))
+            updatedAt = Timestamp(Date(now().toEpochMilliseconds()))
         )
 
         try {

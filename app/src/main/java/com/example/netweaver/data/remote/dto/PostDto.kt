@@ -6,6 +6,7 @@ import kotlinx.datetime.Instant
 import java.util.UUID
 
 data class PostDto(
+    val docId: String = "",
     val id: String = UUID.randomUUID().toString(),
     val userId: String = "",
     val content: String = "",
@@ -17,6 +18,7 @@ data class PostDto(
 )
 
 fun PostDto.toDomain() = Post(
+    docId = docId,
     id = id,
     content = content,
     mediaUrl = mediaUrl,

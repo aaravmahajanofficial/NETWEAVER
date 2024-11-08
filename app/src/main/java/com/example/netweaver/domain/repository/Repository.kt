@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface Repository {
 
-    suspend fun getUsersByIds(userIds: List<String>): Flow<Result<List<User>>>
+    suspend fun getUsersByIds(userIds: List<String>): Result<List<User>>
 
     suspend fun getFeedPosts(): Flow<Result<List<Post>>>
 
@@ -19,6 +19,8 @@ interface Repository {
     suspend fun getUserById(userId: String): Result<User>
 
     suspend fun upsertUser(user: User): Result<User>
+
+    suspend fun getLikesForPosts(userId: String, postIds: List<String>): Result<Set<String>>
 
     suspend fun createPost(
         content: String,
