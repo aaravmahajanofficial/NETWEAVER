@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.netweaver.domain.model.Post
 import com.example.netweaver.domain.usecase.posts.GetPostsUseCase
 import com.example.netweaver.domain.usecase.posts.LikePostUseCase
+import com.example.netweaver.domain.usecase.posts.UnLikePostUseCase
 import com.example.netweaver.ui.model.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -19,7 +20,8 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(
     private val getPostsUseCase: GetPostsUseCase,
-    private val likePostUseCase: LikePostUseCase
+    private val likePostUseCase: LikePostUseCase,
+    private val unLikePostUseCase: UnLikePostUseCase
 ) :
     ViewModel() {
 
@@ -44,6 +46,12 @@ class HomeScreenViewModel @Inject constructor(
 
                 viewModelScope.launch {
 
+                    if (event.post.id in _homeUiState.value.reactionQueue) {
+                        return@launch
+                    }
+
+                    _homeUiState.update { it.copy(reactionQueue = _homeUiState.value.reactionQueue + event.post.id) }
+
                     try {
                         when (val result = likePostUseCase(post = event.post)) {
                             is Result.Success -> {
@@ -57,9 +65,41 @@ class HomeScreenViewModel @Inject constructor(
 
                     } catch (e: Exception) {
                         _homeUiState.update { it.copy(error = e.message) }
+                    } finally {
+                        _homeUiState.update { it.copy(reactionQueue = _homeUiState.value.reactionQueue - event.post.id) }
                     }
                 }
 
+
+            }
+
+            is HomeEvent.UnLikePost -> {
+
+                viewModelScope.launch {
+
+                    if (event.post.id in _homeUiState.value.reactionQueue) {
+                        return@launch
+                    }
+
+                    _homeUiState.update { it.copy(reactionQueue = _homeUiState.value.reactionQueue + event.post.id) }
+
+                    try {
+                        when (val result = unLikePostUseCase(post = event.post)) {
+                            is Result.Success -> {
+                                _homeUiState.update { it.copy(success = "Successfully unliked the post") }
+                            }
+
+                            is Result.Error -> {
+                                _homeUiState.update { it.copy(error = result.exception.message) }
+                            }
+                        }
+
+                    } catch (e: Exception) {
+                        _homeUiState.update { it.copy(error = e.message) }
+                    } finally {
+                        _homeUiState.update { it.copy(reactionQueue = _homeUiState.value.reactionQueue - event.post.id) }
+                    }
+                }
 
             }
         }
@@ -109,6 +149,7 @@ class HomeScreenViewModel @Inject constructor(
 data class HomeState(
     val isLoading: Boolean = false,
     val posts: List<Post>? = null,
+    val reactionQueue: Set<String> = emptySet(),
     val error: String? = null,
     val success: String? = null
 )
@@ -118,5 +159,6 @@ sealed class HomeEvent {
 
     object GetPosts : HomeEvent()
     data class LikePost(val post: Post) : HomeEvent()
+    data class UnLikePost(val post: Post) : HomeEvent()
 
 }

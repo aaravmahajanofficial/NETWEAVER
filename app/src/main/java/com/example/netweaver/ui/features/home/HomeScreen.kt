@@ -39,6 +39,9 @@ fun HomeScreen(viewModel: HomeScreenViewModel = hiltViewModel()) {
                 ),
                 onLike = { post ->
                     viewModel.onEvent(HomeEvent.LikePost(post))
+                },
+                onUnLikePost = { post ->
+                    viewModel.onEvent(HomeEvent.UnLikePost(post))
                 }
             )
 
@@ -50,6 +53,7 @@ fun HomeScreen(viewModel: HomeScreenViewModel = hiltViewModel()) {
 private fun HomeContent(
     uiState: HomeState,
     onLike: (Post) -> Unit,
+    onUnLikePost: (Post) -> Unit,
     paddingValues: PaddingValues,
 ) {
 
@@ -81,7 +85,12 @@ private fun HomeContent(
                 items(uiState.posts.orEmpty(), key = { post -> post.docId }) { post ->
                     // Creating a function that will call `onButtonClick`
                     // "When the button is clicked, call the onLikePost function and give it the post as input."
-                    PostCard(post = post, onLikePost = { onLike(post) })
+                    PostCard(
+                        post = post,
+                        onLikePost = { onLike(post) },
+                        onUnLikePost = { onUnLikePost(post) },
+                        isProcessingReaction = post.id in uiState.reactionQueue
+                    )
                 }
             }
         }

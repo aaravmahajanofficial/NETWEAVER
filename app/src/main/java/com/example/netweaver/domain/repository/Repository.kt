@@ -20,7 +20,7 @@ interface Repository {
 
     suspend fun upsertUser(user: User): Result<User>
 
-    suspend fun getLikesForPosts(userId: String, postIds: List<String>): Result<Set<String>>
+    suspend fun getLikesForPosts(postIds: List<String>): Result<Set<String>>
 
     suspend fun createPost(
         content: String,
@@ -29,8 +29,8 @@ interface Repository {
     ): Result<Unit>
 
     suspend fun likePost(post: Post): Result<Unit>
-//
-//    suspend fun unlikePost(postId: String): Result<Unit>
-//
+
+    suspend fun unlikePost(post: Post): Result<Unit>
+
 //    suspend fun sharePost(postId: String): Result<Unit>
 }

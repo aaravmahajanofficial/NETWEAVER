@@ -7,6 +7,7 @@ import com.example.netweaver.domain.repository.Repository
 import com.example.netweaver.domain.usecase.posts.CreatePostUseCase
 import com.example.netweaver.domain.usecase.posts.GetPostsUseCase
 import com.example.netweaver.domain.usecase.posts.LikePostUseCase
+import com.example.netweaver.domain.usecase.posts.UnLikePostUseCase
 import com.example.netweaver.domain.usecase.user.RegisterWithEmailUseCase
 import com.example.netweaver.domain.usecase.user.SignInWithEmailUseCase
 import com.example.netweaver.domain.usecase.validation.ValidateEmailUseCase
@@ -33,12 +34,15 @@ object AppModule {
     fun provideRepository(
         postgrest: Postgrest,
         supabaseStorage: Storage,
-        firestore: FirebaseFirestore
+        firestore: FirebaseFirestore,
+        firebaseAuth: FirebaseAuth
+
     ): Repository =
         RepositoryImplementation(
             postgrest = postgrest,
             firestore = firestore,
-            supabaseStorage = supabaseStorage
+            supabaseStorage = supabaseStorage,
+            firebaseAuth = firebaseAuth
         )
 
     @Provides
@@ -77,6 +81,11 @@ object AppModule {
     @Singleton
     fun provideLikePostUseCase(repository: Repository) =
         LikePostUseCase(repository = repository)
+
+    @Provides
+    @Singleton
+    fun provideUnLikePostUseCase(repository: Repository) =
+        UnLikePostUseCase(repository = repository)
 
     @Provides
     @Singleton

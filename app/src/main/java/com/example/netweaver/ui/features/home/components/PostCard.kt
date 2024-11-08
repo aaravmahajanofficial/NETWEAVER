@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
@@ -37,7 +38,12 @@ import com.example.netweaver.domain.model.Post
 import com.example.netweaver.utils.ExpandableText
 
 @Composable
-fun PostCard(post: Post, onLikePost: () -> Unit) {
+fun PostCard(
+    post: Post,
+    onLikePost: () -> Unit,
+    onUnLikePost: () -> Unit,
+    isProcessingReaction: Boolean = false
+) {
 
     Surface(
         modifier = Modifier
@@ -238,25 +244,41 @@ fun PostCard(post: Post, onLikePost: () -> Unit) {
                 horizontalArrangement = Arrangement.SpaceAround
             ) {
 
+                if (post.isLiked) {
+                    ReactionButton(
+                        iconPainter = painterResource(R.drawable.like_count),
+                        labelText = "Like",
+                        onReactionClick = onUnLikePost,
+                        labelTextColor = MaterialTheme.colorScheme.primary,
+                        tintFilter = null,
+                        enabled = !isProcessingReaction
+                    )
+                } else {
+                    ReactionButton(
+                        iconPainter = painterResource(R.drawable.like),
+                        labelText = "Like",
+                        onReactionClick = onLikePost,
+                        enabled = !isProcessingReaction
+                    )
+                }
                 ReactionButton(
-                    icon = painterResource(R.drawable.like),
-                    pressedIcon = painterResource(R.drawable.like_count),
-                    title = "Like",
-                    onClick = onLikePost,
-                    isPressed = post.isLiked
+                    iconPainter = painterResource(R.drawable.comment),
+                    labelText = "Comment",
+                    onReactionClick = {},
+                    enabled = !isProcessingReaction
                 )
                 ReactionButton(
-                    icon = painterResource(R.drawable.comment),
-                    title = "Comment",
-                    onClick = {})
+                    iconPainter = painterResource(R.drawable.share),
+                    labelText = "Share",
+                    onReactionClick = {},
+                    enabled = !isProcessingReaction
+                )
                 ReactionButton(
-                    icon = painterResource(R.drawable.share),
-                    title = "Share",
-                    onClick = {})
-                ReactionButton(
-                    icon = painterResource(R.drawable.save),
-                    title = "Save",
-                    onClick = {})
+                    iconPainter = painterResource(R.drawable.save),
+                    labelText = "Save",
+                    onReactionClick = {},
+                    enabled = !isProcessingReaction
+                )
 
             }
 
@@ -270,11 +292,12 @@ fun PostCard(post: Post, onLikePost: () -> Unit) {
 
 @Composable
 fun ReactionButton(
-    icon: Painter,
-    pressedIcon: Painter? = null,
-    title: String,
-    onClick: () -> Unit,
-    isPressed: Boolean = false
+    iconPainter: Painter,
+    labelText: String,
+    enabled: Boolean,
+    onReactionClick: () -> Unit,
+    labelTextColor: Color = MaterialTheme.colorScheme.tertiary,
+    tintFilter: ColorFilter? = ColorFilter.tint(MaterialTheme.colorScheme.tertiary)
 ) {
 
     Column(
@@ -283,22 +306,24 @@ fun ReactionButton(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter = if (isPressed == true) pressedIcon!! else icon,
+            painter = iconPainter,
             contentDescription = null,
-            colorFilter = if (isPressed == true) null else ColorFilter.tint(MaterialTheme.colorScheme.tertiary),
+            colorFilter = tintFilter,
             modifier = Modifier
                 .size(16.dp)
                 .clickable {
-                    onClick()
+                    if (enabled == true) {
+                        onReactionClick()
+                    }
                 }
         )
 
         Spacer(modifier = Modifier.height(2.dp))
 
         Text(
-            title,
+            labelText,
             style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.W500),
-            color = if (isPressed == true) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.tertiary
+            color = labelTextColor
         )
 
     }
