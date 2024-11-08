@@ -8,6 +8,7 @@ import javax.inject.Inject
 class UnLikePostUseCase @Inject constructor(private val repository: Repository) {
     suspend operator fun invoke(post: Post): Result<Unit> = try {
         repository.unlikePost(post)
+        Result.Success(Unit)
     } catch (e: Exception) {
         Result.Error(e)
     }

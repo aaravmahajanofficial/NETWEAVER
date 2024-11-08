@@ -52,24 +52,18 @@ class HomeScreenViewModel @Inject constructor(
 
                     _homeUiState.update { it.copy(reactionQueue = _homeUiState.value.reactionQueue + event.post.id) }
 
-                    try {
-                        when (val result = likePostUseCase(post = event.post)) {
-                            is Result.Success -> {
-                                _homeUiState.update { it.copy(success = "Successfully liked the post") }
-                            }
-
-                            is Result.Error -> {
-                                _homeUiState.update { it.copy(error = result.exception.message) }
-                            }
+                    when (val result = likePostUseCase(post = event.post)) {
+                        is Result.Success -> {
+                            _homeUiState.update { it.copy(success = "Successfully liked the post") }
                         }
 
-                    } catch (e: Exception) {
-                        _homeUiState.update { it.copy(error = e.message) }
-                    } finally {
-                        _homeUiState.update { it.copy(reactionQueue = _homeUiState.value.reactionQueue - event.post.id) }
+                        is Result.Error -> {
+                            _homeUiState.update { it.copy(error = result.exception.message) }
+                        }
                     }
-                }
 
+                    _homeUiState.update { it.copy(reactionQueue = _homeUiState.value.reactionQueue - event.post.id) }
+                }
 
             }
 
@@ -83,22 +77,18 @@ class HomeScreenViewModel @Inject constructor(
 
                     _homeUiState.update { it.copy(reactionQueue = _homeUiState.value.reactionQueue + event.post.id) }
 
-                    try {
-                        when (val result = unLikePostUseCase(post = event.post)) {
-                            is Result.Success -> {
-                                _homeUiState.update { it.copy(success = "Successfully unliked the post") }
-                            }
-
-                            is Result.Error -> {
-                                _homeUiState.update { it.copy(error = result.exception.message) }
-                            }
+                    when (val result = unLikePostUseCase(post = event.post)) {
+                        is Result.Success -> {
+                            _homeUiState.update { it.copy(success = "Successfully unliked the post") }
                         }
 
-                    } catch (e: Exception) {
-                        _homeUiState.update { it.copy(error = e.message) }
-                    } finally {
-                        _homeUiState.update { it.copy(reactionQueue = _homeUiState.value.reactionQueue - event.post.id) }
+                        is Result.Error -> {
+                            _homeUiState.update { it.copy(error = result.exception.message) }
+                        }
                     }
+
+                    _homeUiState.update { it.copy(reactionQueue = _homeUiState.value.reactionQueue - event.post.id) }
+
                 }
 
             }
