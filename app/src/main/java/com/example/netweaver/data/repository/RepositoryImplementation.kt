@@ -154,7 +154,7 @@ class RepositoryImplementation @Inject constructor(
 
         }
 
-    override suspend fun storeToBucket(
+    override suspend fun storeMediaToBucket(
         byteArrayList: List<ByteArray?>?,
         fileExtensions: List<String?>
     ): Result<List<String>?> =
@@ -228,7 +228,10 @@ class RepositoryImplementation @Inject constructor(
     ): Result<Unit> =
         try {
             when (val response =
-                storeToBucket(byteArrayList = byteArrayList, fileExtensions = fileExtensions)) {
+                storeMediaToBucket(
+                    byteArrayList = byteArrayList,
+                    fileExtensions = fileExtensions
+                )) {
                 is Result.Error -> {
                     response.exception
                 }

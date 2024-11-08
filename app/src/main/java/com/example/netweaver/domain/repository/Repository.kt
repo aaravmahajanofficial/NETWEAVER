@@ -7,30 +7,27 @@ import kotlinx.coroutines.flow.Flow
 
 interface Repository {
 
-    suspend fun getUsersByIds(userIds: List<String>): Result<List<User>>
-
+    // posts
     suspend fun getFeedPosts(): Flow<Result<List<Post>>>
-
-    suspend fun storeToBucket(
-        byteArray: List<ByteArray?>?,
-        fileExtensions: List<String?>
-    ): Result<List<String>?>
-
-    suspend fun getUserById(userId: String): Result<User>
-
-    suspend fun upsertUser(user: User): Result<User>
-
+    suspend fun likePost(post: Post): Result<Unit>
+    suspend fun unlikePost(post: Post): Result<Unit>
     suspend fun getLikesForPosts(postIds: List<String>): Result<Set<String>>
-
     suspend fun createPost(
         content: String,
         byteArrayList: List<ByteArray?>?,
         fileExtensions: List<String?>
     ): Result<Unit>
 
-    suspend fun likePost(post: Post): Result<Unit>
+    // users
+    suspend fun getUsersByIds(userIds: List<String>): Result<List<User>>
+    suspend fun getUserById(userId: String): Result<User>
+    suspend fun upsertUser(user: User): Result<User>
 
-    suspend fun unlikePost(post: Post): Result<Unit>
+    // MISC
+    suspend fun storeMediaToBucket(
+        byteArray: List<ByteArray?>?,
+        fileExtensions: List<String?>
+    ): Result<List<String>?>
 
 //    suspend fun sharePost(postId: String): Result<Unit>
 }
