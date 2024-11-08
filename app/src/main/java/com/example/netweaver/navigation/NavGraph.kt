@@ -72,13 +72,16 @@ fun NavGraph(
 
     val startDestination =
         when (authState) {
-            is AuthState.Loading -> {}
+            is AuthState.Loading -> {
+                Routes.Home.route
+            }
+
             is AuthState.Success -> {
                 Routes.Home.route
             }
 
             is AuthState.Error -> {
-                Routes.Login.route
+                Routes.Home.route
             }
         }
 
