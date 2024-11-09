@@ -12,9 +12,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.netweaver.ui.features.auth.AuthState
 import com.example.netweaver.ui.features.auth.AuthViewModel
 import com.example.netweaver.ui.features.auth.ForgotPasswordScreen
@@ -35,19 +37,22 @@ class AppNavigator(private val navController: NavHostController) {
 
     fun navigateTo(event: NavigationEvent) {
         when (event) {
-            NavigationEvent.NavigationToHome -> navController.navigate(route = Routes.Home.route) {
+            is NavigationEvent.NavigationToHome -> navController.navigate(route = Routes.Home.route) {
                 popUpTo(route = Routes.Login.route) {
                     inclusive = true
                 }
             }
 
-            NavigationEvent.NavigationToMyNetwork -> navController.navigate(route = Routes.Home.route)
-            NavigationEvent.NavigationToJobs -> navController.navigate(route = Routes.Jobs.route)
-            NavigationEvent.NavigationToNotifications -> navController.navigate(route = Routes.Notifications.route)
-            NavigationEvent.NavigationToPost -> navController.navigate(route = Routes.Post.route)
-            NavigationEvent.NavigationToMessages -> navController.navigate(route = Routes.Messages.route)
-            NavigationEvent.NavigationToProfile -> navController.navigate(route = Routes.Profile.route)
-            NavigationEvent.NavigateToLogin -> navController.navigate(route = Routes.Login.route) {
+            is NavigationEvent.NavigationToMyNetwork -> navController.navigate(route = Routes.Home.route)
+            is NavigationEvent.NavigationToJobs -> navController.navigate(route = Routes.Jobs.route)
+            is NavigationEvent.NavigationToNotifications -> navController.navigate(route = Routes.Notifications.route)
+            is NavigationEvent.NavigationToPost -> navController.navigate(route = Routes.Post.route)
+            is NavigationEvent.NavigationToMessages -> navController.navigate(route = Routes.Messages.route)
+            is NavigationEvent.NavigationToProfile -> navController.navigate(
+                route = Routes.Profile.createRoute(event.userId)
+            )
+
+            is NavigationEvent.NavigateToLogin -> navController.navigate(route = Routes.Login.route) {
                 popUpTo(0) {
                     inclusive = true
                 }
@@ -111,13 +116,24 @@ fun NavGraph(
             }
         ) {
 
-            composable(route = Routes.Home.route) { HomeScreen() }
+            composable(route = Routes.Home.route) {
+                HomeScreen(onNavigationEvent = { event ->
+                    appNavigator.navigateTo(event)
+                })
+            }
             composable(route = Routes.MyNetwork.route) { MyNetworkScreen() }
-            composable(route = Routes.Post.route) { HomeScreen() }
+            composable(route = Routes.Post.route) {
+                HomeScreen(onNavigationEvent = { event ->
+                    appNavigator.navigateTo(event)
+                })
+            }
             composable(route = Routes.Notifications.route) { NotificationsScreen() }
             composable(route = Routes.Jobs.route) { JobsScreen() }
             composable(route = Routes.Messages.route) { MessagesScreen() }
-            composable(route = Routes.Profile.route) { ProfileScreen() }
+            composable(
+                route = Routes.Profile.route,
+                arguments = listOf(navArgument("userId") { type = NavType.StringType })
+            ) { ProfileScreen() }
             composable(route = Routes.CreatePost.route) {
                 CreatePostScreen(
                     onNavigateBack = {
@@ -139,6 +155,6 @@ sealed class NavigationEvent {
     object NavigationToNotifications : NavigationEvent()
     object NavigationToJobs : NavigationEvent()
     object NavigationToMessages : NavigationEvent()
-    object NavigationToProfile : NavigationEvent()
+    data class NavigationToProfile(val userId: String) : NavigationEvent()
     object NavigateToLogin : NavigationEvent()
 }

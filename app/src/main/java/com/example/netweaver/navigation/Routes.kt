@@ -11,7 +11,10 @@ sealed class Routes(val route: String) {
     object Notifications : Routes("notifications")
     object Jobs : Routes("jobs")
     object Messages : Routes("messages")
-    object Profile : Routes("profile")
+    object Profile : Routes("profile/{userId}") {
+        fun createRoute(userId: String) = "profile/$userId"
+    }
+
     object CreatePost : Routes("createPost")
     object Login : Routes("loginPage")
     object Register : Routes("registerPage")

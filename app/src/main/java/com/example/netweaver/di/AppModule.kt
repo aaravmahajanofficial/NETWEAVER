@@ -10,6 +10,7 @@ import com.example.netweaver.domain.usecase.posts.LikePostUseCase
 import com.example.netweaver.domain.usecase.posts.UnLikePostUseCase
 import com.example.netweaver.domain.usecase.user.RegisterWithEmailUseCase
 import com.example.netweaver.domain.usecase.user.SignInWithEmailUseCase
+import com.example.netweaver.domain.usecase.user.UserProfileUseCase
 import com.example.netweaver.domain.usecase.validation.ValidateEmailUseCase
 import com.example.netweaver.domain.usecase.validation.ValidateNameUseCase
 import com.example.netweaver.domain.usecase.validation.ValidatePasswordUseCase
@@ -108,4 +109,9 @@ object AppModule {
     @Singleton
     fun provideRegisterWithEmailUseCase(authRepository: AuthRepository) =
         RegisterWithEmailUseCase(authRepository = authRepository)
+
+    @Provides
+    @Singleton
+    fun provideUserProfileUseCase(repository: Repository) =
+        UserProfileUseCase(repository = repository)
 }

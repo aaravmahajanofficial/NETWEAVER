@@ -19,12 +19,16 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.netweaver.domain.model.Post
+import com.example.netweaver.navigation.NavigationEvent
 import com.example.netweaver.ui.components.AppScaffold
 import com.example.netweaver.ui.features.home.components.PostCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(viewModel: HomeScreenViewModel = hiltViewModel()) {
+fun HomeScreen(
+    viewModel: HomeScreenViewModel = hiltViewModel(),
+    onNavigationEvent: (NavigationEvent) -> Unit
+) {
 
     val uiState by viewModel.homeUiState.collectAsStateWithLifecycle()
 
@@ -42,7 +46,9 @@ fun HomeScreen(viewModel: HomeScreenViewModel = hiltViewModel()) {
                 },
                 onUnLikePost = { post ->
                     viewModel.onEvent(HomeEvent.UnLikePost(post))
-                }
+                },
+                onNavigationEvent = onNavigationEvent
+
             )
 
         }
@@ -55,6 +61,7 @@ private fun HomeContent(
     onLike: (Post) -> Unit,
     onUnLikePost: (Post) -> Unit,
     paddingValues: PaddingValues,
+    onNavigationEvent: (NavigationEvent) -> Unit
 ) {
 
     when {
@@ -89,7 +96,17 @@ private fun HomeContent(
                         post = post,
                         onLikePost = { onLike(post) },
                         onUnLikePost = { onUnLikePost(post) },
-                        isProcessingReaction = post.id in uiState.reactionQueue
+                        isProcessingReaction = post.id in uiState.reactionQueue,
+                        onNavigationEvent = {
+//                          post.user != null && post.user.userId != null
+                            post.user?.userId?.let { userId ->
+                                onNavigationEvent(
+                                    NavigationEvent.NavigationToProfile(
+                                        userId = userId
+                                    )
+                                )
+                            }
+                        }
                     )
                 }
             }

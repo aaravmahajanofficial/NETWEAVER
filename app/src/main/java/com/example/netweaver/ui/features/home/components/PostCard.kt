@@ -42,7 +42,8 @@ fun PostCard(
     post: Post,
     onLikePost: () -> Unit,
     onUnLikePost: () -> Unit,
-    isProcessingReaction: Boolean = false
+    isProcessingReaction: Boolean = false,
+    onNavigationEvent: () -> Unit,
 ) {
 
     Surface(
@@ -77,6 +78,9 @@ fun PostCard(
                             .align(alignment = Alignment.Top)
                             .size(46.dp)
                             .clip(shape = CircleShape)
+                            .clickable {
+                                onNavigationEvent()
+                            }
                     ) {
                         AsyncImage(
                             model = post.user?.profileImageUrl,
