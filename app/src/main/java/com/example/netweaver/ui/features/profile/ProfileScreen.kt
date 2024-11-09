@@ -1,8 +1,8 @@
 package com.example.netweaver.ui.features.profile
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,11 +19,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
@@ -36,6 +37,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -130,20 +132,20 @@ private fun ProfileContent(paddingValues: PaddingValues) {
                     Text(
                         text = "Aarav Mahajan",
                         modifier = Modifier.padding(start = 12.dp),
-                        style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.headlineSmall,
                         color = MaterialTheme.colorScheme.onSurface
                     )
 
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(2.dp))
 
                     Text(
                         text = "Pre-Final Year | Thapar Institute of Engineering & Technology, Patiala, India",
                         modifier = Modifier.padding(start = 12.dp),
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.onSurface
                     )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(14.dp))
 
                     Text(
                         text = "Google Developer Student Clubs Thapar • Thapar Institute of Engineering & Technology",
@@ -152,26 +154,53 @@ private fun ProfileContent(paddingValues: PaddingValues) {
                         color = MaterialTheme.colorScheme.onSurface
                     )
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(2.dp))
 
                     Text(
                         text = "Panchkula, Haryana, India",
                         modifier = Modifier.padding(start = 12.dp),
                         style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onTertiary
+                        color = Color.Gray
                     )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(14.dp))
 
                     Text(
                         text = "${500}+ connections",
                         modifier = Modifier.padding(start = 12.dp),
-                        style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.W600),
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.primary
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
 
+                    TextButton(
+                        shape = CircleShape,
+                        border = BorderStroke(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.primary
+                        ),
+                        colors = ButtonDefaults.textButtonColors(
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            contentColor = MaterialTheme.colorScheme.primary
+                        ),
+                        modifier = Modifier
+                            .height(34.dp)
+                            .fillMaxWidth()
+                            .padding(horizontal = 12.dp),
+                        onClick = {},
+                        contentPadding = PaddingValues(0.dp)
+                    ) {
+                        Text(
+                            "Enhance profile",
+                            style = MaterialTheme.typography.titleMedium,
+                            textAlign = TextAlign.Center,
+                        )
+
+                    }
+
+                    Spacer(modifier = Modifier.height(18.dp))
                 }
             }
 
@@ -200,7 +229,7 @@ private fun ProfileContent(paddingValues: PaddingValues) {
                         Text(
                             "About",
                             style = MaterialTheme.typography.titleMedium.copy(
-                                fontWeight = FontWeight.W600,
+                                fontWeight = FontWeight.SemiBold,
                                 fontSize = 20.sp
                             ),
                             color = MaterialTheme.colorScheme.onSurface
@@ -238,19 +267,20 @@ private fun ProfileContent(paddingValues: PaddingValues) {
                 Column(
                     modifier = Modifier
                         .padding(12.dp),
-                    horizontalAlignment = Alignment.Start
+                    horizontalAlignment = Alignment.Start,
+                    verticalArrangement = Arrangement.Top
                 ) {
 
                     Row(
                         modifier = Modifier
                             .fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
+                        verticalAlignment = Alignment.Top,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Column(
                             modifier = Modifier,
                             horizontalAlignment = Alignment.Start,
-                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                            verticalArrangement = Arrangement.spacedBy(2.dp)
                         ) {
                             Text(
                                 "Activity",
@@ -262,35 +292,37 @@ private fun ProfileContent(paddingValues: PaddingValues) {
                             )
                             Text(
                                 "6,046 followers",
-                                style = MaterialTheme.typography.labelMedium,
+                                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
                                 color = MaterialTheme.colorScheme.primary
                             )
                         }
                         Row(
                             modifier = Modifier,
-                            horizontalArrangement = Arrangement.spacedBy(24.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                            horizontalArrangement = Arrangement.spacedBy(22.dp),
+                            verticalAlignment = Alignment.Top
                         ) {
-                            Box(
+                            TextButton(
+                                shape = CircleShape,
+                                border = BorderStroke(
+                                    width = 1.25.dp,
+                                    color = MaterialTheme.colorScheme.primary
+                                ),
+                                colors = ButtonDefaults.textButtonColors(
+                                    containerColor = MaterialTheme.colorScheme.surface,
+                                    contentColor = MaterialTheme.colorScheme.primary
+                                ),
                                 modifier = Modifier
-                                    .background(
-                                        color = MaterialTheme.colorScheme.surface,
-                                        shape = CircleShape
-                                    )
-                                    .border(
-                                        1.dp,
-                                        color = MaterialTheme.colorScheme.primary,
-                                        shape = CircleShape
-                                    )
                                     .height(32.dp)
-                                    .width(120.dp),
-                                contentAlignment = Alignment.Center
+                                    .weight(1f)
+                                    .padding(start = 72.dp),
+                                onClick = {},
+                                contentPadding = PaddingValues(0.dp)
                             ) {
-
                                 Text(
                                     "Create a post",
-                                    style = MaterialTheme.typography.labelLarge,
-                                    color = MaterialTheme.colorScheme.primary
+                                    style = MaterialTheme.typography.titleSmall,
+                                    fontSize = 16.sp,
+                                    textAlign = TextAlign.Center,
                                 )
 
                             }
@@ -310,28 +342,9 @@ private fun ProfileContent(paddingValues: PaddingValues) {
                         color = MaterialTheme.colorScheme.outline
                     )
 
-                    Spacer(modifier = Modifier.height(18.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            "Show all posts",
-                            style = MaterialTheme.typography.titleSmall,
-                            color = MaterialTheme.colorScheme.onBackground
-                        )
-
-                        Spacer(modifier = Modifier.width(4.dp))
-
-                        Icon(
-                            painter = painterResource(R.drawable.right_arrow),
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.tertiary,
-                            modifier = Modifier.size(14.dp)
-                        )
-                    }
+                    ShowAllBanner(title = "Show all posts")
 
 
                 }
@@ -340,122 +353,128 @@ private fun ProfileContent(paddingValues: PaddingValues) {
             }
         }
 
-        // Experience
-        item {
+        val cardTitleList = listOf<String>("Experience", "Education")
+        repeat(cardTitleList.size) { index ->
+            item {
 
-            Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(color = MaterialTheme.colorScheme.surface),
-            ) {
-                Column(
+                Box(
                     modifier = Modifier
-                        .padding(12.dp),
-                    horizontalAlignment = Alignment.Start
+                        .fillMaxWidth()
+                        .background(color = MaterialTheme.colorScheme.surface),
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
+                    Column(
+                        modifier = Modifier
+                            .padding(12.dp),
+                        horizontalAlignment = Alignment.Start
                     ) {
-
-                        Text(
-                            "Experience",
-                            style = MaterialTheme.typography.titleLarge.copy(
-                                fontWeight = FontWeight.W600,
-                                fontSize = 20.sp
-                            ),
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
                         Row(
-                            modifier = Modifier,
-                            horizontalArrangement = Arrangement.spacedBy(24.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Icon(
-                                painter = painterResource(R.drawable.add),
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.tertiary,
-                                modifier = Modifier.size(24.dp)
+
+                            Text(
+                                cardTitleList[index],
+                                style = MaterialTheme.typography.titleLarge.copy(
+                                    fontWeight = FontWeight.W600,
+                                    fontSize = 20.sp
+                                ),
+                                color = MaterialTheme.colorScheme.onSurface
                             )
+                            Row(
+                                modifier = Modifier,
+                                horizontalArrangement = Arrangement.spacedBy(24.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.add),
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.tertiary,
+                                    modifier = Modifier.size(24.dp)
+                                )
 
 
-                            Icon(
-                                painter = painterResource(R.drawable.pencil),
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.tertiary,
-                                modifier = Modifier.size(24.dp)
+                                Icon(
+                                    painter = painterResource(R.drawable.pencil),
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.tertiary,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(14.dp))
+
+                        repeat(2) {
+                            CustomCard(
+                                title = "Thapar Institute of Engineering & Technology",
+                                subTitle = "Bachelor of Engineering - BE, Computer Engineering",
+                                startDate = "Sep 2022",
+                                endDate = "Oct 2026"
                             )
                         }
+
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        ShowAllBanner(title = buildString {
+                            append("Show all ")
+                            append(3)
+                            append(" ")
+                            append(cardTitleList[index].lowercase())
+                            if (3 != 1) append("s")
+                        })
+
                     }
-
-                    Spacer(modifier = Modifier.height(14.dp))
-
-                    repeat(2) {
-                        Card {
-                            ExperienceCard(
-                                title = "UI/UX Designer",
-                                companyName = "Athena Infomics",
-                                startDate = "Sep 2020",
-                                endDate = "Apr 2021"
-                            )
-                        }
-                    }
-
-
                 }
+
+
             }
-
-
         }
 
     }
 }
 
 @Composable
-private fun Card(
-    content: @Composable (() -> Unit) = {}
-) {
-    Box(
-        modifier = Modifier
-            .padding(vertical = 4.dp)
-            .fillMaxWidth()
-            .background(color = MaterialTheme.colorScheme.surface)
-            .border(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.outline,
-                shape = RoundedCornerShape(12.dp)
-            )
-            .aspectRatio(2.75f),
+private fun ShowAllBanner(title: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
     ) {
+        Text(
+            title,
+            style = MaterialTheme.typography.titleMedium,
+            color = Color.DarkGray
+        )
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 12.dp),
-            horizontalAlignment = Alignment.Start,
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            content()
-        }
+        Spacer(modifier = Modifier.width(4.dp))
 
+        Icon(
+            painter = painterResource(R.drawable.right_arrow),
+            contentDescription = null,
+            tint = Color.DarkGray,
+            modifier = Modifier.size(18.dp)
+        )
     }
 }
 
 @Composable
-private fun ExperienceCard(
+private fun CustomCard(
     title: String,
-    companyName: String,
+    subTitle: String,
     startDate: String,
     endDate: String
 ) {
     Column(
-        modifier = Modifier.fillMaxHeight(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.SpaceEvenly
     ) {
+
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
@@ -465,48 +484,52 @@ private fun ExperienceCard(
 
             Box(
                 modifier = Modifier
-                    .size(64.dp)
+                    .size(46.dp)
                     .background(
-                        color = Color.Black,
-                        shape = RoundedCornerShape(4.dp)
+                        color = Color.Red,
                     )
                     .clip(RoundedCornerShape(4.dp))
             )
 
             Column(
                 modifier = Modifier
-                    .padding(horizontal = 12.dp, vertical = 8.dp)
+                    .padding(horizontal = 12.dp)
                     .weight(1f),
                 horizontalAlignment = Alignment.Start,
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
                     title,
-                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground,
                 )
 
+                Spacer(modifier = Modifier.height(2.dp))
+
                 Text(
-                    companyName,
-                    style = MaterialTheme.typography.bodySmall,
+                    subTitle,
+                    style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.onBackground,
                 )
+
+                Spacer(modifier = Modifier.height(2.dp))
+
+                Text(
+                    "$startDate - $endDate", style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onTertiary
+                )
+
+                Spacer(modifier = Modifier.height(18.dp))
+
+
             }
 
 
         }
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                "$startDate - $endDate • 8 months",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onTertiary,
-            )
-        }
+        HorizontalDivider(color = MaterialTheme.colorScheme.outline)
+
     }
 
 

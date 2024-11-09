@@ -22,7 +22,7 @@ fun ExpandableText(
 
     Text(
         text = text,
-        style = MaterialTheme.typography.bodyMedium,
+        style = MaterialTheme.typography.labelLarge,
         color = MaterialTheme.colorScheme.onSurface,
         maxLines = if (isExpanded) Int.MAX_VALUE else maxLines,
         overflow = TextOverflow.Ellipsis,
