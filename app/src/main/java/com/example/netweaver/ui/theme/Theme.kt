@@ -26,7 +26,7 @@ private val DarkColorScheme = darkColorScheme(
     onBackground = Color(0xE6FFFFFF),
 
     // posts
-    surface = Color(0xFF1d2226),
+    surface = Color(0xFF1D2226),
     onSurface = Color(0xE6FFFFFF),
 
     // hyperlinks, numbers etc.

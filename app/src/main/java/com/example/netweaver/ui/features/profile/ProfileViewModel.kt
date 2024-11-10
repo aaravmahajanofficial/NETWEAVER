@@ -12,6 +12,7 @@ import com.example.netweaver.domain.usecase.user.GetExperiencesUseCase
 import com.example.netweaver.domain.usecase.user.GetUserPostsUseCase
 import com.example.netweaver.domain.usecase.user.UserProfileUseCase
 import com.example.netweaver.ui.model.Result
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -28,6 +29,7 @@ class ProfileViewModel @Inject constructor(
     private val getEducationUseCase: GetEducationUseCase,
     private val getExperiencesUseCase: GetExperiencesUseCase,
     private val getUserPostsUseCase: GetUserPostsUseCase,
+    firebaseAuth: FirebaseAuth,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -36,8 +38,18 @@ class ProfileViewModel @Inject constructor(
     private val _profileUiState = MutableStateFlow(ProfileState())
     val profileUiState: StateFlow<ProfileState> = _profileUiState.asStateFlow()
 
+    private val _profileType = MutableStateFlow<ProfileType>(ProfileType.PersonalProfile)
+    val profileType: StateFlow<ProfileType> = _profileType.asStateFlow()
+
     init {
         if (validateUserId()) {
+
+            if (userId == firebaseAuth.currentUser?.uid) {
+                _profileType.value = ProfileType.PersonalProfile
+            } else {
+                _profileType.value = ProfileType.OtherProfile
+            }
+
             loadProfile(isRefreshing = false)
         }
     }
@@ -167,11 +179,26 @@ data class ProfileState(
     val isRefreshing: Boolean = false,
     val error: String? = null,
     val success: String? = null,
+
     val user: User? = null,
     val posts: List<Post>? = null,
     val education: List<Education>? = null,
-    val experience: List<Experience>? = null
+    val experience: List<Experience>? = null,
+
+    val isConnected: Boolean = false,
+    val connectionStatus: ConnectionStatus = ConnectionStatus.NONE
 )
+
+sealed class ProfileType {
+    data object PersonalProfile : ProfileType()
+    data object OtherProfile : ProfileType()
+}
+
+enum class ConnectionStatus {
+    NONE,
+    PENDING,
+    CONNECTED
+}
 
 sealed class ProfileEvent {
     object Refresh : ProfileEvent()

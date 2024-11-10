@@ -9,7 +9,6 @@ import androidx.lifecycle.lifecycleScope
 import com.example.netweaver.navigation.NavGraph
 import com.example.netweaver.ui.theme.NETWEAVERTheme
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -23,7 +22,6 @@ class MainActivity : ComponentActivity() {
         splashScreen.setKeepOnScreenCondition { keepSplashScreen }
 
         lifecycleScope.launch {
-            delay(500L)
             keepSplashScreen = false
         }
 

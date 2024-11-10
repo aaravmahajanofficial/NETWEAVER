@@ -3,6 +3,8 @@ package com.example.netweaver.ui.features.profile
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil3.compose.AsyncImage
 import com.example.netweaver.R
 import com.example.netweaver.domain.model.Education
 import com.example.netweaver.domain.model.Experience
@@ -56,6 +59,7 @@ fun ProfileScreen(
 ) {
 
     val uiState by viewModel.profileUiState.collectAsStateWithLifecycle()
+    val profileType by viewModel.profileType.collectAsStateWithLifecycle()
 
     AppScaffold(
         showBack = true,
@@ -64,6 +68,7 @@ fun ProfileScreen(
         content = { innerPadding ->
             ProfileContent(
                 uiState = uiState,
+                profileType = profileType,
                 paddingValues = PaddingValues(
                     top = innerPadding.calculateTopPadding(),
                     bottom = innerPadding.calculateBottomPadding(),
@@ -76,6 +81,7 @@ fun ProfileScreen(
 @Composable
 private fun ProfileContent(
     uiState: ProfileState,
+    profileType: ProfileType,
     paddingValues: PaddingValues
 ) {
 
@@ -103,12 +109,23 @@ private fun ProfileContent(
                         .fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Image(
-                        painter = painterResource(R.drawable.profile_background),
-                        contentDescription = "",
-                        contentScale = ContentScale.Fit,
-                        modifier = Modifier.fillMaxSize()
-                    )
+                    if (uiState.user?.profileImageUrl.isNullOrBlank()) {
+                        Image(
+                            painter = if (isSystemInDarkTheme()) painterResource(R.drawable.profile_background_dark) else painterResource(
+                                R.drawable.profile_background
+                            ),
+                            contentDescription = "",
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    } else {
+                        AsyncImage(
+                            model = uiState.user.profileImageUrl,
+                            contentDescription = "",
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
                 }
 
                 // Avatar
@@ -149,12 +166,12 @@ private fun ProfileContent(
                         color = MaterialTheme.colorScheme.onSurface
                     )
 
-                    Spacer(modifier = Modifier.height(2.dp))
+                    Spacer(modifier = Modifier.height(1.dp))
 
                     Text(
                         text = uiState.user?.headline ?: "--",
                         modifier = Modifier.padding(start = 12.dp),
-                        style = MaterialTheme.typography.labelLarge,
+                        style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurface
                     )
 
@@ -180,39 +197,140 @@ private fun ProfileContent(
 
                     Spacer(modifier = Modifier.height(14.dp))
 
-                    Text(
-                        text = "${0} connections",
-                        modifier = Modifier.padding(start = 12.dp),
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
+                    when (profileType) {
+                        is ProfileType.OtherProfile -> {
+                            Text(
+                                text = "${0} connections",
+                                modifier = Modifier.padding(start = 12.dp),
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.onTertiary
+                            )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(16.dp))
 
-                    TextButton(
-                        shape = CircleShape,
-                        border = BorderStroke(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.secondary
-                        ),
-                        colors = ButtonDefaults.textButtonColors(
-                            containerColor = MaterialTheme.colorScheme.surface,
-                            contentColor = MaterialTheme.colorScheme.secondary
-                        ),
-                        modifier = Modifier
-                            .height(34.dp)
-                            .fillMaxWidth()
-                            .padding(horizontal = 12.dp),
-                        onClick = {},
-                        contentPadding = PaddingValues(0.dp)
-                    ) {
-                        Text(
-                            "Enhance profile",
-                            style = MaterialTheme.typography.titleMedium,
-                            textAlign = TextAlign.Center,
-                        )
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 12.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                when (uiState.connectionStatus) {
+                                    ConnectionStatus.NONE -> {
 
+                                        ProfileActionsButton(
+                                            title = "Connect",
+                                            icon = painterResource(R.drawable.connect),
+                                            containerColor = MaterialTheme.colorScheme.secondary,
+                                            contentColor = MaterialTheme.colorScheme.surface,
+                                            onClick = {}
+                                        )
+
+                                    }
+
+                                    ConnectionStatus.PENDING -> {
+
+                                        ProfileActionsButton(
+                                            title = "Pending",
+                                            icon = painterResource(R.drawable.clock),
+                                            containerColor = MaterialTheme.colorScheme.surface,
+                                            contentColor = MaterialTheme.colorScheme.secondary,
+                                            onClick = {}
+                                        )
+
+                                    }
+
+                                    ConnectionStatus.CONNECTED -> {}
+                                }
+
+                                Spacer(modifier = Modifier.width(8.dp))
+
+                                ProfileActionsButton(
+                                    title = "Message",
+                                    icon = painterResource(R.drawable.send),
+                                    containerColor = MaterialTheme.colorScheme.surface,
+                                    contentColor = MaterialTheme.colorScheme.secondary,
+                                    onClick = {}
+                                )
+
+                                Spacer(modifier = Modifier.width(8.dp))
+
+                                Box(
+                                    modifier = Modifier
+                                        .size(32.dp)
+                                        .background(
+                                            color = MaterialTheme.colorScheme.surface,
+                                            shape = CircleShape,
+                                        )
+                                        .border(
+                                            1.dp,
+                                            color = MaterialTheme.colorScheme.onTertiary,
+                                            shape = CircleShape
+                                        ),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.horizontal_options),
+                                        contentDescription = "More Options",
+                                        tint = MaterialTheme.colorScheme.tertiary,
+                                    )
+                                }
+
+                            }
+                        }
+
+                        is ProfileType.PersonalProfile -> {
+                            Text(
+                                text = "${0} connections",
+                                modifier = Modifier.padding(start = 12.dp),
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.secondary
+                            )
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 12.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                ProfileActionsButton(
+                                    title = "Edit Profile",
+                                    icon = painterResource(R.drawable.pencil),
+                                    containerColor = MaterialTheme.colorScheme.surface,
+                                    contentColor = MaterialTheme.colorScheme.secondary,
+                                    onClick = {}
+                                )
+
+                                Spacer(modifier = Modifier.width(8.dp))
+
+                                Box(
+                                    modifier = Modifier
+                                        .size(32.dp)
+                                        .background(
+                                            color = MaterialTheme.colorScheme.surface,
+                                            shape = CircleShape,
+                                        )
+                                        .border(
+                                            1.dp,
+                                            color = MaterialTheme.colorScheme.onTertiary,
+                                            shape = CircleShape
+                                        ),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.horizontal_options),
+                                        contentDescription = "More Options",
+                                        tint = MaterialTheme.colorScheme.tertiary,
+                                    )
+                                }
+                            }
+
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(18.dp))
@@ -301,59 +419,121 @@ private fun ProfileContent(
                         ) {
                             Text(
                                 "Activity",
-                                style = MaterialTheme.typography.titleLarge.copy(
-                                    fontWeight = FontWeight.W600,
-                                    fontSize = 20.sp
-                                ),
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 20.sp,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                             Text(
                                 "${0} followers",
-                                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.secondary
                             )
-                        }
-                        Row(
-                            modifier = Modifier,
-                            horizontalArrangement = Arrangement.spacedBy(22.dp),
-                            verticalAlignment = Alignment.Top
-                        ) {
-                            TextButton(
-                                shape = CircleShape,
-                                border = BorderStroke(
-                                    width = 1.25.dp,
-                                    color = MaterialTheme.colorScheme.secondary
-                                ),
-                                colors = ButtonDefaults.textButtonColors(
-                                    containerColor = MaterialTheme.colorScheme.surface,
-                                    contentColor = MaterialTheme.colorScheme.secondary
-                                ),
-                                modifier = Modifier
-                                    .height(32.dp)
-                                    .weight(1f)
-                                    .padding(start = 72.dp),
-                                onClick = {},
-                                contentPadding = PaddingValues(0.dp)
-                            ) {
-                                Text(
-                                    "Create a post",
-                                    style = MaterialTheme.typography.titleSmall,
-                                    fontSize = 16.sp,
-                                    textAlign = TextAlign.Center,
-                                )
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            if (uiState.posts.isNullOrEmpty()) {
+                                when (profileType) {
+                                    ProfileType.OtherProfile -> {
+                                        Column(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalAlignment = Alignment.Start,
+                                            verticalArrangement = Arrangement.SpaceEvenly
+                                        ) {
+                                            Text(
+//                                                "${uiState.user?.userId} haven't posted yet.",
+                                                "T-Pack haven't posted yet.",
+                                                style = MaterialTheme.typography.bodyLarge,
+                                                textAlign = TextAlign.Center,
+                                                color = MaterialTheme.colorScheme.tertiary
+                                            )
+                                            Text(
+//                                                "Recent posts ${uiState.user?.userId} shares will be displayed here.",
+                                                "Recent posts T-Pack shares will be displayed here.",
+                                                style = MaterialTheme.typography.labelLarge,
+                                                textAlign = TextAlign.Center,
+                                                color = MaterialTheme.colorScheme.tertiary
+                                            )
+                                        }
+                                    }
+
+                                    ProfileType.PersonalProfile -> {
+
+                                        Column(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalAlignment = Alignment.Start,
+                                            verticalArrangement = Arrangement.SpaceEvenly
+                                        ) {
+                                            Text(
+                                                "You haven't posted yet",
+                                                style = MaterialTheme.typography.bodyLarge,
+                                                textAlign = TextAlign.Center,
+                                                color = MaterialTheme.colorScheme.tertiary
+                                            )
+                                            Text(
+                                                "Posts you share will be displayed here.",
+                                                style = MaterialTheme.typography.labelLarge,
+                                                textAlign = TextAlign.Center,
+                                                color = MaterialTheme.colorScheme.tertiary
+                                            )
+                                        }
+
+                                    }
+                                }
+                            } else {
+
+                                repeat(uiState.posts.size) {
+
+
+                                }
 
                             }
 
-                            Icon(
-                                painter = painterResource(R.drawable.pencil),
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.tertiary,
-                                modifier = Modifier.size(24.dp)
-                            )
+                        }
+                        if (profileType is ProfileType.PersonalProfile) {
+                            Row(
+                                modifier = Modifier,
+                                horizontalArrangement = Arrangement.spacedBy(22.dp),
+                                verticalAlignment = Alignment.Top
+                            ) {
+                                TextButton(
+                                    shape = CircleShape,
+                                    border = BorderStroke(
+                                        width = 1.25.dp,
+                                        color = MaterialTheme.colorScheme.secondary
+                                    ),
+                                    colors = ButtonDefaults.textButtonColors(
+                                        containerColor = MaterialTheme.colorScheme.surface,
+                                        contentColor = MaterialTheme.colorScheme.secondary
+                                    ),
+                                    modifier = Modifier
+                                        .height(32.dp)
+                                        .weight(1f)
+                                        .padding(start = 72.dp),
+                                    onClick = {},
+                                    contentPadding = PaddingValues(0.dp)
+                                ) {
+                                    Text(
+                                        "Create a post",
+                                        style = MaterialTheme.typography.titleSmall,
+                                        fontSize = 16.sp,
+                                        textAlign = TextAlign.Center,
+                                    )
+
+                                }
+
+                                Icon(
+                                    painter = painterResource(R.drawable.pencil),
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.tertiary,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            }
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
                     HorizontalDivider(
                         color = MaterialTheme.colorScheme.outline
@@ -361,7 +541,7 @@ private fun ProfileContent(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    ShowAllBanner(title = "Show all posts")
+                    ShowAllBanner(title = "Show all activity")
 
 
                 }
