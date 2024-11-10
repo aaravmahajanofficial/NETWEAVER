@@ -5,18 +5,26 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class ExperienceDto(
+    @SerialName("id")
     val id: String,
+    @SerialName("user_id")
     val userId: String,
+    @SerialName("company_name")
     val companyName: String,
+    @SerialName("position")
     val position: String,
+    @SerialName("start_date")
     val startDate: Instant,
+    @SerialName("end_date")
     val endDate: Instant,
-    val description: String,
+    @SerialName("created_at")
     val createdAt: Instant,
+    @SerialName("updated_at")
     val updatedAt: Instant
 )
 
@@ -27,7 +35,6 @@ fun ExperienceDto.toDomain() = Experience(
     userId = userId,
     companyName = companyName,
     position = position,
-    description = description,
     startDate = startDate.toDateTime(),
     endDate = endDate.toDateTime()
 )
