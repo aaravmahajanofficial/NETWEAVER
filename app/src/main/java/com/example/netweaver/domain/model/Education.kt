@@ -10,5 +10,5 @@ data class Education(
     val degree: String = "",
     val field: String = "",
     val startDate: Instant = now(),
-    val endDate: Instant = now()
+    val endDate: Instant? = now()
 )

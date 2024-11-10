@@ -1,6 +1,7 @@
 package com.example.netweaver.data.remote.dto
 
 import com.example.netweaver.domain.model.Education
+import kotlinx.datetime.Clock.System.now
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -8,19 +9,19 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class EducationDto(
     @SerialName("id")
-    val id: String,
+    val id: String = "",
     @SerialName("user_id")
-    val userId: String,
+    val userId: String = "",
     @SerialName("school")
-    val school: String,
+    val school: String = "",
     @SerialName("degree")
-    val degree: String,
+    val degree: String = "",
     @SerialName("field")
-    val field: String,
+    val field: String = "",
     @SerialName("start_date")
-    val startDate: Instant,
+    val startDate: Instant = now(),
     @SerialName("end_date")
-    val endDate: Instant
+    val endDate: Instant = now()
 )
 
 fun EducationDto.toDomain() = Education(
