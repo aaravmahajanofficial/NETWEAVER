@@ -8,6 +8,9 @@ import com.example.netweaver.domain.usecase.posts.CreatePostUseCase
 import com.example.netweaver.domain.usecase.posts.GetPostsUseCase
 import com.example.netweaver.domain.usecase.posts.LikePostUseCase
 import com.example.netweaver.domain.usecase.posts.UnLikePostUseCase
+import com.example.netweaver.domain.usecase.user.GetEducationUseCase
+import com.example.netweaver.domain.usecase.user.GetExperiencesUseCase
+import com.example.netweaver.domain.usecase.user.GetUserPostsUseCase
 import com.example.netweaver.domain.usecase.user.RegisterWithEmailUseCase
 import com.example.netweaver.domain.usecase.user.SignInWithEmailUseCase
 import com.example.netweaver.domain.usecase.user.UserProfileUseCase
@@ -114,4 +117,20 @@ object AppModule {
     @Singleton
     fun provideUserProfileUseCase(repository: Repository) =
         UserProfileUseCase(repository = repository)
+
+    @Provides
+    @Singleton
+    fun provideGetUserPostsUseCase(repository: Repository) =
+        GetUserPostsUseCase(repository = repository)
+
+    @Provides
+    @Singleton
+    fun provideGetExperiencesUseCase(repository: Repository) =
+        GetExperiencesUseCase(repository = repository)
+
+    @Provides
+    @Singleton
+    fun provideGetEducationUseCase(repository: Repository) =
+        GetEducationUseCase(repository = repository)
+
 }

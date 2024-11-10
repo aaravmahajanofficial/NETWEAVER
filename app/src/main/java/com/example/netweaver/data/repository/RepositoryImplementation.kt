@@ -1,10 +1,14 @@
 package com.example.netweaver.data.repository
 
 import android.util.Log
+import com.example.netweaver.data.remote.dto.EducationDto
+import com.example.netweaver.data.remote.dto.ExperienceDto
 import com.example.netweaver.data.remote.dto.LikeDto
 import com.example.netweaver.data.remote.dto.PostDto
 import com.example.netweaver.data.remote.dto.UserDto
 import com.example.netweaver.data.remote.dto.toDomain
+import com.example.netweaver.domain.model.Education
+import com.example.netweaver.domain.model.Experience
 import com.example.netweaver.domain.model.Post
 import com.example.netweaver.domain.model.User
 import com.example.netweaver.domain.repository.Repository
@@ -348,6 +352,52 @@ class RepositoryImplementation @Inject constructor(
                 Result.Error(e)
             }
         }
+
+    override suspend fun getUserPosts(userId: String): Result<List<Post>> = try {
+        withContext(Dispatchers.IO) {
+
+            val response = postgrest.from("Posts").select {
+                filter {
+                    eq("user_id", userId)
+                }
+            }.decodeList<PostDto>()
+
+            Result.Success(response.map { it.toDomain() })
+        }
+    } catch (e: Exception) {
+        Result.Error(e)
+    }
+
+
+    override suspend fun getExperiences(userId: String): Result<List<Experience>> = try {
+        withContext(Dispatchers.IO) {
+
+            val response = postgrest.from("Experience").select {
+                filter {
+                    eq("user_id", userId)
+                }
+            }.decodeList<ExperienceDto>()
+
+            Result.Success(response.map { it.toDomain() })
+        }
+    } catch (e: Exception) {
+        Result.Error(e)
+    }
+
+    override suspend fun getEducation(userId: String): Result<List<Education>> = try {
+        withContext(Dispatchers.IO) {
+
+            val response = postgrest.from("Education").select {
+                filter {
+                    eq("user_id", userId)
+                }
+            }.decodeList<EducationDto>()
+
+            Result.Success(response.map { it.toDomain() })
+        }
+    } catch (e: Exception) {
+        Result.Error(e)
+    }
 }
 
 

@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -43,8 +42,12 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.netweaver.R
+import com.example.netweaver.domain.model.Education
+import com.example.netweaver.domain.model.Experience
 import com.example.netweaver.ui.components.AppScaffold
 import com.example.netweaver.utils.ExpandableText
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,6 +63,7 @@ fun ProfileScreen(
         scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState()),
         content = { innerPadding ->
             ProfileContent(
+                uiState = uiState,
                 paddingValues = PaddingValues(
                     top = innerPadding.calculateTopPadding(),
                     bottom = innerPadding.calculateBottomPadding(),
@@ -70,7 +74,10 @@ fun ProfileScreen(
 }
 
 @Composable
-private fun ProfileContent(paddingValues: PaddingValues) {
+private fun ProfileContent(
+    uiState: ProfileState,
+    paddingValues: PaddingValues
+) {
 
     LazyColumn(
         modifier = Modifier
@@ -87,16 +94,22 @@ private fun ProfileContent(paddingValues: PaddingValues) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(
-                        shape = RoundedCornerShape(bottomStart = 4.dp, bottomEnd = 4.dp),
                         color = MaterialTheme.colorScheme.surface
                     )
             ) {
 
                 Box(
                     modifier = Modifier
-                        .aspectRatio(4.25f)
-                        .background(color = Color.Blue.copy(alpha = 0.7f))
-                )
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.profile_background),
+                        contentDescription = "",
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
 
                 // Avatar
                 Column(
@@ -113,7 +126,7 @@ private fun ProfileContent(paddingValues: PaddingValues) {
                         contentAlignment = Alignment.Center
                     ) {
                         Image(
-                            painterResource(R.drawable.kevin_wang_cnaescojesi_unsplash),
+                            painterResource(R.drawable.profile_avatar),
                             contentDescription = null,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
@@ -130,7 +143,7 @@ private fun ProfileContent(paddingValues: PaddingValues) {
                     Spacer(modifier = Modifier.height(12.dp))
 
                     Text(
-                        text = "Aarav Mahajan",
+                        text = uiState.user?.fullName ?: "Full Name",
                         modifier = Modifier.padding(start = 12.dp),
                         style = MaterialTheme.typography.headlineSmall,
                         color = MaterialTheme.colorScheme.onSurface
@@ -139,7 +152,7 @@ private fun ProfileContent(paddingValues: PaddingValues) {
                     Spacer(modifier = Modifier.height(2.dp))
 
                     Text(
-                        text = "Pre-Final Year | Thapar Institute of Engineering & Technology, Patiala, India",
+                        text = uiState.user?.headline ?: "--",
                         modifier = Modifier.padding(start = 12.dp),
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.onSurface
@@ -147,30 +160,32 @@ private fun ProfileContent(paddingValues: PaddingValues) {
 
                     Spacer(modifier = Modifier.height(14.dp))
 
-                    Text(
-                        text = "Google Developer Student Clubs Thapar • Thapar Institute of Engineering & Technology",
-                        modifier = Modifier.padding(start = 12.dp),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
+                    if (!uiState.experience.isNullOrEmpty()) {
+                        Text(
+                            text = uiState.experience[0].companyName,
+                            modifier = Modifier.padding(start = 12.dp),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
 
-                    Spacer(modifier = Modifier.height(2.dp))
+                        Spacer(modifier = Modifier.height(2.dp))
+                    }
 
                     Text(
-                        text = "Panchkula, Haryana, India",
+                        text = uiState.user?.location ?: "Location",
                         modifier = Modifier.padding(start = 12.dp),
-                        style = MaterialTheme.typography.labelMedium,
+                        style = MaterialTheme.typography.titleSmall,
                         color = Color.Gray
                     )
 
                     Spacer(modifier = Modifier.height(14.dp))
 
                     Text(
-                        text = "${500}+ connections",
+                        text = "${0} connections",
                         modifier = Modifier.padding(start = 12.dp),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.secondary
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -179,11 +194,11 @@ private fun ProfileContent(paddingValues: PaddingValues) {
                         shape = CircleShape,
                         border = BorderStroke(
                             width = 1.dp,
-                            color = MaterialTheme.colorScheme.primary
+                            color = MaterialTheme.colorScheme.secondary
                         ),
                         colors = ButtonDefaults.textButtonColors(
                             containerColor = MaterialTheme.colorScheme.surface,
-                            contentColor = MaterialTheme.colorScheme.primary
+                            contentColor = MaterialTheme.colorScheme.secondary
                         ),
                         modifier = Modifier
                             .height(34.dp)
@@ -207,51 +222,53 @@ private fun ProfileContent(paddingValues: PaddingValues) {
         }
 
         // About
-        item {
+        if (!uiState.user?.about.isNullOrBlank()) {
+            item {
 
-            Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(color = MaterialTheme.colorScheme.surface),
-            ) {
-                Column(
+                Box(
                     modifier = Modifier
-                        .padding(12.dp),
-                    horizontalAlignment = Alignment.Start
+                        .fillMaxWidth()
+                        .background(color = MaterialTheme.colorScheme.surface),
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
+                    Column(
+                        modifier = Modifier
+                            .padding(12.dp),
+                        horizontalAlignment = Alignment.Start
                     ) {
-                        Text(
-                            "About",
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                fontWeight = FontWeight.SemiBold,
-                                fontSize = 20.sp
-                            ),
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        Icon(
-                            painter = painterResource(R.drawable.pencil),
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.tertiary,
-                            modifier = Modifier.size(24.dp)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                "About",
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontWeight = FontWeight.SemiBold,
+                                    fontSize = 20.sp
+                                ),
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Icon(
+                                painter = painterResource(R.drawable.pencil),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.tertiary,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        ExpandableText(
+                            text = uiState.user.about,
+                            maxLines = 4
                         )
                     }
-
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    ExpandableText(
-                        text = "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).",
-                        maxLines = 4
-                    )
                 }
+
+
             }
-
-
         }
 
         // Activity
@@ -291,9 +308,9 @@ private fun ProfileContent(paddingValues: PaddingValues) {
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                             Text(
-                                "6,046 followers",
+                                "${0} followers",
                                 style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
-                                color = MaterialTheme.colorScheme.primary
+                                color = MaterialTheme.colorScheme.secondary
                             )
                         }
                         Row(
@@ -305,11 +322,11 @@ private fun ProfileContent(paddingValues: PaddingValues) {
                                 shape = CircleShape,
                                 border = BorderStroke(
                                     width = 1.25.dp,
-                                    color = MaterialTheme.colorScheme.primary
+                                    color = MaterialTheme.colorScheme.secondary
                                 ),
                                 colors = ButtonDefaults.textButtonColors(
                                     containerColor = MaterialTheme.colorScheme.surface,
-                                    contentColor = MaterialTheme.colorScheme.primary
+                                    contentColor = MaterialTheme.colorScheme.secondary
                                 ),
                                 modifier = Modifier
                                     .height(32.dp)
@@ -353,86 +370,133 @@ private fun ProfileContent(paddingValues: PaddingValues) {
             }
         }
 
-        val cardTitleList = listOf<String>("Experience", "Education")
-        repeat(cardTitleList.size) { index ->
+        if (!uiState.experience.isNullOrEmpty()) {
+
             item {
-
                 Spacer(modifier = Modifier.height(8.dp))
+                CustomCard(title = "Experience", content = uiState.experience)
+            }
 
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(color = MaterialTheme.colorScheme.surface),
+        }
+
+        if (!uiState.education.isNullOrEmpty()) {
+
+            item {
+                Spacer(modifier = Modifier.height(8.dp))
+                CustomCard(title = "Education", content = uiState.education)
+            }
+
+        }
+
+    }
+}
+
+@Composable
+private fun CustomCard(title: String, content: List<Any>) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(color = MaterialTheme.colorScheme.surface),
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(12.dp),
+            horizontalAlignment = Alignment.Start
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontWeight = FontWeight.W600,
+                        fontSize = 20.sp
+                    ),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Row(
+                    modifier = Modifier,
+                    horizontalArrangement = Arrangement.spacedBy(24.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .padding(12.dp),
-                        horizontalAlignment = Alignment.Start
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-
-                            Text(
-                                cardTitleList[index],
-                                style = MaterialTheme.typography.titleLarge.copy(
-                                    fontWeight = FontWeight.W600,
-                                    fontSize = 20.sp
-                                ),
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                            Row(
-                                modifier = Modifier,
-                                horizontalArrangement = Arrangement.spacedBy(24.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.add),
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.tertiary,
-                                    modifier = Modifier.size(24.dp)
-                                )
+                    Icon(
+                        painter = painterResource(R.drawable.add),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.tertiary,
+                        modifier = Modifier.size(24.dp)
+                    )
 
 
-                                Icon(
-                                    painter = painterResource(R.drawable.pencil),
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.tertiary,
-                                    modifier = Modifier.size(24.dp)
-                                )
-                            }
-                        }
+                    Icon(
+                        painter = painterResource(R.drawable.pencil),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.tertiary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+            }
 
-                        Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
-                        repeat(2) {
-                            CustomCard(
-                                title = "Thapar Institute of Engineering & Technology",
-                                subTitle = "Bachelor of Engineering - BE, Computer Engineering",
-                                startDate = "Sep 2022",
-                                endDate = "Oct 2026"
+            when (title) {
+                "Experience" -> {
+                    content.forEach { item ->
+                        (item as Experience).let { experience ->
+                            ContentCard(
+                                title = experience.companyName,
+                                subTitle = experience.position,
+                                startDate = "${experience.startDate.toLocalDateTime(TimeZone.currentSystemDefault()).month} ${
+                                    experience.startDate.toLocalDateTime(
+                                        TimeZone.currentSystemDefault()
+                                    ).year
+                                }",
+                                endDate = "${experience.endDate?.toLocalDateTime(TimeZone.currentSystemDefault())?.month} ${
+                                    experience.endDate?.toLocalDateTime(
+                                        TimeZone.currentSystemDefault()
+                                    )?.year
+                                }"
                             )
                         }
-
-                        Spacer(modifier = Modifier.height(4.dp))
-
-                        ShowAllBanner(title = buildString {
-                            append("Show all ")
-                            append(3)
-                            append(" ")
-                            append(cardTitleList[index].lowercase())
-                            if (3 != 1) append("s")
-                        })
-
                     }
                 }
 
+                "Education" -> {
+                    content.forEach { item ->
+                        (item as Education).let { education ->
+                            ContentCard(
+                                title = education.school,
+                                subTitle = "${education.degree}, ${education.field}",
+                                startDate = "${education.startDate.toLocalDateTime(TimeZone.currentSystemDefault()).month} ${
+                                    education.startDate.toLocalDateTime(
+                                        TimeZone.currentSystemDefault()
+                                    ).year
+                                }",
+                                endDate = "${education.endDate?.toLocalDateTime(TimeZone.currentSystemDefault())?.month} ${
+                                    education.endDate?.toLocalDateTime(
+                                        TimeZone.currentSystemDefault()
+                                    )?.year
+                                }",
+                            )
+                        }
+                    }
+                }
 
             }
-        }
 
+            Spacer(modifier = Modifier.height(4.dp))
+
+            ShowAllBanner(title = buildString {
+                append("Show all ")
+                append(content.size)
+                append(" ")
+                append(title)
+                if (content.size != 1) append("s")
+            })
+
+        }
     }
 }
 
@@ -446,7 +510,7 @@ private fun ShowAllBanner(title: String) {
         Text(
             title,
             style = MaterialTheme.typography.titleMedium,
-            color = Color.DarkGray
+            color = MaterialTheme.colorScheme.onTertiary
         )
 
         Spacer(modifier = Modifier.width(4.dp))
@@ -454,14 +518,14 @@ private fun ShowAllBanner(title: String) {
         Icon(
             painter = painterResource(R.drawable.right_arrow),
             contentDescription = null,
-            tint = Color.DarkGray,
+            tint = MaterialTheme.colorScheme.onTertiary,
             modifier = Modifier.size(18.dp)
         )
     }
 }
 
 @Composable
-private fun CustomCard(
+private fun ContentCard(
     title: String,
     subTitle: String,
     startDate: String,

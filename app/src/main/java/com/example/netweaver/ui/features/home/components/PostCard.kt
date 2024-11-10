@@ -92,27 +92,24 @@ fun PostCard(
                     Column(
                         modifier = Modifier
                             .weight(1f)
-                            .padding(start = 8.dp, end = 16.dp),
+                            .padding(start = 8.dp),
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.Start
                     ) {
 
                         Text(
                             text = post.user?.fullName ?: "User",
-                            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.W600),
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.W600,
                             color = MaterialTheme.colorScheme.onSurface
                         )
-                        Spacer(modifier = Modifier.height(2.dp))
-
                         Text(
                             text = post.user?.headline ?: "Headline",
-                            style = MaterialTheme.typography.labelMedium,
+                            style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onTertiary,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
-
-                        Spacer(modifier = Modifier.height(4.dp))
 
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -145,7 +142,7 @@ fun PostCard(
                         Icon(
                             imageVector = Icons.Sharp.Add,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
+                            tint = MaterialTheme.colorScheme.secondary,
                             modifier = Modifier.size(20.dp)
                         )
 
@@ -153,10 +150,8 @@ fun PostCard(
 
                         Text(
                             text = "Follow",
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                fontWeight = FontWeight.W500
-                            ),
-                            color = MaterialTheme.colorScheme.primary
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.secondary
                         )
 
                     }

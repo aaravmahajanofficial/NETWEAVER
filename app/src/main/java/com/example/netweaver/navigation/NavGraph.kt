@@ -78,15 +78,15 @@ fun NavGraph(
     val startDestination =
         when (authState) {
             is AuthState.Loading -> {
-                Routes.Home.route
+                Routes.ProfileTest.route
             }
 
             is AuthState.Success -> {
-                Routes.Home.route
+                Routes.ProfileTest.route
             }
 
             is AuthState.Error -> {
-                Routes.Home.route
+                Routes.ProfileTest.route
             }
         }
 
@@ -133,6 +133,9 @@ fun NavGraph(
             composable(
                 route = Routes.Profile.route,
                 arguments = listOf(navArgument("userId") { type = NavType.StringType })
+            ) { ProfileScreen() }
+            composable(
+                route = Routes.ProfileTest.route
             ) { ProfileScreen() }
             composable(route = Routes.CreatePost.route) {
                 CreatePostScreen(

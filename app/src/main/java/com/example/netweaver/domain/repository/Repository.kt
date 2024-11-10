@@ -1,5 +1,7 @@
 package com.example.netweaver.domain.repository
 
+import com.example.netweaver.domain.model.Education
+import com.example.netweaver.domain.model.Experience
 import com.example.netweaver.domain.model.Post
 import com.example.netweaver.domain.model.User
 import com.example.netweaver.ui.model.Result
@@ -7,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface Repository {
 
-    // posts
+    // Feed & Post
     suspend fun getFeedPosts(): Flow<Result<List<Post>>>
     suspend fun likePost(post: Post): Result<Unit>
     suspend fun unlikePost(post: Post): Result<Unit>
@@ -18,10 +20,18 @@ interface Repository {
         fileExtensions: List<String?>
     ): Result<Unit>
 
-    // users
+    suspend fun getUserPosts(userId: String): Result<List<Post>>
+
+    // User
     suspend fun getUsersByIds(userIds: List<String>): Result<List<User>>
     suspend fun getUserById(userId: String): Result<User>
     suspend fun upsertUser(user: User): Result<User>
+
+    // Experience Section
+    suspend fun getExperiences(userId: String): Result<List<Experience>>
+
+    // Education Section
+    suspend fun getEducation(userId: String): Result<List<Education>>
 
     // MISC
     suspend fun storeMediaToBucket(

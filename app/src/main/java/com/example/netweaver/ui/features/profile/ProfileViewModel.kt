@@ -3,10 +3,18 @@ package com.example.netweaver.ui.features.profile
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.netweaver.domain.model.Education
+import com.example.netweaver.domain.model.Experience
+import com.example.netweaver.domain.model.Post
 import com.example.netweaver.domain.model.User
+import com.example.netweaver.domain.usecase.user.GetEducationUseCase
+import com.example.netweaver.domain.usecase.user.GetExperiencesUseCase
+import com.example.netweaver.domain.usecase.user.GetUserPostsUseCase
 import com.example.netweaver.domain.usecase.user.UserProfileUseCase
 import com.example.netweaver.ui.model.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,6 +25,9 @@ import javax.inject.Inject
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val userProfileUseCase: UserProfileUseCase,
+    private val getEducationUseCase: GetEducationUseCase,
+    private val getExperiencesUseCase: GetExperiencesUseCase,
+    private val getUserPostsUseCase: GetUserPostsUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -26,7 +37,18 @@ class ProfileViewModel @Inject constructor(
     val profileUiState: StateFlow<ProfileState> = _profileUiState.asStateFlow()
 
     init {
-        loadProfile(isRefreshing = false)
+        if (validateUserId()) {
+            loadProfile(isRefreshing = false)
+        }
+    }
+
+    fun validateUserId(): Boolean {
+
+        return if (userId.isNullOrBlank()) {
+            _profileUiState.update { it.copy(error = "Invalid User Id") }
+            false
+        } else
+            true
     }
 
     fun onEvent(event: ProfileEvent) {
@@ -39,11 +61,6 @@ class ProfileViewModel @Inject constructor(
 
     private fun loadProfile(isRefreshing: Boolean) {
 
-        if (userId.isNullOrBlank()) {
-            _profileUiState.update { it.copy(error = "Invalid User Id") }
-            return
-        }
-
         viewModelScope.launch {
 
             _profileUiState.update {
@@ -54,35 +71,95 @@ class ProfileViewModel @Inject constructor(
                 )
             }
 
-            when (val result = userProfileUseCase(userId = userId)) {
-                is Result.Success -> {
+            try {
+                // 1. parallel loading
+                // 2. for fast failing, if any one stops others are also cancelled -> Atomic Transaction (All or null)
+                coroutineScope {
+                    val profileDeferred = async { userProfileUseCase(userId = userId!!) }
+                    val postsDeferred = async { getUserPostsUseCase(userId = userId!!) }
+                    val educationDeferred = async { getEducationUseCase(userId = userId!!) }
+                    val experienceDeferred = async { getExperiencesUseCase(userId = userId!!) }
+
+
+                    // wait for all to complete
+                    val user = when (val result = profileDeferred.await()) {
+                        is Result.Success -> {
+                            result.data
+                        }
+
+                        is Result.Error -> {
+                            throw result.exception // Ultimate Failure
+                        }
+                    }
+
+                    val posts = try {
+                        when (val result = postsDeferred.await()) {
+                            is Result.Success -> {
+                                result.data
+                            }
+
+                            is Result.Error -> {
+                                null
+                            }
+                        }
+                    } catch (_: Exception) {
+                        null
+                    }
+
+                    val education = try {
+                        when (val result = educationDeferred.await()) {
+                            is Result.Success -> {
+                                result.data
+                            }
+
+                            is Result.Error -> {
+                                null
+                            }
+                        }
+                    } catch (_: Exception) {
+                        null
+                    }
+
+                    val experience = try {
+                        when (val result = experienceDeferred.await()) {
+                            is Result.Success -> {
+                                result.data
+                            }
+
+                            is Result.Error -> {
+                                null
+                            }
+                        }
+
+                    } catch (_: Exception) {
+                        null
+                    }
+
                     _profileUiState.update {
                         it.copy(
                             isLoading = false,
                             isRefreshing = false,
-                            user = result.data,
+                            user = user,
+                            posts = posts,
+                            education = education,
+                            experience = experience,
                             error = null
                         )
                     }
+
                 }
 
-                is Result.Error -> {
-                    _profileUiState.update {
-                        it.copy(
-                            isLoading = false,
-                            isRefreshing = false,
-                            error = result.exception.message ?: "Unknown error occurred"
-                        )
-                    }
-
+            } catch (e: Exception) {
+                _profileUiState.update {
+                    it.copy(
+                        isLoading = false,
+                        isRefreshing = false,
+                        error = e.message ?: "Unknown error occurred"
+                    )
                 }
             }
-
         }
-
     }
-
-
 }
 
 data class ProfileState(
@@ -90,7 +167,10 @@ data class ProfileState(
     val isRefreshing: Boolean = false,
     val error: String? = null,
     val success: String? = null,
-    val user: User? = null
+    val user: User? = null,
+    val posts: List<Post>? = null,
+    val education: List<Education>? = null,
+    val experience: List<Experience>? = null
 )
 
 sealed class ProfileEvent {
