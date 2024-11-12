@@ -421,7 +421,6 @@ private fun ProfileContent(
                                 "Activity",
                                 style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.SemiBold,
-                                fontSize = 20.sp,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                             Text(
@@ -591,10 +590,8 @@ private fun CustomCard(title: String, content: List<Any>) {
 
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        fontWeight = FontWeight.W600,
-                        fontSize = 20.sp
-                    ),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.W600,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Row(
