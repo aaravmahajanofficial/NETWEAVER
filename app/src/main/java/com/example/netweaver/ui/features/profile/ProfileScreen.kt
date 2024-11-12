@@ -47,6 +47,7 @@ import coil3.compose.AsyncImage
 import com.example.netweaver.R
 import com.example.netweaver.domain.model.Education
 import com.example.netweaver.domain.model.Experience
+import com.example.netweaver.ui.ProfileActivityCard
 import com.example.netweaver.ui.components.AppScaffold
 import com.example.netweaver.utils.ExpandableText
 import kotlinx.datetime.TimeZone
@@ -430,7 +431,7 @@ private fun ProfileContent(
                                 color = MaterialTheme.colorScheme.secondary
                             )
 
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(12.dp))
 
                             if (uiState.posts.isNullOrEmpty()) {
                                 when (profileType) {
@@ -441,15 +442,13 @@ private fun ProfileContent(
                                             verticalArrangement = Arrangement.SpaceEvenly
                                         ) {
                                             Text(
-//                                                "${uiState.user?.userId} haven't posted yet.",
-                                                "T-Pack haven't posted yet.",
+                                                "${uiState.user?.userId} haven't posted yet.",
                                                 style = MaterialTheme.typography.bodyLarge,
                                                 textAlign = TextAlign.Center,
                                                 color = MaterialTheme.colorScheme.tertiary
                                             )
                                             Text(
-//                                                "Recent posts ${uiState.user?.userId} shares will be displayed here.",
-                                                "Recent posts T-Pack shares will be displayed here.",
+                                                "Recent posts ${uiState.user?.userId} shares will be displayed here.",
                                                 style = MaterialTheme.typography.labelLarge,
                                                 textAlign = TextAlign.Center,
                                                 color = MaterialTheme.colorScheme.tertiary
@@ -482,8 +481,23 @@ private fun ProfileContent(
                                 }
                             } else {
 
-                                repeat(uiState.posts.size) {
+                                repeat(uiState.posts.size) { index ->
 
+                                    ProfileActivityCard(
+                                        userName = uiState.posts[index].user?.fullName ?: "",
+                                        content = uiState.posts[index].content,
+                                        commentsCount = uiState.posts[index].commentsCount,
+                                        likesCount = uiState.posts[index].likesCount,
+                                        mediaUrl = uiState.posts[index].mediaUrl?.get(0) ?: "",
+                                        createdAt = uiState.posts[index].createdAt.toString()
+                                    )
+
+                                    if (index != uiState.posts.size - 1) {
+                                        HorizontalDivider(
+                                            color = MaterialTheme.colorScheme.outline
+                                        )
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                    }
 
                                 }
 
