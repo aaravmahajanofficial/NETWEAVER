@@ -45,6 +45,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.example.netweaver.R
+import com.example.netweaver.domain.model.ConnectionState
 import com.example.netweaver.domain.model.Education
 import com.example.netweaver.domain.model.Experience
 import com.example.netweaver.ui.ProfileActivityCard
@@ -217,8 +218,8 @@ private fun ProfileContent(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                when (uiState.connectionStatus) {
-                                    ConnectionStatus.NONE -> {
+                                when (uiState.connectionState) {
+                                    ConnectionState.None -> {
 
                                         ProfileActionsButton(
                                             title = "Connect",
@@ -230,7 +231,7 @@ private fun ProfileContent(
 
                                     }
 
-                                    ConnectionStatus.PENDING -> {
+                                    ConnectionState.PendingOutgoing -> {
 
                                         ProfileActionsButton(
                                             title = "Pending",
@@ -242,20 +243,38 @@ private fun ProfileContent(
 
                                     }
 
-                                    ConnectionStatus.CONNECTED -> {}
+                                    ConnectionState.PendingIncoming -> {
+                                        ProfileActionsButton(
+                                            title = "Accept",
+                                            containerColor = MaterialTheme.colorScheme.surface,
+                                            contentColor = MaterialTheme.colorScheme.secondary,
+                                            onClick = {}
+                                        )
+                                    }
+
+                                    ConnectionState.Connected -> {}
                                 }
 
                                 Spacer(modifier = Modifier.width(8.dp))
 
-                                ProfileActionsButton(
-                                    title = "Message",
-                                    icon = painterResource(R.drawable.send),
-                                    containerColor = MaterialTheme.colorScheme.surface,
-                                    contentColor = MaterialTheme.colorScheme.secondary,
-                                    onClick = {}
-                                )
+                                if (uiState.connectionState != ConnectionState.PendingIncoming) {
+                                    ProfileActionsButton(
+                                        title = "Message",
+                                        icon = painterResource(R.drawable.send),
+                                        containerColor = MaterialTheme.colorScheme.surface,
+                                        contentColor = MaterialTheme.colorScheme.secondary,
+                                        onClick = {}
+                                    )
+                                } else {
+                                    ProfileActionsButton(
+                                        title = "Ignore",
+                                        containerColor = MaterialTheme.colorScheme.surface,
+                                        contentColor = MaterialTheme.colorScheme.secondary,
+                                        onClick = {}
+                                    )
+                                }
 
-                                Spacer(modifier = Modifier.width(8.dp))
+                                Spacer(modifier = Modifier.width(12.dp))
 
                                 Box(
                                     modifier = Modifier
@@ -424,12 +443,24 @@ private fun ProfileContent(
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
-                            Text(
-                                "${0} followers",
-                                style = MaterialTheme.typography.titleSmall,
-                                fontWeight = FontWeight.SemiBold,
-                                color = MaterialTheme.colorScheme.secondary
-                            )
+                            when (profileType) {
+                                is ProfileType.PersonalProfile -> {
+                                    Text(
+                                        "${0} followers",
+                                        style = MaterialTheme.typography.titleSmall,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = MaterialTheme.colorScheme.secondary
+                                    )
+                                }
+
+                                is ProfileType.OtherProfile -> {
+                                    Text(
+                                        "${0} followers",
+                                        style = MaterialTheme.typography.titleSmall,
+                                        color = MaterialTheme.colorScheme.onTertiary
+                                    )
+                                }
+                            }
 
                             Spacer(modifier = Modifier.height(12.dp))
 

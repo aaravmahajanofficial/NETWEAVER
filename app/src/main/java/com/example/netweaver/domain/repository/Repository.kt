@@ -1,5 +1,6 @@
 package com.example.netweaver.domain.repository
 
+import com.example.netweaver.domain.model.Connection
 import com.example.netweaver.domain.model.Education
 import com.example.netweaver.domain.model.Experience
 import com.example.netweaver.domain.model.Post
@@ -40,4 +41,12 @@ interface Repository {
     ): Result<List<String>?>
 
 //    suspend fun sharePost(postId: String): Result<Unit>
+
+    // Network/Connections
+    suspend fun sendConnectionRequest(receiverId: String): Result<Unit>
+    suspend fun acceptConnectionRequest(requestId: String): Result<Unit>
+    suspend fun rejectConnectionRequest(requestId: String): Result<Unit>
+    suspend fun getConnections(userId: String): Result<List<User>>
+    suspend fun getPendingConnections(userId: String): Result<List<User>>
+    suspend fun getConnectionStatus(userId: String): Result<Connection>
 }

@@ -1,18 +1,25 @@
 package com.example.netweaver.data.remote.dto
 
 import com.example.netweaver.domain.model.Connection
+import kotlinx.datetime.Clock.System.now
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class ConnectionDto(
-    val id: String,
-    val requesterId: String,
-    val receiverId: String,
-    val status: ConnectionStatus,
-    val createdAt: Instant,
-    val updatedAt: Instant
+    @SerialName("id")
+    val id: String = "",
+    @SerialName("requester_id")
+    val requesterId: String = "",
+    @SerialName("receiver_id")
+    val receiverId: String = "",
+    @SerialName("status")
+    val status: ConnectionStatus? = null,
+    @SerialName("created_at")
+    val createdAt: Instant = now(),
+    @SerialName("updated_at")
+    val updatedAt: Instant = now()
 )
 
 @Serializable
@@ -20,11 +27,8 @@ enum class ConnectionStatus {
     @SerialName("pending")
     PENDING,
 
-    @SerialName("accepted")
-    ACCEPTED,
-
-    @SerialName("rejected")
-    REJECTED
+    @SerialName("connected")
+    CONNECTED,
 }
 
 fun ConnectionDto.toDomainModel() = Connection(

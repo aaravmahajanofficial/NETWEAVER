@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun RowScope.ProfileActionsButton(
     title: String,
-    icon: Painter,
+    icon: Painter? = null,
     containerColor: Color,
     contentColor: Color,
     onClick: () -> Unit,
@@ -54,14 +54,16 @@ fun RowScope.ProfileActionsButton(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                painter = icon,
-                contentDescription = "$title Button",
-                modifier = Modifier.size(16.dp),
-                tint = contentColor
-            )
+            icon?.let {
+                Icon(
+                    painter = it,
+                    contentDescription = "$title Button",
+                    modifier = Modifier.size(16.dp),
+                    tint = contentColor
+                )
 
-            Spacer(modifier = Modifier.width(4.dp))
+                Spacer(modifier = Modifier.width(4.dp))
+            }
 
             Text(
                 title,

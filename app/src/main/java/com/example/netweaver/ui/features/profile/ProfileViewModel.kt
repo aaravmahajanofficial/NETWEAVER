@@ -1,12 +1,16 @@
 package com.example.netweaver.ui.features.profile
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.netweaver.domain.model.Connection
+import com.example.netweaver.domain.model.ConnectionState
 import com.example.netweaver.domain.model.Education
 import com.example.netweaver.domain.model.Experience
 import com.example.netweaver.domain.model.Post
 import com.example.netweaver.domain.model.User
+import com.example.netweaver.domain.usecase.connections.GetConnectionStatusUseCase
 import com.example.netweaver.domain.usecase.user.GetEducationUseCase
 import com.example.netweaver.domain.usecase.user.GetExperiencesUseCase
 import com.example.netweaver.domain.usecase.user.GetUserPostsUseCase
@@ -29,11 +33,14 @@ class ProfileViewModel @Inject constructor(
     private val getEducationUseCase: GetEducationUseCase,
     private val getExperiencesUseCase: GetExperiencesUseCase,
     private val getUserPostsUseCase: GetUserPostsUseCase,
+    private val getConnectionStatusUseCase: GetConnectionStatusUseCase,
     firebaseAuth: FirebaseAuth,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val userId = savedStateHandle.get<String>("userId")
+    private val currentUserId =
+        firebaseAuth.currentUser?.uid ?: "0f07b4e0-4eb8-4a9a-be40-07ae8f608b0e"
 
     private val _profileUiState = MutableStateFlow(ProfileState())
     val profileUiState: StateFlow<ProfileState> = _profileUiState.asStateFlow()
@@ -44,7 +51,7 @@ class ProfileViewModel @Inject constructor(
     init {
         if (validateUserId()) {
 
-            if (userId == firebaseAuth.currentUser?.uid) {
+            if (userId == currentUserId) {
                 _profileType.value = ProfileType.PersonalProfile
             } else {
                 _profileType.value = ProfileType.OtherProfile
@@ -91,26 +98,21 @@ class ProfileViewModel @Inject constructor(
                     val postsDeferred = async { getUserPostsUseCase(userId = userId!!) }
                     val educationDeferred = async { getEducationUseCase(userId = userId!!) }
                     val experienceDeferred = async { getExperiencesUseCase(userId = userId!!) }
-
+                    val connectionDeferred = if (userId != currentUserId) {
+                        async { getConnectionStatusUseCase(userId = userId!!) }
+                    } else null
 
                     // wait for all to complete
                     val user = when (val result = profileDeferred.await()) {
-                        is Result.Success -> {
-                            result.data
-                        }
-
-                        is Result.Error -> {
-                            throw result.exception // Ultimate Failure
-                        }
+                        is Result.Success -> result.data
+                        is Result.Error -> throw result.exception // Ultimate Failure
                     }
 
                     val posts = try {
                         when (val result = postsDeferred.await()) {
-                            is Result.Success -> {
-                                result.data
-                            }
-
+                            is Result.Success -> result.data
                             is Result.Error -> {
+                                Log.d("ERROR 1", result.exception.message.toString())
                                 null
                             }
                         }
@@ -120,11 +122,9 @@ class ProfileViewModel @Inject constructor(
 
                     val education = try {
                         when (val result = educationDeferred.await()) {
-                            is Result.Success -> {
-                                result.data
-                            }
-
+                            is Result.Success -> result.data
                             is Result.Error -> {
+                                Log.d("ERROR 2", result.exception.message.toString())
                                 null
                             }
                         }
@@ -134,13 +134,28 @@ class ProfileViewModel @Inject constructor(
 
                     val experience = try {
                         when (val result = experienceDeferred.await()) {
-                            is Result.Success -> {
-                                result.data
-                            }
-
+                            is Result.Success -> result.data
                             is Result.Error -> {
+                                Log.d("ERROR 3", result.exception.message.toString())
                                 null
                             }
+                        }
+
+                    } catch (_: Exception) {
+                        null
+                    }
+
+                    val connection = try {
+
+                        when (val result = connectionDeferred?.await()) {
+
+                            is Result.Success -> result.data
+                            is Result.Error -> {
+                                Log.d("ERROR 4", result.exception.message.toString())
+                                null
+                            }
+
+                            null -> null
                         }
 
                     } catch (_: Exception) {
@@ -155,6 +170,8 @@ class ProfileViewModel @Inject constructor(
                             posts = posts,
                             education = education,
                             experience = experience,
+                            connection = connection,
+                            connectionState = connection?.getConnectionState(userId!!)!!,
                             error = null
                         )
                     }
@@ -162,6 +179,7 @@ class ProfileViewModel @Inject constructor(
                 }
 
             } catch (e: Exception) {
+                Log.d("ERROR 5", e.message.toString())
                 _profileUiState.update {
                     it.copy(
                         isLoading = false,
@@ -185,19 +203,13 @@ data class ProfileState(
     val education: List<Education>? = null,
     val experience: List<Experience>? = null,
 
-    val isConnected: Boolean = false,
-    val connectionStatus: ConnectionStatus = ConnectionStatus.NONE
+    val connection: Connection? = null,
+    val connectionState: ConnectionState = ConnectionState.None
 )
 
 sealed class ProfileType {
     data object PersonalProfile : ProfileType()
     data object OtherProfile : ProfileType()
-}
-
-enum class ConnectionStatus {
-    NONE,
-    PENDING,
-    CONNECTED
 }
 
 sealed class ProfileEvent {

@@ -4,6 +4,7 @@ import com.example.netweaver.data.repository.AuthRepositoryImplementation
 import com.example.netweaver.data.repository.RepositoryImplementation
 import com.example.netweaver.domain.repository.AuthRepository
 import com.example.netweaver.domain.repository.Repository
+import com.example.netweaver.domain.usecase.connections.GetConnectionStatusUseCase
 import com.example.netweaver.domain.usecase.posts.CreatePostUseCase
 import com.example.netweaver.domain.usecase.posts.GetPostsUseCase
 import com.example.netweaver.domain.usecase.posts.LikePostUseCase
@@ -132,5 +133,10 @@ object AppModule {
     @Singleton
     fun provideGetEducationUseCase(repository: Repository) =
         GetEducationUseCase(repository = repository)
+
+    @Provides
+    @Singleton
+    fun provideGetConnectionStatusUseCase(repository: Repository) =
+        GetConnectionStatusUseCase(repository = repository)
 
 }

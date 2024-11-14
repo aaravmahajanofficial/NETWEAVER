@@ -1,12 +1,16 @@
 package com.example.netweaver.data.repository
 
 import android.util.Log
+import com.example.netweaver.data.remote.dto.ConnectionDto
+import com.example.netweaver.data.remote.dto.ConnectionStatus
 import com.example.netweaver.data.remote.dto.EducationDto
 import com.example.netweaver.data.remote.dto.ExperienceDto
 import com.example.netweaver.data.remote.dto.LikeDto
 import com.example.netweaver.data.remote.dto.PostDto
 import com.example.netweaver.data.remote.dto.UserDto
 import com.example.netweaver.data.remote.dto.toDomain
+import com.example.netweaver.data.remote.dto.toDomainModel
+import com.example.netweaver.domain.model.Connection
 import com.example.netweaver.domain.model.Education
 import com.example.netweaver.domain.model.Experience
 import com.example.netweaver.domain.model.Post
@@ -243,7 +247,7 @@ class RepositoryImplementation @Inject constructor(
                 is Result.Success -> {
 
                     val postDto = PostDto(
-                        userId = UUID.randomUUID().toString(),
+                        userId = currentUserId,
                         content = content.trim(),
                         mediaUrl = response.data,
                         createdAt = Timestamp.now(),
@@ -398,6 +402,143 @@ class RepositoryImplementation @Inject constructor(
     } catch (e: Exception) {
         Result.Error(e)
     }
+
+    override suspend fun sendConnectionRequest(receiverId: String): Result<Unit> = try {
+        withContext(Dispatchers.IO) {
+
+            postgrest.from("Connections").upsert(
+                ConnectionDto(
+                    requesterId = currentUserId,
+                    receiverId = receiverId
+                )
+            )
+
+            Result.Success(Unit)
+        }
+    } catch (e: Exception) {
+        Result.Error(e)
+    }
+
+    override suspend fun acceptConnectionRequest(requestId: String): Result<Unit> = try {
+
+        withContext(Dispatchers.IO) {
+
+            postgrest.from("Connections").update(
+                {
+                    set("status", ConnectionStatus.CONNECTED)
+                }
+            ) {
+                filter {
+                    eq("id", requestId)
+                    eq("receiver_id", currentUserId)
+                }
+            }
+
+            Result.Success(Unit)
+        }
+
+    } catch (e: Exception) {
+        Result.Error(e)
+    }
+
+    private suspend fun getConnectionsByStatus(
+        userId: String,
+        connectionStatus: ConnectionStatus
+    ): Result<List<User>> =
+        try {
+
+            withContext(Dispatchers.IO) {
+
+                val response =
+                    postgrest.from("Connections")
+                        .select {
+                            filter {
+                                and {
+                                    or {
+                                        eq("receiver_id", userId)
+                                        eq("requester_id", userId)
+                                    }
+                                    eq("status", connectionStatus)
+                                }
+                            }
+                        }
+                        .decodeList<ConnectionDto>()
+
+                val userIds = response.flatMap { connection ->
+                    listOf(connection.requesterId, connection.receiverId)
+                }.filter {
+                    it != userId
+                }
+
+                val users = getUsersByIds(userIds)
+
+                when (users) {
+                    is Result.Error -> {
+                        Result.Error(users.exception)
+                    }
+
+                    is Result.Success -> {
+                        Result.Success(users.data)
+                    }
+                }
+
+            }
+
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+
+    override suspend fun getConnections(userId: String): Result<List<User>> =
+        getConnectionsByStatus(userId = userId, connectionStatus = ConnectionStatus.CONNECTED)
+
+    override suspend fun getPendingConnections(userId: String): Result<List<User>> =
+        getConnectionsByStatus(userId = userId, connectionStatus = ConnectionStatus.PENDING)
+
+    override suspend fun rejectConnectionRequest(requestId: String): Result<Unit> = try {
+
+        withContext(Dispatchers.IO) {
+            postgrest.from("Connections").delete {
+                filter {
+                    eq("id", requestId)
+                    eq("receiver_id", currentUserId)
+                }
+            }
+
+            Result.Success(Unit)
+        }
+
+    } catch (e: Exception) {
+        Result.Error(e)
+    }
+
+    override suspend fun getConnectionStatus(userId: String): Result<Connection> = try {
+
+        withContext(Dispatchers.IO) {
+
+            val result = postgrest.from("Connections").select {
+                filter {
+                    or {
+                        and {
+                            eq("receiver_id", currentUserId)
+                            eq("requester_id", userId)
+                        }
+
+                        and {
+                            eq("receiver_id", userId)
+                            eq("requester_id", currentUserId)
+                        }
+                    }
+                }
+            }.decodeSingle<ConnectionDto>()
+
+            Result.Success(result.toDomainModel())
+
+        }
+
+    } catch (e: Exception) {
+        Result.Error(e)
+    }
+
 }
 
 
