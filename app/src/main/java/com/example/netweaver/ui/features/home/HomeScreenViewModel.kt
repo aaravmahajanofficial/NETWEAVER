@@ -3,7 +3,6 @@ package com.example.netweaver.ui.features.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.netweaver.domain.model.Post
-import com.example.netweaver.domain.model.User
 import com.example.netweaver.domain.usecase.posts.GetPostsUseCase
 import com.example.netweaver.domain.usecase.posts.LikePostUseCase
 import com.example.netweaver.domain.usecase.posts.UnLikePostUseCase
@@ -16,20 +15,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock.System.now
 import javax.inject.Inject
-
-val sampleUser = User(
-    userId = "u1",
-    email = "john.doe@example.com",
-    firstName = "John",
-    lastName = "Doe",
-    fullName = "John Doe",
-    headline = "Software Engineer",
-    location = "New York, USA",
-    about = "Passionate about technology and coding.",
-    profileImageUrl = "https://example.com/john_doe.jpg"
-)
 
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(
@@ -39,52 +25,11 @@ class HomeScreenViewModel @Inject constructor(
 ) :
     ViewModel() {
 
-    private val _homeUiState = MutableStateFlow(
-        HomeState(
-            posts = listOf(
-                Post(
-                    docId = "p1",
-                    id = "1",
-                    user = sampleUser,
-                    content = "Exploring Kotlin and Jetpack Compose!",
-                    mediaUrl = listOf("https://example.com/image1.jpg"),
-                    isLiked = true,
-                    likesCount = 12,
-                    commentsCount = 3,
-                    createdAt = now(),
-                    updatedAt = now()
-                ),
-                Post(
-                    docId = "p2",
-                    id = "2",
-                    user = sampleUser,
-                    content = "Just finished a great project with the team.",
-                    mediaUrl = listOf("https://example.com/image2.jpg"),
-                    isLiked = false,
-                    likesCount = 30,
-                    commentsCount = 5,
-                    createdAt = now(),
-                    updatedAt = now()
-                ),
-                Post(
-                    docId = "p3",
-                    id = "3",
-                    user = sampleUser,
-                    content = "Learning new things every day!",
-                    mediaUrl = listOf(),
-                    isLiked = false,
-                    likesCount = 8,
-                    commentsCount = 1,
-                    createdAt = now(),
-                    updatedAt = now()
-                )
-            )
-        )
-    )
+    private val _homeUiState = MutableStateFlow(HomeState())
     val homeUiState: StateFlow<HomeState> = _homeUiState.asStateFlow()
 
     init {
-//        onEvent(HomeEvent.GetPosts)
+        onEvent(HomeEvent.GetPosts)
     }
 
     fun onEvent(event: HomeEvent) {
