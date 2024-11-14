@@ -19,11 +19,11 @@ import com.example.netweaver.domain.usecase.validation.ValidateEmailUseCase
 import com.example.netweaver.domain.usecase.validation.ValidateNameUseCase
 import com.example.netweaver.domain.usecase.validation.ValidatePasswordUseCase
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.storage.Storage
 import javax.inject.Singleton
@@ -39,20 +39,15 @@ object AppModule {
     fun provideRepository(
         postgrest: Postgrest,
         supabaseStorage: Storage,
-        firestore: FirebaseFirestore,
-        firebaseAuth: FirebaseAuth
-
+        firebaseAuth: FirebaseAuth,
+        supabaseClient: SupabaseClient
     ): Repository =
         RepositoryImplementation(
             postgrest = postgrest,
-            firestore = firestore,
             supabaseStorage = supabaseStorage,
-            firebaseAuth = firebaseAuth
+            firebaseAuth = firebaseAuth,
+            supabaseClient = supabaseClient
         )
-
-    @Provides
-    @Singleton
-    fun provideFireStore(): FirebaseFirestore = FirebaseFirestore.getInstance()
 
     @Provides
     @Singleton

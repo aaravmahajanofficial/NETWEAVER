@@ -10,6 +10,6 @@ import javax.inject.Inject
 class GetPostsUseCase @Inject constructor(
     private val repository: Repository
 ) {
-    suspend operator fun invoke(): Flow<Result<List<Post>>> = repository.getFeedPosts()
+    suspend operator fun invoke(): Flow<Result<List<Post>>> = repository.getPosts()
 
 }

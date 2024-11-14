@@ -17,32 +17,33 @@ import com.example.netweaver.domain.model.Post
 import com.example.netweaver.domain.model.User
 import com.example.netweaver.domain.repository.Repository
 import com.example.netweaver.ui.model.Result
-import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.FirebaseFirestoreException
-import com.google.firebase.firestore.Query
-import com.google.firebase.firestore.SetOptions
+import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.query.Columns
+import io.github.jan.supabase.realtime.channel
+import io.github.jan.supabase.realtime.postgresListDataFlow
 import io.github.jan.supabase.storage.Storage
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock.System.now
-import java.util.Date
 import java.util.UUID
 import javax.inject.Inject
+import kotlin.collections.distinct
+import kotlin.collections.map
 
 class RepositoryImplementation @Inject constructor(
     private val postgrest: Postgrest,
     private val supabaseStorage: Storage,
-    private val firestore: FirebaseFirestore,
+    supabaseClient: SupabaseClient,
     firebaseAuth: FirebaseAuth
 ) :
     Repository {
@@ -50,50 +51,39 @@ class RepositoryImplementation @Inject constructor(
     private val currentUserId =
         firebaseAuth.currentUser?.uid ?: "0f07b4e0-4eb8-4a9a-be40-07ae8f608b0e"
 
-    private val pendingLikes = mutableSetOf<String>()
-    private val pendingUnlikes = mutableSetOf<String>()
+    private val channel = supabaseClient.channel("postsChannel")
 
-    override suspend fun getFeedPosts(): Flow<Result<List<Post>>> = callbackFlow {
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override suspend fun getPosts(): Flow<Result<List<Post>>> =
 
-        val postsRef = firestore.collection("posts")
+        channel.postgresListDataFlow(
+            schema = "public",
+            table = "Posts",
+            primaryKey = PostDto::id
+        ).onStart {
+            channel.subscribe()
+        }
+            .transformLatest { posts ->
 
-        val subscription = postsRef.orderBy("createdAt", Query.Direction.DESCENDING)
-            .addSnapshotListener { snapshot, error ->
-                if (error != null) {
-                    trySend(Result.Error(error))
-                    close(error)
-                    return@addSnapshotListener
-                }
+                try {
+                    // Parallel Process -> get the user ids from posts & fetch like statuses for the posts for the current user
+                    coroutineScope {
+                        val usersDeferred = async {
+                            getUsersByIds(posts.map { it.userId }
+                                .distinct())
+                        }
+                        val likedPostsDeferred =
+                            async { getLikesForPosts(posts.map { it.id }.distinct()) }
 
-                if (snapshot != null) {
+                        val usersResponse = usersDeferred.await()
+                        val likedPostsResponse = likedPostsDeferred.await()
 
-                    try {
+                        when {
+                            (usersResponse is Result.Success) && (likedPostsResponse is Result.Success) -> {
 
-                        launch(Dispatchers.IO) {
+                                val usersMap = usersResponse.data.associateBy { it.userId }
 
-                            // Fetch all the posts from the Firebase
-                            val posts =
-                                snapshot.documents.mapNotNull { doc ->
-                                    doc.toObject(PostDto::class.java)?.copy(docId = doc.id)
-                                }
-
-                            // get the user ids from posts
-                            val userIds = posts.map { it.userId }.distinct()
-                            val userResponse = getUsersByIds(userIds)
-
-                            // fetch like statuses for the posts for the current user
-                            val postIds = posts.map { it.id }.distinct()
-                            val likedPostsResponse =
-                                getLikesForPosts(postIds)
-
-                            if (userResponse is Result.Success && likedPostsResponse is Result.Success) {
-
-                                val usersMap = userResponse.data.associateBy { it.userId }
-                                val likedPostsIds = likedPostsResponse.data.toMutableSet()
-
-                                likedPostsIds.addAll(pendingLikes)
-
-                                likedPostsIds.removeAll(pendingUnlikes)
+                                val likedPostsIds = likedPostsResponse.data
 
                                 val finalPosts = posts.map { post ->
                                     post.toDomain().copy(
@@ -102,23 +92,22 @@ class RepositoryImplementation @Inject constructor(
                                     )
                                 }
 
-                                trySend(Result.Success(finalPosts))
-                            } else {
-                                val error = (userResponse as Result.Error).exception
-                                close(error)
+                                emit(Result.Success(finalPosts))
+                            }
+
+                            else -> {
+                                emit(Result.Error(Exception("Failed to fetch the users or likes. Try again")))
                             }
                         }
-
-                    } catch (e: Exception) {
-                        trySend(Result.Error(e))
-                        close(e)
                     }
+                } catch (e: Exception) {
+                    emit(Result.Error(e))
                 }
-
+            }.catch { e ->
+                emit(Result.Error(e))
+            }.onCompletion {
+                channel.unsubscribe()
             }
-
-        awaitClose { subscription.remove() }
-    }.flowOn(Dispatchers.IO)
 
     override suspend fun getUsersByIds(userIds: List<String>): Result<List<User>> =
         withContext(Dispatchers.IO) {
@@ -250,12 +239,10 @@ class RepositoryImplementation @Inject constructor(
                         userId = currentUserId,
                         content = content.trim(),
                         mediaUrl = response.data,
-                        createdAt = Timestamp.now(),
-                        updatedAt = Timestamp.now()
                     )
 
                     withContext(Dispatchers.IO) {
-                        firestore.collection("posts").add(postDto).await()
+                        postgrest.from("Posts").upsert(postDto)
                     }
                 }
 
@@ -265,86 +252,48 @@ class RepositoryImplementation @Inject constructor(
 
         } catch (e: IllegalArgumentException) {
             Result.Error(e)
-        } catch (e: FirebaseFirestoreException) {
-            Result.Error(e)
         } catch (e: Exception) {
             Result.Error(e)
         }
 
-    override suspend fun likePost(post: Post): Result<Unit> =
+    override suspend fun likePost(post: Post): Result<Unit> = try {
         withContext(Dispatchers.IO) {
 
-            // 1. User unlikes a post
-            // 2. User quickly likes it again before Supabase updates
-            // 3. Post is liked
-            pendingLikes.add(post.id)
-            pendingUnlikes.remove(post.id)
-
-            val postDto = PostDto(
-                id = post.id,
-                userId = post.user?.userId
-                    ?: return@withContext Result.Error(IllegalArgumentException("User cannot be null")),
-                content = post.content,
-                mediaUrl = post.mediaUrl,
-                likesCount = post.likesCount + 1,
-                commentsCount = post.commentsCount,
-                createdAt = Timestamp(Date(post.createdAt.toEpochMilliseconds())),
-                updatedAt = Timestamp(Date(now().toEpochMilliseconds()))
+            val likeDto = LikeDto(
+                userId = currentUserId,
+                postId = post.id,
+                createdAt = post.createdAt
             )
-
-            try {
-
-                firestore.collection("posts").document(postDto.id)
-                    .set(postDto, SetOptions.merge()).await()
-
-                val likeDto = LikeDto(
-                    userId = currentUserId,
-                    postId = post.id,
-                    createdAt = post.createdAt
-                )
-
-                postgrest.from("Likes").upsert(likeDto)
-
-                Result.Success(Unit)
-
-            } catch (e: Exception) {
-                pendingLikes.remove(post.id)
-                Log.d("SUPABASE ERROR LIKE", e.toString())
-                Result.Error(e)
+            postgrest.from("Likes").upsert(likeDto)
+            postgrest.from("Posts").update({
+                set("likes_count", post.likesCount + 1)
+            }) {
+                filter { eq("id", post.id) }
             }
+
+            Result.Success(Unit)
         }
+    } catch (e: Exception) {
+        Log.d("SUPABASE ERROR LIKE", e.toString())
+        Result.Error(e)
+    }
 
     override suspend fun unlikePost(post: Post): Result<Unit> =
         withContext(Dispatchers.IO) {
             try {
 
-                // 1. User likes a post
-                // 2. User quickly unlikes it before Supabase updates
-                // 3. Post is unliked
-                pendingUnlikes.add(post.id)
-                pendingLikes.remove(post.id)
-
-                val postDto = PostDto(
-                    id = post.id,
-                    userId = post.user?.userId
-                        ?: return@withContext Result.Error(IllegalArgumentException("User cannot be null")),
-                    content = post.content,
-                    mediaUrl = post.mediaUrl,
-                    likesCount = post.likesCount - 1,
-                    commentsCount = post.commentsCount,
-                    createdAt = Timestamp(Date(post.createdAt.toEpochMilliseconds())),
-                    updatedAt = Timestamp(Date(now().toEpochMilliseconds()))
-                )
-
-                firestore.collection("posts").document(postDto.id)
-                    .set(postDto, SetOptions.merge())
+                postgrest.from("Posts").update({
+                    set("likes_count", post.likesCount - 1)
+                }) {
+                    filter { eq("id", post.id) }
+                }
 
                 postgrest.from("Likes").delete {
                     filter {
-                        eq("user_id", currentUserId)
-                    }
-                    filter {
-                        eq("post_id", post.id)
+                        and {
+                            eq("user_id", currentUserId)
+                            eq("post_id", post.id)
+                        }
                     }
                 }
 
@@ -352,7 +301,6 @@ class RepositoryImplementation @Inject constructor(
 
             } catch (e: Exception) {
                 Log.d("SUPABASE ERROR UNLIKE", e.toString())
-                pendingUnlikes.remove(post.id)
                 Result.Error(e)
             }
         }

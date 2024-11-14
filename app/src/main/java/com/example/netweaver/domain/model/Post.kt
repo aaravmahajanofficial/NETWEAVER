@@ -4,7 +4,6 @@ import kotlinx.datetime.Clock.System.now
 import kotlinx.datetime.Instant
 
 data class Post(
-    val docId: String = "",
     val id: String = "",
     val user: User? = null,
     val content: String = "",

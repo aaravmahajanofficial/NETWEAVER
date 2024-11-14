@@ -89,7 +89,7 @@ private fun HomeContent(
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
-                items(uiState.posts.orEmpty(), key = { post -> post.docId }) { post ->
+                items(uiState.posts.orEmpty(), key = { post -> post.id }) { post ->
                     // Creating a function that will call `onButtonClick`
                     // "When the button is clicked, call the onLikePost function and give it the post as input."
                     PostCard(

@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 interface Repository {
 
     // Feed & Post
-    suspend fun getFeedPosts(): Flow<Result<List<Post>>>
+    suspend fun getPosts(): Flow<Result<List<Post>>>
     suspend fun likePost(post: Post): Result<Unit>
     suspend fun unlikePost(post: Post): Result<Unit>
     suspend fun getLikesForPosts(postIds: List<String>): Result<Set<String>>

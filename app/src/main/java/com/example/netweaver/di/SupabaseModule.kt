@@ -10,6 +10,7 @@ import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.realtime.Realtime
 import io.github.jan.supabase.storage.Storage
 import io.github.jan.supabase.storage.storage
 import javax.inject.Singleton
@@ -28,6 +29,7 @@ object SupabaseModule {
         ) {
             install(Postgrest)
             install(Storage)
+            install(Realtime)
         }
     }
 
