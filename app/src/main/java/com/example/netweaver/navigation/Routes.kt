@@ -15,8 +15,6 @@ sealed class Routes(val route: String) {
         fun createRoute(userId: String) = "profile/$userId"
     }
 
-    object ProfileTest : Routes("profile")
-
     object CreatePost : Routes("createPost")
     object Login : Routes("loginPage")
     object Register : Routes("registerPage")
