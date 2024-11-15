@@ -261,7 +261,7 @@ class RepositoryImplementation @Inject constructor(
             val likeDto = LikeDto(
                 userId = currentUserId,
                 postId = post.id,
-                createdAt = post.createdAt
+                createdAt = now()
             )
             postgrest.from("Likes").upsert(likeDto)
             postgrest.from("Posts").update({

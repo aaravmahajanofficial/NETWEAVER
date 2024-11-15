@@ -1,6 +1,7 @@
 package com.example.netweaver.data.remote.dto
 
 import com.example.netweaver.domain.model.Post
+import com.example.netweaver.utils.formatTimestampToRelative
 import kotlinx.datetime.Clock.System.now
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
@@ -33,7 +34,7 @@ fun PostDto.toDomain() = Post(
     mediaUrl = mediaUrl,
     likesCount = likesCount,
     commentsCount = commentsCount,
-    createdAt = createdAt,
-    updatedAt = updatedAt,
+    createdAt = formatTimestampToRelative(createdAt.toString()),
+    updatedAt = formatTimestampToRelative(updatedAt.toString()),
     user = null
 )
