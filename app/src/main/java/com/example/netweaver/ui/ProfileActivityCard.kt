@@ -35,7 +35,7 @@ fun ProfileActivityCard(
     content: String,
     commentsCount: Long,
     likesCount: Long,
-    mediaUrl: String,
+    mediaUrl: String?,
     createdAt: String
 ) {
 
@@ -83,17 +83,19 @@ fun ProfileActivityCard(
                 verticalAlignment = Alignment.Top,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Box(
-                    modifier = Modifier
-                        .width(64.dp)
-                        .height(64.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    AsyncImage(
-                        model = mediaUrl,
-                        contentDescription = "Post Image",
-                        contentScale = ContentScale.Crop
-                    )
+                if (mediaUrl != null) {
+                    Box(
+                        modifier = Modifier
+                            .width(64.dp)
+                            .height(64.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        AsyncImage(
+                            model = mediaUrl,
+                            contentDescription = "Post Image",
+                            contentScale = ContentScale.Crop
+                        )
+                    }
                 }
 
                 Text(

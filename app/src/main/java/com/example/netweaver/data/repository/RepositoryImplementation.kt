@@ -457,7 +457,7 @@ class RepositoryImplementation @Inject constructor(
 
         }
 
-    override suspend fun getConnectionStatus(userId: String): Result<Connection> =
+    override suspend fun getConnectionStatus(userId: String): Result<Connection?> =
         withContext(Dispatchers.IO) {
             try {
                 val result = postgrest.from("Connections").select {
@@ -474,9 +474,9 @@ class RepositoryImplementation @Inject constructor(
                             }
                         }
                     }
-                }.decodeSingle<ConnectionDto>()
+                }.decodeSingleOrNull<ConnectionDto>()
 
-                Result.Success(result.toDomainModel())
+                Result.Success(result?.toDomainModel())
             } catch (e: Exception) {
                 Result.Error(e)
             }

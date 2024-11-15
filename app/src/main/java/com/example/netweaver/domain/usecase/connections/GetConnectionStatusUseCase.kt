@@ -7,7 +7,7 @@ import javax.inject.Inject
 
 class GetConnectionStatusUseCase @Inject constructor(private val repository: Repository) {
 
-    suspend operator fun invoke(userId: String): Result<Connection> =
+    suspend operator fun invoke(userId: String): Result<Connection?> =
         repository.getConnectionStatus(userId = userId)
 
 }

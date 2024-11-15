@@ -111,23 +111,14 @@ private fun ProfileContent(
                         .fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    if (uiState.user?.profileImageUrl.isNullOrBlank()) {
-                        Image(
-                            painter = if (isSystemInDarkTheme()) painterResource(R.drawable.profile_background_dark) else painterResource(
-                                R.drawable.profile_background
-                            ),
-                            contentDescription = "",
-                            contentScale = ContentScale.Fit,
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    } else {
-                        AsyncImage(
-                            model = uiState.user.profileImageUrl,
-                            contentDescription = "",
-                            contentScale = ContentScale.Fit,
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    }
+                    Image(
+                        painter = if (isSystemInDarkTheme()) painterResource(R.drawable.profile_background_dark) else painterResource(
+                            R.drawable.profile_background
+                        ),
+                        contentDescription = "",
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier.fillMaxSize()
+                    )
                 }
 
                 // Avatar
@@ -141,22 +132,37 @@ private fun ProfileContent(
 
                     Box(
                         modifier = Modifier
-                            .padding(start = 12.dp),
+                            .padding(start = 12.dp)
+                            .size(120.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        Image(
-                            painterResource(R.drawable.profile_avatar),
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .background(
-                                    shape = CircleShape,
-                                    color = MaterialTheme.colorScheme.surface
-                                )
-                                .size(120.dp)
-                                .padding(4.dp)
-                                .clip(shape = CircleShape)
-                        )
+                        if (uiState.user?.profileImageUrl.isNullOrBlank()) {
+                            Image(
+                                painterResource(R.drawable.profile_avatar),
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .background(
+                                        shape = CircleShape,
+                                        color = MaterialTheme.colorScheme.surface
+                                    )
+                                    .padding(4.dp)
+                                    .clip(shape = CircleShape)
+                            )
+                        } else {
+                            AsyncImage(
+                                model = uiState.user.profileImageUrl,
+                                contentDescription = "",
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .background(
+                                        shape = CircleShape,
+                                        color = MaterialTheme.colorScheme.surface
+                                    )
+                                    .padding(4.dp)
+                                    .clip(shape = CircleShape)
+                            )
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -167,12 +173,9 @@ private fun ProfileContent(
                         style = MaterialTheme.typography.headlineSmall,
                         color = MaterialTheme.colorScheme.onSurface
                     )
-
-                    Spacer(modifier = Modifier.height(1.dp))
-
                     Text(
                         text = uiState.user?.headline ?: "--",
-                        modifier = Modifier.padding(start = 12.dp),
+                        modifier = Modifier.padding(horizontal = 12.dp),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -181,19 +184,17 @@ private fun ProfileContent(
 
                     if (!uiState.experience.isNullOrEmpty()) {
                         Text(
-                            text = uiState.experience[0].companyName,
+                            text = uiState.experience.firstOrNull()?.companyName ?: "",
                             modifier = Modifier.padding(start = 12.dp),
-                            style = MaterialTheme.typography.labelMedium,
+                            style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.onSurface
                         )
-
-                        Spacer(modifier = Modifier.height(2.dp))
                     }
 
                     Text(
                         text = uiState.user?.location ?: "Location",
                         modifier = Modifier.padding(start = 12.dp),
-                        style = MaterialTheme.typography.titleSmall,
+                        style = MaterialTheme.typography.labelLarge,
                         color = Color.Gray
                     )
 
@@ -253,6 +254,7 @@ private fun ProfileContent(
                                     }
 
                                     ConnectionState.Connected -> {}
+                                    null -> null
                                 }
 
                                 Spacer(modifier = Modifier.width(8.dp))
@@ -353,7 +355,7 @@ private fun ProfileContent(
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(18.dp))
+                    Spacer(modifier = Modifier.height(14.dp))
                 }
             }
 
@@ -382,10 +384,8 @@ private fun ProfileContent(
                         ) {
                             Text(
                                 "About",
-                                style = MaterialTheme.typography.titleMedium.copy(
-                                    fontWeight = FontWeight.SemiBold,
-                                    fontSize = 20.sp
-                                ),
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                             Icon(
@@ -512,15 +512,16 @@ private fun ProfileContent(
                                 }
                             } else {
 
-                                repeat(uiState.posts.size) { index ->
+                                uiState.posts.forEachIndexed { index, post ->
 
                                     ProfileActivityCard(
-                                        userName = uiState.posts[index].user?.fullName ?: "",
-                                        content = uiState.posts[index].content,
-                                        commentsCount = uiState.posts[index].commentsCount,
-                                        likesCount = uiState.posts[index].likesCount,
-                                        mediaUrl = uiState.posts[index].mediaUrl?.get(0) ?: "",
-                                        createdAt = uiState.posts[index].createdAt.toString()
+                                        userName = post.user?.fullName
+                                            ?: "Anonymous User",
+                                        content = post.content,
+                                        commentsCount = post.commentsCount,
+                                        likesCount = post.likesCount,
+                                        mediaUrl = post.mediaUrl?.firstOrNull(),
+                                        createdAt = post.createdAt.toString()
                                     )
 
                                     if (index != uiState.posts.size - 1) {

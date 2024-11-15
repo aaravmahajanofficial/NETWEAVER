@@ -48,5 +48,5 @@ interface Repository {
     suspend fun rejectConnectionRequest(requestId: String): Result<Unit>
     suspend fun getConnections(userId: String): Result<List<User>>
     suspend fun getPendingConnections(userId: String): Result<List<User>>
-    suspend fun getConnectionStatus(userId: String): Result<Connection>
+    suspend fun getConnectionStatus(userId: String): Result<Connection?>
 }

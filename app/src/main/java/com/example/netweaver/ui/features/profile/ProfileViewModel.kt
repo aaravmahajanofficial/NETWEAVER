@@ -1,6 +1,5 @@
 package com.example.netweaver.ui.features.profile
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -103,18 +102,15 @@ class ProfileViewModel @Inject constructor(
                     } else null
 
                     // wait for all to complete
-                    val user = when (val result = profileDeferred.await()) {
+                    val userDetails = when (val result = profileDeferred.await()) {
                         is Result.Success -> result.data
-                        is Result.Error -> throw result.exception // Ultimate Failure
+                        is Result.Error -> throw result.exception
                     }
 
                     val posts = try {
                         when (val result = postsDeferred.await()) {
                             is Result.Success -> result.data
-                            is Result.Error -> {
-                                Log.d("ERROR 1", result.exception.message.toString())
-                                null
-                            }
+                            is Result.Error -> null
                         }
                     } catch (_: Exception) {
                         null
@@ -123,10 +119,7 @@ class ProfileViewModel @Inject constructor(
                     val education = try {
                         when (val result = educationDeferred.await()) {
                             is Result.Success -> result.data
-                            is Result.Error -> {
-                                Log.d("ERROR 2", result.exception.message.toString())
-                                null
-                            }
+                            is Result.Error -> null
                         }
                     } catch (_: Exception) {
                         null
@@ -135,10 +128,7 @@ class ProfileViewModel @Inject constructor(
                     val experience = try {
                         when (val result = experienceDeferred.await()) {
                             is Result.Success -> result.data
-                            is Result.Error -> {
-                                Log.d("ERROR 3", result.exception.message.toString())
-                                null
-                            }
+                            is Result.Error -> null
                         }
 
                     } catch (_: Exception) {
@@ -150,11 +140,7 @@ class ProfileViewModel @Inject constructor(
                         when (val result = connectionDeferred?.await()) {
 
                             is Result.Success -> result.data
-                            is Result.Error -> {
-                                Log.d("ERROR 4", result.exception.message.toString())
-                                null
-                            }
-
+                            is Result.Error -> null
                             null -> null
                         }
 
@@ -166,12 +152,12 @@ class ProfileViewModel @Inject constructor(
                         it.copy(
                             isLoading = false,
                             isRefreshing = false,
-                            user = user,
+                            user = userDetails,
                             posts = posts,
                             education = education,
                             experience = experience,
                             connection = connection,
-                            connectionState = connection?.getConnectionState(userId!!)!!,
+                            connectionState = connection?.getConnectionState(userId!!),
                             error = null
                         )
                     }
@@ -179,7 +165,6 @@ class ProfileViewModel @Inject constructor(
                 }
 
             } catch (e: Exception) {
-                Log.d("ERROR 5", e.message.toString())
                 _profileUiState.update {
                     it.copy(
                         isLoading = false,
@@ -199,12 +184,12 @@ data class ProfileState(
     val success: String? = null,
 
     val user: User? = null,
-    val posts: List<Post>? = null,
-    val education: List<Education>? = null,
-    val experience: List<Experience>? = null,
+    val posts: List<Post>? = emptyList<Post>(),
+    val education: List<Education>? = emptyList<Education>(),
+    val experience: List<Experience>? = emptyList<Experience>(),
 
     val connection: Connection? = null,
-    val connectionState: ConnectionState = ConnectionState.None
+    val connectionState: ConnectionState? = ConnectionState.None
 )
 
 sealed class ProfileType {
