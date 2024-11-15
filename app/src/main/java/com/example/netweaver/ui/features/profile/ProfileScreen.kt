@@ -64,6 +64,8 @@ fun ProfileScreen(
     val profileType by viewModel.profileType.collectAsStateWithLifecycle()
 
     AppScaffold(
+        isRefreshing = uiState.isRefreshing,
+        onRefresh = { viewModel.onEvent(ProfileEvent.Refresh) },
         showBack = true,
         showBottomAppBar = false,
         scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState()),
@@ -71,6 +73,15 @@ fun ProfileScreen(
             ProfileContent(
                 uiState = uiState,
                 profileType = profileType,
+                onAccept = { reqId ->
+                    viewModel.onEvent(ProfileEvent.Accept(requestId = reqId))
+                },
+                onConnect = { userId ->
+                    viewModel.onEvent(ProfileEvent.Connect(userId = userId))
+                },
+                onIgnore = { reqId ->
+                    viewModel.onEvent(ProfileEvent.Ignore(requestId = reqId))
+                },
                 paddingValues = PaddingValues(
                     top = innerPadding.calculateTopPadding(),
                     bottom = innerPadding.calculateBottomPadding(),
@@ -80,10 +91,14 @@ fun ProfileScreen(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ProfileContent(
     uiState: ProfileState,
     profileType: ProfileType,
+    onAccept: (String) -> Unit,
+    onConnect: (String) -> Unit,
+    onIgnore: (String) -> Unit,
     paddingValues: PaddingValues
 ) {
 
@@ -229,10 +244,13 @@ private fun ProfileContent(
                                     ConnectionState.PendingIncoming -> {
                                         ProfileActionsButton(
                                             title = "Accept",
-                                            icon = painterResource(R.drawable.connect),
                                             containerColor = MaterialTheme.colorScheme.secondary,
                                             contentColor = MaterialTheme.colorScheme.surface,
-                                            onClick = {}
+                                            onClick = {
+                                                uiState.connection?.id?.let {
+                                                    onAccept(it)
+                                                }
+                                            }
                                         )
                                     }
 
@@ -243,12 +261,14 @@ private fun ProfileContent(
                                             icon = painterResource(R.drawable.connect),
                                             containerColor = MaterialTheme.colorScheme.secondary,
                                             contentColor = MaterialTheme.colorScheme.surface,
-                                            onClick = {}
+                                            onClick = {
+                                                uiState.user?.userId?.let {
+                                                    onConnect(it)
+                                                }
+                                            }
                                         )
                                     }
                                 }
-
-                                Spacer(modifier = Modifier.width(8.dp))
 
                                 if (uiState.connectionState != ConnectionState.PendingIncoming) {
                                     ProfileActionsButton(
@@ -263,11 +283,15 @@ private fun ProfileContent(
                                         title = "Ignore",
                                         containerColor = MaterialTheme.colorScheme.surface,
                                         contentColor = MaterialTheme.colorScheme.secondary,
-                                        onClick = {}
+                                        onClick = {
+                                            uiState.connection?.id?.let {
+                                                onIgnore(it)
+                                            }
+                                        }
                                     )
                                 }
 
-                                Spacer(modifier = Modifier.width(12.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
 
                                 Box(
                                     modifier = Modifier
@@ -295,7 +319,7 @@ private fun ProfileContent(
 
                         is ProfileType.PersonalProfile -> {
                             Text(
-                                text = "${0} connections",
+                                text = "${uiState.connectionsCount} connections",
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.secondary

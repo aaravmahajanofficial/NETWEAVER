@@ -43,9 +43,10 @@ interface Repository {
 //    suspend fun sharePost(postId: String): Result<Unit>
 
     // Network/Connections
-    suspend fun sendConnectionRequest(receiverId: String): Result<Unit>
+    suspend fun sendConnectionRequest(userId: String): Result<Unit>
     suspend fun acceptConnectionRequest(requestId: String): Result<Unit>
     suspend fun rejectConnectionRequest(requestId: String): Result<Unit>
+    suspend fun getConnectionsCount(userId: String): Result<Long>
     suspend fun getConnections(userId: String): Result<List<User>>
     suspend fun getPendingConnections(userId: String): Result<List<User>>
     suspend fun getConnectionStatus(userId: String): Result<Connection?>

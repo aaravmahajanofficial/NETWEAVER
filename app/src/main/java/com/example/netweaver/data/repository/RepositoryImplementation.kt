@@ -353,13 +353,13 @@ class RepositoryImplementation @Inject constructor(
         }
 
 
-    override suspend fun sendConnectionRequest(receiverId: String): Result<Unit> =
+    override suspend fun sendConnectionRequest(userId: String): Result<Unit> =
         withContext(Dispatchers.IO) {
             try {
                 postgrest.from("Connections").upsert(
                     ConnectionDto(
                         requesterId = currentUserId,
-                        receiverId = receiverId
+                        receiverId = userId
                     )
                 )
 
@@ -377,6 +377,23 @@ class RepositoryImplementation @Inject constructor(
                         set("status", ConnectionStatus.CONNECTED)
                     }
                 ) {
+                    filter {
+                        eq("id", requestId)
+                        eq("receiver_id", currentUserId)
+                    }
+                }
+
+                Result.Success(Unit)
+            } catch (e: Exception) {
+                Result.Error(e)
+            }
+
+        }
+
+    override suspend fun rejectConnectionRequest(requestId: String): Result<Unit> =
+        withContext(Dispatchers.IO) {
+            try {
+                postgrest.from("Connections").delete {
                     filter {
                         eq("id", requestId)
                         eq("receiver_id", currentUserId)
@@ -434,28 +451,35 @@ class RepositoryImplementation @Inject constructor(
 
     }
 
+    override suspend fun getConnectionsCount(userId: String): Result<Long> =
+        withContext(Dispatchers.IO) {
+            try {
+                val count = postgrest.from("Connections").select {
+                    filter {
+                        and {
+                            or {
+                                eq("receiver_id", userId)
+                                eq("requester_id", userId)
+                            }
+                            eq("status", ConnectionStatus.CONNECTED)
+
+                        }
+                    }
+                }.countOrNull()
+
+                Log.d("ConnectionCount", count.toString())
+                Result.Success(count ?: 0)
+            } catch (e: Exception) {
+                Log.d("ConnectionCount ERROR", e.toString())
+                Result.Error(e)
+            }
+        }
+
     override suspend fun getConnections(userId: String): Result<List<User>> =
         getConnectionsByStatus(userId = userId, connectionStatus = ConnectionStatus.CONNECTED)
 
     override suspend fun getPendingConnections(userId: String): Result<List<User>> =
         getConnectionsByStatus(userId = userId, connectionStatus = ConnectionStatus.PENDING)
-
-    override suspend fun rejectConnectionRequest(requestId: String): Result<Unit> =
-        withContext(Dispatchers.IO) {
-            try {
-                postgrest.from("Connections").delete {
-                    filter {
-                        eq("id", requestId)
-                        eq("receiver_id", currentUserId)
-                    }
-                }
-
-                Result.Success(Unit)
-            } catch (e: Exception) {
-                Result.Error(e)
-            }
-
-        }
 
     override suspend fun getConnectionStatus(userId: String): Result<Connection?> =
         withContext(Dispatchers.IO) {

@@ -10,6 +10,8 @@ import com.example.netweaver.domain.model.Experience
 import com.example.netweaver.domain.model.Post
 import com.example.netweaver.domain.model.User
 import com.example.netweaver.domain.usecase.connections.GetConnectionStatusUseCase
+import com.example.netweaver.domain.usecase.connections.GetUserConnectionsUseCase
+import com.example.netweaver.domain.usecase.connections.HandleRequestUseCase
 import com.example.netweaver.domain.usecase.user.GetEducationUseCase
 import com.example.netweaver.domain.usecase.user.GetExperiencesUseCase
 import com.example.netweaver.domain.usecase.user.GetUserPostsUseCase
@@ -33,6 +35,8 @@ class ProfileViewModel @Inject constructor(
     private val getExperiencesUseCase: GetExperiencesUseCase,
     private val getUserPostsUseCase: GetUserPostsUseCase,
     private val getConnectionStatusUseCase: GetConnectionStatusUseCase,
+    private val getUserConnectionsUseCase: GetUserConnectionsUseCase,
+    private val handleRequestUseCase: HandleRequestUseCase,
     firebaseAuth: FirebaseAuth,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
@@ -71,9 +75,129 @@ class ProfileViewModel @Inject constructor(
 
     fun onEvent(event: ProfileEvent) {
         when (event) {
-            ProfileEvent.Refresh -> {
+            is ProfileEvent.Refresh -> {
                 loadProfile(isRefreshing = true)
             }
+
+            is ProfileEvent.Accept -> {
+                viewModelScope.launch {
+
+                    _profileUiState.update {
+                        it.copy(
+                            isLoading = true,
+                            error = null
+                        )
+                    }
+
+                    when (val result =
+                        handleRequestUseCase.acceptConnectionRequest(
+                            requestId = event.requestId
+                        )) {
+                        is Result.Success -> {
+                            _profileUiState.update {
+                                it.copy(
+                                    isLoading = false,
+                                    error = null,
+                                    success = "Successfully accepted the request.",
+                                    connectionState = ConnectionState.Connected
+                                )
+                            }
+                        }
+
+                        is Result.Error -> {
+                            _profileUiState.update {
+                                it.copy(
+                                    isLoading = false,
+                                    error = result.exception.message ?: "An unknown error occurred."
+                                )
+                            }
+                        }
+                    }
+
+
+                }
+            }
+
+            is ProfileEvent.Ignore -> {
+
+                viewModelScope.launch {
+
+                    _profileUiState.update {
+                        it.copy(
+                            isLoading = true,
+                            error = null
+                        )
+                    }
+
+                    when (val result =
+                        handleRequestUseCase.rejectConnectionRequest(
+                            requestId = event.requestId
+                        )) {
+                        is Result.Success -> {
+                            _profileUiState.update {
+                                it.copy(
+                                    isLoading = false,
+                                    error = null,
+                                    success = "Successfully ignored the request.",
+                                    connectionState = null
+                                )
+                            }
+                        }
+
+                        is Result.Error -> {
+                            _profileUiState.update {
+                                it.copy(
+                                    isLoading = false,
+                                    error = result.exception.message ?: "An unknown error occurred."
+                                )
+                            }
+                        }
+                    }
+
+
+                }
+
+
+            }
+
+            is ProfileEvent.Connect -> {
+                viewModelScope.launch {
+
+                    _profileUiState.update {
+                        it.copy(
+                            isLoading = true,
+                            error = null
+                        )
+                    }
+
+                    when (val result =
+                        handleRequestUseCase.sendConnectionRequest(userId = event.userId)) {
+                        is Result.Success -> {
+                            _profileUiState.update {
+                                it.copy(
+                                    isLoading = false,
+                                    error = null,
+                                    success = "Successfully sent the request.",
+                                    connectionState = ConnectionState.PendingOutgoing
+                                )
+                            }
+                        }
+
+                        is Result.Error -> {
+                            _profileUiState.update {
+                                it.copy(
+                                    isLoading = false,
+                                    error = result.exception.message ?: "An unknown error occurred."
+                                )
+                            }
+                        }
+                    }
+
+
+                }
+            }
+
+            is ProfileEvent.Message -> {}
         }
     }
 
@@ -97,6 +221,8 @@ class ProfileViewModel @Inject constructor(
                     val postsDeferred = async { getUserPostsUseCase(userId = userId!!) }
                     val educationDeferred = async { getEducationUseCase(userId = userId!!) }
                     val experienceDeferred = async { getExperiencesUseCase(userId = userId!!) }
+                    val connectionsCountDeferred =
+                        async { getUserConnectionsUseCase.getConnectionsCount(userId = userId!!) }
                     val connectionDeferred = if (userId != currentUserId) {
                         async { getConnectionStatusUseCase(userId = userId!!) }
                     } else null
@@ -148,6 +274,18 @@ class ProfileViewModel @Inject constructor(
                         null
                     }
 
+                    val connectionsCount = try {
+
+                        when (val result = connectionsCountDeferred.await()) {
+
+                            is Result.Success -> result.data
+                            is Result.Error -> null
+                        }
+
+                    } catch (_: Exception) {
+                        null
+                    }
+
                     _profileUiState.update {
                         it.copy(
                             isLoading = false,
@@ -157,6 +295,7 @@ class ProfileViewModel @Inject constructor(
                             education = education,
                             experience = experience,
                             connection = connection,
+                            connectionsCount = connectionsCount,
                             connectionState = connection?.getConnectionState(currentUserId),
                             error = null
                         )
@@ -188,6 +327,7 @@ data class ProfileState(
     val education: List<Education>? = emptyList<Education>(),
     val experience: List<Experience>? = emptyList<Experience>(),
 
+    val connectionsCount: Long? = 0,
     val connection: Connection? = null,
     val connectionState: ConnectionState? = null
 )
@@ -199,4 +339,8 @@ sealed class ProfileType {
 
 sealed class ProfileEvent {
     object Refresh : ProfileEvent()
+    data class Accept(val requestId: String) : ProfileEvent()
+    data class Connect(val userId: String) : ProfileEvent()
+    data class Ignore(val requestId: String) : ProfileEvent()
+    object Message : ProfileEvent()
 }

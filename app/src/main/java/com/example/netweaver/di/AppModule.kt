@@ -5,6 +5,8 @@ import com.example.netweaver.data.repository.RepositoryImplementation
 import com.example.netweaver.domain.repository.AuthRepository
 import com.example.netweaver.domain.repository.Repository
 import com.example.netweaver.domain.usecase.connections.GetConnectionStatusUseCase
+import com.example.netweaver.domain.usecase.connections.GetUserConnectionsUseCase
+import com.example.netweaver.domain.usecase.connections.HandleRequestUseCase
 import com.example.netweaver.domain.usecase.posts.CreatePostUseCase
 import com.example.netweaver.domain.usecase.posts.GetPostsUseCase
 import com.example.netweaver.domain.usecase.posts.LikePostUseCase
@@ -133,5 +135,15 @@ object AppModule {
     @Singleton
     fun provideGetConnectionStatusUseCase(repository: Repository) =
         GetConnectionStatusUseCase(repository = repository)
+
+    @Provides
+    @Singleton
+    fun provideHandleRequestUseCase(repository: Repository) =
+        HandleRequestUseCase(repository = repository)
+
+    @Provides
+    @Singleton
+    fun provideGetUserConnectionsUseCase(repository: Repository) =
+        GetUserConnectionsUseCase(repository = repository)
 
 }

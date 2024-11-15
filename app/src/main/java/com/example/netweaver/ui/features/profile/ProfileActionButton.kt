@@ -72,4 +72,6 @@ fun RowScope.ProfileActionsButton(
             )
         }
     }
+
+    Spacer(modifier = Modifier.width(8.dp))
 }

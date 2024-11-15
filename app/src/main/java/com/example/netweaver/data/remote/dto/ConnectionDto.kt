@@ -24,10 +24,7 @@ data class ConnectionDto(
 
 @Serializable
 enum class ConnectionStatus {
-    @SerialName("pending")
     PENDING,
-
-    @SerialName("connected")
     CONNECTED,
 }
 

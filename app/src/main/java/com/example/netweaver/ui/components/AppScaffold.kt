@@ -34,6 +34,8 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarScrollBehavior
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -130,6 +132,8 @@ sealed class BottomNavItem(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppScaffold(
+    onRefresh: () -> Unit = {},
+    isRefreshing: Boolean = false,
     showBack: Boolean = false,
     scrollBehavior: TopAppBarScrollBehavior,
     showBottomAppBar: Boolean = true,
@@ -388,7 +392,18 @@ fun AppScaffold(
                 floatingActionButton()
             }
         ) { paddingValues ->
-            content(paddingValues)
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+            ) {
+                PullToRefreshBox(
+                    state = rememberPullToRefreshState(),
+                    isRefreshing = isRefreshing,
+                    onRefresh = { onRefresh() }) {
+                    content(PaddingValues(0.dp))
+                }
+            }
 
         }
     }
