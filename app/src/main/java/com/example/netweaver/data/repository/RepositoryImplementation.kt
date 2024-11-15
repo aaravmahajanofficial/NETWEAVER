@@ -21,6 +21,7 @@ import com.google.firebase.auth.FirebaseAuth
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.query.Columns
+import io.github.jan.supabase.postgrest.query.Count
 import io.github.jan.supabase.realtime.channel
 import io.github.jan.supabase.realtime.postgresListDataFlow
 import io.github.jan.supabase.storage.Storage
@@ -454,7 +455,8 @@ class RepositoryImplementation @Inject constructor(
     override suspend fun getConnectionsCount(userId: String): Result<Long> =
         withContext(Dispatchers.IO) {
             try {
-                val count = postgrest.from("Connections").select {
+                val count = postgrest.from("Connections").select() {
+                    count(Count.EXACT)
                     filter {
                         and {
                             or {
@@ -467,10 +469,8 @@ class RepositoryImplementation @Inject constructor(
                     }
                 }.countOrNull()
 
-                Log.d("ConnectionCount", count.toString())
                 Result.Success(count ?: 0)
             } catch (e: Exception) {
-                Log.d("ConnectionCount ERROR", e.toString())
                 Result.Error(e)
             }
         }

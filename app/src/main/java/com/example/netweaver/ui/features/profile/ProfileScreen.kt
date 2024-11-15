@@ -215,7 +215,7 @@ private fun ProfileContent(
                     when (profileType) {
                         is ProfileType.OtherProfile -> {
                             Text(
-                                text = "${0} connections",
+                                text = "${uiState.connectionsCount} connections",
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.onTertiary
