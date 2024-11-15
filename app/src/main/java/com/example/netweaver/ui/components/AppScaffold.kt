@@ -313,7 +313,9 @@ fun AppScaffold(
                 CustomTopAppBar(
                     scrollBehavior = scrollBehavior,
                     showBack = showBack,
-                    onClick = {}
+                    onClick = {
+                        navController.navigateUp()
+                    }
                 )
             },
             bottomBar = {

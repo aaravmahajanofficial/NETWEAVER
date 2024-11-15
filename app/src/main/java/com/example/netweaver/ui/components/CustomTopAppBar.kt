@@ -38,7 +38,7 @@ fun CustomTopAppBar(
     scrollBehavior: TopAppBarScrollBehavior,
     title: String? = null,
     showBack: Boolean = true,
-    onClick: () -> Unit? = {},
+    onClick: () -> Unit = {},
 ) {
 
     var searchQuery by remember { mutableStateOf("") }
