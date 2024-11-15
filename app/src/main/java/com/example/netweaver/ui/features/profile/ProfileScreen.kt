@@ -50,6 +50,7 @@ import com.example.netweaver.domain.model.Education
 import com.example.netweaver.domain.model.Experience
 import com.example.netweaver.ui.ProfileActivityCard
 import com.example.netweaver.ui.components.AppScaffold
+import com.example.netweaver.ui.components.CustomOutlinedButton
 import com.example.netweaver.utils.ExpandableText
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -226,13 +227,13 @@ private fun ProfileContent(
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 when (uiState.connectionState) {
 
                                     ConnectionState.PendingOutgoing -> {
-                                        ProfileActionsButton(
+                                        CustomActionButton(
                                             title = "Pending",
                                             icon = painterResource(R.drawable.clock),
                                             containerColor = MaterialTheme.colorScheme.surface,
@@ -242,7 +243,7 @@ private fun ProfileContent(
                                     }
 
                                     ConnectionState.PendingIncoming -> {
-                                        ProfileActionsButton(
+                                        CustomActionButton(
                                             title = "Accept",
                                             containerColor = MaterialTheme.colorScheme.secondary,
                                             contentColor = MaterialTheme.colorScheme.surface,
@@ -256,7 +257,7 @@ private fun ProfileContent(
 
                                     ConnectionState.Connected -> {}
                                     null -> {
-                                        ProfileActionsButton(
+                                        CustomActionButton(
                                             title = "Connect",
                                             icon = painterResource(R.drawable.connect),
                                             containerColor = MaterialTheme.colorScheme.secondary,
@@ -271,7 +272,7 @@ private fun ProfileContent(
                                 }
 
                                 if (uiState.connectionState != ConnectionState.PendingIncoming) {
-                                    ProfileActionsButton(
+                                    CustomActionButton(
                                         title = "Message",
                                         icon = painterResource(R.drawable.send),
                                         containerColor = MaterialTheme.colorScheme.surface,
@@ -279,7 +280,7 @@ private fun ProfileContent(
                                         onClick = {}
                                     )
                                 } else {
-                                    ProfileActionsButton(
+                                    CustomActionButton(
                                         title = "Ignore",
                                         containerColor = MaterialTheme.colorScheme.surface,
                                         contentColor = MaterialTheme.colorScheme.secondary,
@@ -293,26 +294,10 @@ private fun ProfileContent(
 
                                 Spacer(modifier = Modifier.width(4.dp))
 
-                                Box(
-                                    modifier = Modifier
-                                        .size(32.dp)
-                                        .background(
-                                            color = MaterialTheme.colorScheme.surface,
-                                            shape = CircleShape,
-                                        )
-                                        .border(
-                                            1.dp,
-                                            color = MaterialTheme.colorScheme.onTertiary,
-                                            shape = CircleShape
-                                        ),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Icon(
-                                        painter = painterResource(R.drawable.horizontal_options),
-                                        contentDescription = "More Options",
-                                        tint = MaterialTheme.colorScheme.tertiary,
-                                    )
-                                }
+                                CustomOutlinedButton(
+                                    icon = painterResource(R.drawable.horizontal_options),
+                                    buttonSize = 32.dp,
+                                    onClick = {})
 
                             }
                         }
@@ -334,7 +319,7 @@ private fun ProfileContent(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                ProfileActionsButton(
+                                CustomActionButton(
                                     title = "Edit Profile",
                                     icon = painterResource(R.drawable.pencil),
                                     containerColor = MaterialTheme.colorScheme.surface,

@@ -25,7 +25,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun RowScope.ProfileActionsButton(
+fun RowScope.CustomActionButton(
     title: String,
     icon: Painter? = null,
     containerColor: Color,
@@ -73,5 +73,4 @@ fun RowScope.ProfileActionsButton(
         }
     }
 
-    Spacer(modifier = Modifier.width(8.dp))
 }

@@ -52,25 +52,15 @@ class ProfileViewModel @Inject constructor(
     val profileType: StateFlow<ProfileType> = _profileType.asStateFlow()
 
     init {
-        if (validateUserId()) {
 
-            if (userId == currentUserId) {
-                _profileType.value = ProfileType.PersonalProfile
-            } else {
-                _profileType.value = ProfileType.OtherProfile
-            }
-
-            loadProfile(isRefreshing = false)
+        if (userId == currentUserId) {
+            _profileType.value = ProfileType.PersonalProfile
+        } else {
+            _profileType.value = ProfileType.OtherProfile
         }
-    }
 
-    fun validateUserId(): Boolean {
+        loadProfile(isRefreshing = false)
 
-        return if (userId.isNullOrBlank()) {
-            _profileUiState.update { it.copy(error = "Invalid User Id") }
-            false
-        } else
-            true
     }
 
     fun onEvent(event: ProfileEvent) {
