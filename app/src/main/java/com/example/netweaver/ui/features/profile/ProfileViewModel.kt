@@ -157,7 +157,7 @@ class ProfileViewModel @Inject constructor(
                             education = education,
                             experience = experience,
                             connection = connection,
-                            connectionState = connection?.getConnectionState(userId!!),
+                            connectionState = connection?.getConnectionState(currentUserId),
                             error = null
                         )
                     }
@@ -189,7 +189,7 @@ data class ProfileState(
     val experience: List<Experience>? = emptyList<Experience>(),
 
     val connection: Connection? = null,
-    val connectionState: ConnectionState? = ConnectionState.None
+    val connectionState: ConnectionState? = null
 )
 
 sealed class ProfileType {

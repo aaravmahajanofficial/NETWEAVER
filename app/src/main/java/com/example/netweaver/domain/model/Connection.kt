@@ -12,7 +12,7 @@ data class Connection(
     val createdAt: Instant = now(),
     val updatedAt: Instant = now()
 ) {
-    fun getConnectionState(currentUserId: String): ConnectionState =
+    fun getConnectionState(currentUserId: String): ConnectionState? =
         when {
             status == ConnectionStatus.PENDING && requesterId == currentUserId -> {
                 ConnectionState.PendingOutgoing
@@ -27,13 +27,12 @@ data class Connection(
             }
 
             else -> {
-                ConnectionState.None
+                null
             }
         }
 }
 
 sealed interface ConnectionState {
-    object None : ConnectionState
     object PendingOutgoing : ConnectionState
     object PendingIncoming : ConnectionState
     object Connected : ConnectionState

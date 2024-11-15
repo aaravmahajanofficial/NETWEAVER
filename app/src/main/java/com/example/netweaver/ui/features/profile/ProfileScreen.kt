@@ -123,7 +123,9 @@ private fun ProfileContent(
 
                 // Avatar
                 Column(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 12.dp),
                     horizontalAlignment = Alignment.Start,
                     verticalArrangement = Arrangement.SpaceEvenly
                 ) {
@@ -132,7 +134,6 @@ private fun ProfileContent(
 
                     Box(
                         modifier = Modifier
-                            .padding(start = 12.dp)
                             .size(120.dp),
                         contentAlignment = Alignment.Center
                     ) {
@@ -169,13 +170,11 @@ private fun ProfileContent(
 
                     Text(
                         text = uiState.user?.fullName ?: "Full Name",
-                        modifier = Modifier.padding(start = 12.dp),
                         style = MaterialTheme.typography.headlineSmall,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
                         text = uiState.user?.headline ?: "--",
-                        modifier = Modifier.padding(horizontal = 12.dp),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -185,7 +184,6 @@ private fun ProfileContent(
                     if (!uiState.experience.isNullOrEmpty()) {
                         Text(
                             text = uiState.experience.firstOrNull()?.companyName ?: "",
-                            modifier = Modifier.padding(start = 12.dp),
                             style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.onSurface
                         )
@@ -193,7 +191,6 @@ private fun ProfileContent(
 
                     Text(
                         text = uiState.user?.location ?: "Location",
-                        modifier = Modifier.padding(start = 12.dp),
                         style = MaterialTheme.typography.labelLarge,
                         color = Color.Gray
                     )
@@ -204,7 +201,6 @@ private fun ProfileContent(
                         is ProfileType.OtherProfile -> {
                             Text(
                                 text = "${0} connections",
-                                modifier = Modifier.padding(start = 12.dp),
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.onTertiary
@@ -214,26 +210,13 @@ private fun ProfileContent(
 
                             Row(
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 12.dp),
+                                    .fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 when (uiState.connectionState) {
-                                    ConnectionState.None -> {
-
-                                        ProfileActionsButton(
-                                            title = "Connect",
-                                            icon = painterResource(R.drawable.connect),
-                                            containerColor = MaterialTheme.colorScheme.secondary,
-                                            contentColor = MaterialTheme.colorScheme.surface,
-                                            onClick = {}
-                                        )
-
-                                    }
 
                                     ConnectionState.PendingOutgoing -> {
-
                                         ProfileActionsButton(
                                             title = "Pending",
                                             icon = painterResource(R.drawable.clock),
@@ -241,20 +224,28 @@ private fun ProfileContent(
                                             contentColor = MaterialTheme.colorScheme.secondary,
                                             onClick = {}
                                         )
-
                                     }
 
                                     ConnectionState.PendingIncoming -> {
                                         ProfileActionsButton(
                                             title = "Accept",
-                                            containerColor = MaterialTheme.colorScheme.surface,
-                                            contentColor = MaterialTheme.colorScheme.secondary,
+                                            icon = painterResource(R.drawable.connect),
+                                            containerColor = MaterialTheme.colorScheme.secondary,
+                                            contentColor = MaterialTheme.colorScheme.surface,
                                             onClick = {}
                                         )
                                     }
 
                                     ConnectionState.Connected -> {}
-                                    null -> null
+                                    null -> {
+                                        ProfileActionsButton(
+                                            title = "Connect",
+                                            icon = painterResource(R.drawable.connect),
+                                            containerColor = MaterialTheme.colorScheme.secondary,
+                                            contentColor = MaterialTheme.colorScheme.surface,
+                                            onClick = {}
+                                        )
+                                    }
                                 }
 
                                 Spacer(modifier = Modifier.width(8.dp))
@@ -305,7 +296,6 @@ private fun ProfileContent(
                         is ProfileType.PersonalProfile -> {
                             Text(
                                 text = "${0} connections",
-                                modifier = Modifier.padding(start = 12.dp),
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.secondary
@@ -515,8 +505,7 @@ private fun ProfileContent(
                                 uiState.posts.forEachIndexed { index, post ->
 
                                     ProfileActivityCard(
-                                        userName = post.user?.fullName
-                                            ?: "Anonymous User",
+                                        userName = uiState.user?.fullName ?: "Full Name",
                                         content = post.content,
                                         commentsCount = post.commentsCount,
                                         likesCount = post.likesCount,
