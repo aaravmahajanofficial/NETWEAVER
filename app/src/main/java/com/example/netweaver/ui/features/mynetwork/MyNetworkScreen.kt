@@ -1,14 +1,13 @@
 package com.example.netweaver.ui.features.mynetwork
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -18,14 +17,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
@@ -36,10 +34,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.netweaver.R
 import com.example.netweaver.ui.components.AppScaffold
+import com.example.netweaver.ui.components.CustomOutlinedButton
+import com.example.netweaver.ui.features.mynetwork.components.ArrowNavigationRow
+import com.example.netweaver.ui.features.profile.CustomActionButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,13 +49,8 @@ fun MyNetworkScreen() {
 
     AppScaffold(
         scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState()),
-        content = { innerPadding ->
-            MyNetworkContent(
-                paddingValues = PaddingValues(
-                    top = innerPadding.calculateTopPadding(),
-                    bottom = innerPadding.calculateBottomPadding(),
-                )
-            )
+        content = {
+            MyNetworkContent()
         }
     )
 
@@ -61,81 +58,109 @@ fun MyNetworkScreen() {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun MyNetworkContent(
-    paddingValues: PaddingValues
-) {
+private fun MyNetworkContent() {
 
     LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues),
+        modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Top
     ) {
 
-        items(1) {
-            Box(
+        item {
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 8.dp)
-                    .height(52.dp)
-                    .background(color = MaterialTheme.colorScheme.surface)
+                    .background(MaterialTheme.colorScheme.surface),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceEvenly
             ) {
+                ArrowNavigationRow(
+                    title = "Invitations (0)",
+                    onClick = {}
+                )
+                HorizontalDivider(
+                    color = MaterialTheme.colorScheme.outline
+                )
+
                 Row(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(
-                            start = 12.dp,
-                            end = 12.dp
-                        ),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                        .fillMaxWidth()
+                        .padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(
-                        "Invitations (0)",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onBackground
+
+                    Image(
+                        painter = if (isSystemInDarkTheme()) painterResource(R.drawable.profile_avatar_dark) else painterResource(
+                            R.drawable.profile_avatar
+                        ),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(68.dp)
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop
                     )
 
-                    Icon(
-                        painter = painterResource(R.drawable.right_arrow),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.tertiary
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(start = 12.dp),
+                        horizontalAlignment = Alignment.Start,
+                        verticalArrangement = Arrangement.spacedBy(2.dp)
+                    ) {
+                        Text(
+                            "Aarav Mahajan",
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+                        Text(
+                            "Pre-Final Year | Thapar Institute of Engineering & Technology",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onTertiary,
+                            modifier = Modifier.padding(end = 12.dp),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+
+                        Text(
+                            "Today",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onTertiary
+                        )
+
+
+                    }
+
+                    CustomOutlinedButton(
+                        icon = painterResource(R.drawable.cancel),
+                        buttonSize = 32.dp,
+                        borderColor = MaterialTheme.colorScheme.onTertiary,
+                        iconColor = MaterialTheme.colorScheme.onTertiary,
+                        onClick = {}
+                    )
+
+                    Spacer(modifier = Modifier.width(12.dp))
+
+                    CustomOutlinedButton(
+                        icon = painterResource(R.drawable.tick),
+                        buttonSize = 32.dp,
+                        borderColor = MaterialTheme.colorScheme.secondary,
+                        iconColor = MaterialTheme.colorScheme.secondary,
+                        onClick = {}
                     )
 
                 }
             }
+        }
 
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp)
-                    .height(52.dp)
-                    .background(color = MaterialTheme.colorScheme.surface)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(
-                            start = 12.dp,
-                            end = 12.dp
-                        ),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        "Manage my network",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-
-                    Icon(
-                        painter = painterResource(R.drawable.right_arrow),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.tertiary
-                    )
-
-                }
-            }
+        item {
+            Spacer(modifier = Modifier.height(8.dp))
+            ArrowNavigationRow(
+                title = "Manage my network",
+                onClick = {}
+            )
         }
 
         item {
@@ -157,7 +182,7 @@ private fun MyNetworkContent(
 
                 Spacer(modifier = Modifier.height(4.dp))
 
-                repeat(4) {
+                repeat(2) {
                     Row(
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
                         horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -180,17 +205,21 @@ private fun MyNetworkContent(
                                     .clip(shape = RoundedCornerShape(12.dp)),
                             ) {
 
+                                // Profile Background Image
                                 Image(
-                                    painterResource(R.drawable.kevin_wang_cnaescojesi_unsplash),
+                                    painter = if (isSystemInDarkTheme()) painterResource(R.drawable.profile_background_dark) else painterResource(
+                                        R.drawable.profile_background
+                                    ),
                                     contentDescription = null,
                                     modifier = Modifier.height(65.dp),
                                     contentScale = ContentScale.Crop
                                 )
 
+                                // Profile Details + Connect button
                                 Column(
                                     modifier = Modifier
                                         .fillMaxSize()
-                                        .padding(start = 12.dp, end = 12.dp),
+                                        .padding(horizontal = 12.dp),
                                     horizontalAlignment = Alignment.CenterHorizontally,
                                     verticalArrangement = Arrangement.SpaceBetween
                                 ) {
@@ -201,7 +230,9 @@ private fun MyNetworkContent(
                                         verticalArrangement = Arrangement.SpaceEvenly
                                     ) {
                                         Image(
-                                            painterResource(R.drawable.kevin_wang_cnaescojesi_unsplash),
+                                            painter = if (isSystemInDarkTheme()) painterResource(R.drawable.profile_avatar_dark) else painterResource(
+                                                R.drawable.profile_avatar
+                                            ),
                                             contentDescription = null,
                                             modifier = Modifier
                                                 .size(92.dp)
@@ -211,53 +242,37 @@ private fun MyNetworkContent(
                                         )
 
                                         Text(
-                                            "Name",
-                                            style = MaterialTheme.typography.titleMedium.copy(
-                                                fontWeight = FontWeight.W500
-                                            ),
+                                            "Aarav Mahajan",
+                                            style = MaterialTheme.typography.bodyLarge,
+                                            fontWeight = FontWeight.Bold,
                                             maxLines = 1,
+                                            textAlign = TextAlign.Center,
                                             overflow = TextOverflow.Ellipsis,
                                             color = MaterialTheme.colorScheme.onBackground,
-                                            modifier = Modifier.padding(top = 24.dp, bottom = 2.dp)
+                                            modifier = Modifier.padding(top = 24.dp, bottom = 1.dp)
                                         )
 
                                         Text(
-                                            "Headline",
-                                            style = MaterialTheme.typography.labelMedium.copy(
-                                                fontWeight = FontWeight.Normal
-                                            ),
+                                            "ANDROID DEV | GOOGLE, USA",
+                                            style = MaterialTheme.typography.labelMedium,
                                             color = MaterialTheme.colorScheme.onTertiary,
+                                            textAlign = TextAlign.Center,
                                             maxLines = 2,
                                             overflow = TextOverflow.Ellipsis,
+                                            modifier = Modifier.padding(horizontal = 12.dp)
                                         )
                                     }
 
-                                    Column(
+                                    Row(
                                         modifier = Modifier.padding(bottom = 12.dp),
-                                        horizontalAlignment = Alignment.CenterHorizontally
+                                        horizontalArrangement = Arrangement.Center,
+                                        verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        OutlinedButton(
-                                            onClick = {},
-                                            border = BorderStroke(
-                                                width = 1.dp,
-                                                color = MaterialTheme.colorScheme.primary
-                                            ),
-                                            colors = ButtonDefaults.outlinedButtonColors(
-                                                containerColor = MaterialTheme.colorScheme.surface,
-                                            ),
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .height(32.dp),
-                                        ) {
-
-                                            Text(
-                                                "Connect",
-                                                style = MaterialTheme.typography.titleMedium.copy(
-                                                    fontWeight = FontWeight.Medium
-                                                )
-                                            )
-
-                                        }
+                                        CustomActionButton(
+                                            title = "Connect",
+                                            containerColor = MaterialTheme.colorScheme.surface,
+                                            contentColor = MaterialTheme.colorScheme.secondary,
+                                            onClick = {})
                                     }
                                 }
 
