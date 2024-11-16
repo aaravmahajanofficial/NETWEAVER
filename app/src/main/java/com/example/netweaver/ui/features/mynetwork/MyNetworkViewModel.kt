@@ -2,10 +2,14 @@ package com.example.netweaver.ui.features.mynetwork
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.netweaver.domain.model.Connection
 import com.example.netweaver.domain.model.User
+import com.example.netweaver.domain.usecase.connections.GetUserConnectionsUseCase
 import com.example.netweaver.domain.usecase.connections.HandleRequestUseCase
 import com.example.netweaver.ui.model.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,20 +18,23 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MyNetworkViewModel @Inject constructor(private val handleRequestUseCase: HandleRequestUseCase) :
+class MyNetworkViewModel @Inject constructor(
+    private val handleRequestUseCase: HandleRequestUseCase,
+    private val getUserConnectionsUseCase: GetUserConnectionsUseCase
+) :
     ViewModel() {
 
     private val _myNetworkUiState = MutableStateFlow(MyNetworkState())
     val myNetworkState: StateFlow<MyNetworkState> = _myNetworkUiState.asStateFlow()
 
+    init {
+        loadPage(isRefreshing = false)
+    }
+
     fun onEvent(event: MyNetworkEvent) {
         when (event) {
             is MyNetworkEvent.Refresh -> {
-                _myNetworkUiState.update {
-                    it.copy(
-                        isRefreshing = true
-                    )
-                }
+                loadPage(isRefreshing = true)
             }
 
             is MyNetworkEvent.Accept -> {
@@ -146,15 +153,83 @@ class MyNetworkViewModel @Inject constructor(private val handleRequestUseCase: H
             }
         }
     }
+
+    private fun loadPage(isRefreshing: Boolean) {
+
+        viewModelScope.launch {
+
+            _myNetworkUiState.update {
+                it.copy(
+                    isLoading = !isRefreshing,
+                    isRefreshing = isRefreshing
+                )
+            }
+
+            try {
+
+                val (invitations, recommendations) = coroutineScope {
+                    val connectionRequestsDeferred =
+                        async { getUserConnectionsUseCase.getPendingConnections() }
+                    val recommendationsDeferred =
+                        async { getUserConnectionsUseCase.getRecommendations() }
+                    Pair(connectionRequestsDeferred.await(), recommendationsDeferred.await())
+                }
+
+                when {
+                    invitations is Result.Success && recommendations is Result.Success -> {
+
+                        _myNetworkUiState.update {
+                            it.copy(
+                                isLoading = false,
+                                isRefreshing = false,
+                                error = null,
+                                recommendations = recommendations.data,
+                                pendingInvitations = invitations.data
+                            )
+                        }
+                    }
+
+                    else -> {
+
+                        handleError(
+                            when {
+                                invitations is Result.Error -> invitations.exception.message
+                                recommendations is Result.Error -> recommendations.exception.message
+                                else -> "Unknown Error Occurred"
+                            }
+                        )
+                    }
+                }
+
+
+            } catch (e: Exception) {
+                handleError(e.message)
+            }
+        }
+
+    }
+
+    private fun handleError(error: String?) {
+
+        _myNetworkUiState.update {
+            it.copy(
+                isLoading = false,
+                isRefreshing = false,
+                error = error ?: "Unknown error occurred."
+            )
+        }
+
+    }
 }
+
 
 data class MyNetworkState(
     val isLoading: Boolean = false,
     val isRefreshing: Boolean = false,
     val error: String? = null,
     val success: String? = null,
-    val users: List<User>? = emptyList<User>(),
-    val pendingConnections: List<User>? = emptyList<User>()
+    val recommendations: List<User>? = emptyList<User>(),
+    val pendingInvitations: List<Connection>? = emptyList<Connection>()
 )
 
 sealed class MyNetworkEvent {
