@@ -452,10 +452,10 @@ class RepositoryImplementation @Inject constructor(
             }
         }
 
-    override suspend fun getPendingConnections(connectionType: ConnectionType): Result<List<User>> =
+    override suspend fun getPendingConnections(connectionType: ConnectionType): Result<List<Connection>> =
         withContext(Dispatchers.IO) {
             try {
-                val response =
+                val connections =
                     postgrest.from("Connections")
                         .select {
                             filter {
@@ -476,37 +476,58 @@ class RepositoryImplementation @Inject constructor(
                                 }
                             }
                         }
-                        .decodeList<ConnectionDto>()
+                        .decodeList<ConnectionDto>().map { it.toDomainModel() }
 
                 when (connectionType) {
                     is ConnectionType.All -> {
-                        val userIds = response.flatMap { connection ->
+
+                        val users = getUsersByIds(connections.flatMap { connection ->
                             listOf(connection.requesterId, connection.receiverId)
                         }.filter {
                             it != currentUserId
-                        }
-                        val users = getUsersByIds(userIds)
+                        })
+
                         when (users) {
-                            is Result.Error -> {
-                                Result.Error(users.exception)
+                            is Result.Success -> {
+
+                                connections.map { connection ->
+
+                                    val user =
+                                        users.data.find { it.userId == connection.receiverId || it.userId == connection.requesterId }
+
+                                    connection.copy(user = user)
+                                }
+
+                                Result.Success(connections)
                             }
 
-                            is Result.Success -> {
-                                Result.Success(users.data)
+                            is Result.Error -> {
+                                Result.Error(users.exception)
                             }
                         }
                     }
 
                     is ConnectionType.IncomingOnly -> {
-                        val users = getUsersByIds(response.map { it.requesterId })
+                        val users = getUsersByIds(connections.map { it.requesterId })
                         when (users) {
+                            is Result.Success -> {
+
+                                connections.map { connection ->
+
+                                    val user =
+                                        users.data.find { it.userId == connection.requesterId }
+
+                                    connection.copy(user = user)
+
+                                }
+
+                                Result.Success(connections)
+                            }
+
                             is Result.Error -> {
                                 Result.Error(users.exception)
                             }
 
-                            is Result.Success -> {
-                                Result.Success(users.data)
-                            }
                         }
                     }
                 }
@@ -579,7 +600,7 @@ class RepositoryImplementation @Inject constructor(
                     connections is Result.Success && pendingConnections is Result.Success -> {
                         val excludedIds = buildSet {
                             addAll(connections.data.map { it.userId })
-                            addAll(pendingConnections.data.map { it.userId })
+                            addAll(pendingConnections.data.map { it.user?.userId })
                             add(currentUserId)
                         }
                         val users =

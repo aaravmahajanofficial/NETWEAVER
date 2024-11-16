@@ -10,7 +10,8 @@ data class Connection(
     val receiverId: String = "",
     val status: ConnectionStatus? = null,
     val createdAt: Instant = now(),
-    val updatedAt: Instant = now()
+    val updatedAt: Instant = now(),
+    val user: User? = null
 ) {
     fun getConnectionState(currentUserId: String): ConnectionState? =
         when {

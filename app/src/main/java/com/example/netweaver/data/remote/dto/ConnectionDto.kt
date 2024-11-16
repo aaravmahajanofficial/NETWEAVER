@@ -34,5 +34,6 @@ fun ConnectionDto.toDomainModel() = Connection(
     receiverId = receiverId,
     status = status,
     createdAt = createdAt,
-    updatedAt = updatedAt
+    updatedAt = updatedAt,
+    user = null
 )
