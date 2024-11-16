@@ -40,6 +40,8 @@ interface Repository {
         fileExtensions: List<String?>
     ): Result<List<String>?>
 
+    suspend fun getRecommendations(): Result<List<User>>
+
 //    suspend fun sharePost(postId: String): Result<Unit>
 
     // Network/Connections
@@ -48,6 +50,16 @@ interface Repository {
     suspend fun rejectConnectionRequest(requestId: String): Result<Unit>
     suspend fun getConnectionsCount(userId: String): Result<Long>
     suspend fun getConnections(userId: String): Result<List<User>>
-    suspend fun getPendingConnections(userId: String): Result<List<User>>
+    suspend fun getPendingConnections(type: ConnectionType): Result<List<User>>
     suspend fun getConnectionStatus(userId: String): Result<Connection?>
+}
+
+data class Document(
+    val byteArray: ByteArray?,
+    var fileExtension: String,
+)
+
+sealed class ConnectionType {
+    object All : ConnectionType()
+    object IncomingOnly : ConnectionType()
 }

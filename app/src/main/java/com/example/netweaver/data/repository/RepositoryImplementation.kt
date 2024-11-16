@@ -15,6 +15,8 @@ import com.example.netweaver.domain.model.Education
 import com.example.netweaver.domain.model.Experience
 import com.example.netweaver.domain.model.Post
 import com.example.netweaver.domain.model.User
+import com.example.netweaver.domain.repository.ConnectionType
+import com.example.netweaver.domain.repository.Document
 import com.example.netweaver.domain.repository.Repository
 import com.example.netweaver.ui.model.Result
 import com.google.firebase.auth.FirebaseAuth
@@ -22,6 +24,7 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.query.Count
+import io.github.jan.supabase.postgrest.query.filter.FilterOperator
 import io.github.jan.supabase.realtime.channel
 import io.github.jan.supabase.realtime.postgresListDataFlow
 import io.github.jan.supabase.storage.Storage
@@ -105,7 +108,7 @@ class RepositoryImplementation @Inject constructor(
                     emit(Result.Error(e))
                 }
             }.catch { e ->
-                emit(Result.Error(e))
+                emit(Result.Error(Exception(e)))
             }.onCompletion {
                 channel.unsubscribe()
             }
@@ -408,54 +411,115 @@ class RepositoryImplementation @Inject constructor(
 
         }
 
-    private suspend fun getConnectionsByStatus(
-        userId: String,
-        connectionStatus: ConnectionStatus
-    ): Result<List<User>> = withContext(Dispatchers.IO) {
-        try {
-            val response =
-                postgrest.from("Connections")
-                    .select {
-                        filter {
-                            and {
-                                or {
-                                    eq("receiver_id", userId)
-                                    eq("requester_id", userId)
+    override suspend fun getConnections(userId: String): Result<List<User>> =
+        withContext(Dispatchers.IO) {
+            try {
+                val response =
+                    postgrest.from("Connections")
+                        .select {
+                            filter {
+                                and {
+                                    or {
+                                        eq("receiver_id", userId)
+                                        eq("requester_id", userId)
+                                    }
+                                    eq("status", ConnectionStatus.CONNECTED)
                                 }
-                                eq("status", connectionStatus)
+                            }
+                        }
+                        .decodeList<ConnectionDto>()
+
+                val userIds = response.flatMap { connection ->
+                    listOf(connection.requesterId, connection.receiverId)
+                }.filter {
+                    it != userId
+                }
+
+                val users = getUsersByIds(userIds)
+
+                when (users) {
+                    is Result.Error -> {
+                        Result.Error(users.exception)
+                    }
+
+                    is Result.Success -> {
+                        Result.Success(users.data)
+                    }
+                }
+
+            } catch (e: Exception) {
+                Result.Error(e)
+            }
+        }
+
+    override suspend fun getPendingConnections(connectionType: ConnectionType): Result<List<User>> =
+        withContext(Dispatchers.IO) {
+            try {
+                val response =
+                    postgrest.from("Connections")
+                        .select {
+                            filter {
+                                and {
+                                    when (connectionType) {
+                                        is ConnectionType.All -> {
+                                            or {
+                                                eq("receiver_id", currentUserId)
+                                                eq("requester_id", currentUserId)
+                                            }
+                                        }
+
+                                        is ConnectionType.IncomingOnly -> {
+                                            eq("receiver_id", currentUserId)
+                                        }
+                                    }
+                                    eq("status", ConnectionStatus.PENDING)
+                                }
+                            }
+                        }
+                        .decodeList<ConnectionDto>()
+
+                when (connectionType) {
+                    is ConnectionType.All -> {
+                        val userIds = response.flatMap { connection ->
+                            listOf(connection.requesterId, connection.receiverId)
+                        }.filter {
+                            it != currentUserId
+                        }
+                        val users = getUsersByIds(userIds)
+                        when (users) {
+                            is Result.Error -> {
+                                Result.Error(users.exception)
+                            }
+
+                            is Result.Success -> {
+                                Result.Success(users.data)
                             }
                         }
                     }
-                    .decodeList<ConnectionDto>()
 
-            val userIds = response.flatMap { connection ->
-                listOf(connection.requesterId, connection.receiverId)
-            }.filter {
-                it != userId
-            }
+                    is ConnectionType.IncomingOnly -> {
+                        val users = getUsersByIds(response.map { it.requesterId })
+                        when (users) {
+                            is Result.Error -> {
+                                Result.Error(users.exception)
+                            }
 
-            val users = getUsersByIds(userIds)
-
-            when (users) {
-                is Result.Error -> {
-                    Result.Error(users.exception)
+                            is Result.Success -> {
+                                Result.Success(users.data)
+                            }
+                        }
+                    }
                 }
 
-                is Result.Success -> {
-                    Result.Success(users.data)
-                }
+            } catch (e: Exception) {
+                Result.Error(e)
             }
-
-        } catch (e: Exception) {
-            Result.Error(e)
         }
-
-    }
 
     override suspend fun getConnectionsCount(userId: String): Result<Long> =
         withContext(Dispatchers.IO) {
             try {
-                val count = postgrest.from("Connections").select() {
+                val count = postgrest.from("Connections").select {
                     count(Count.EXACT)
                     filter {
                         and {
@@ -474,12 +538,6 @@ class RepositoryImplementation @Inject constructor(
                 Result.Error(e)
             }
         }
-
-    override suspend fun getConnections(userId: String): Result<List<User>> =
-        getConnectionsByStatus(userId = userId, connectionStatus = ConnectionStatus.CONNECTED)
-
-    override suspend fun getPendingConnections(userId: String): Result<List<User>> =
-        getConnectionsByStatus(userId = userId, connectionStatus = ConnectionStatus.PENDING)
 
     override suspend fun getConnectionStatus(userId: String): Result<Connection?> =
         withContext(Dispatchers.IO) {
@@ -505,6 +563,60 @@ class RepositoryImplementation @Inject constructor(
                 Result.Error(e)
             }
         }
+
+    override suspend fun getRecommendations(): Result<List<User>> =
+        withContext(Dispatchers.IO) {
+            try {
+
+                val (connections, pendingConnections) = coroutineScope {
+                    val connectionsDeferred = async { getConnections(currentUserId) }
+                    val pendingConnectionsDeferred =
+                        async { getPendingConnections(connectionType = ConnectionType.All) }
+                    Pair(connectionsDeferred.await(), pendingConnectionsDeferred.await())
+                }
+
+                when {
+                    connections is Result.Success && pendingConnections is Result.Success -> {
+                        val excludedIds = buildSet {
+                            addAll(connections.data.map { it.userId })
+                            addAll(pendingConnections.data.map { it.userId })
+                            add(currentUserId)
+                        }
+                        val users =
+                            postgrest.from("Users")
+                                .select {
+                                    filter {
+                                        filterNot(
+                                            "id",
+                                            FilterOperator.IN,
+                                            excludedIds
+                                        )
+                                    }
+                                }
+                                .decodeList<UserDto>()
+
+                        Result.Success(users.map { it.toDomain() })
+                    }
+
+                    connections is Result.Error -> {
+                        Result.Error(Exception("Failed to fetch connected connections: ${connections.exception}"))
+                    }
+
+                    pendingConnections is Result.Error -> {
+                        Result.Error(Exception("Failed to fetch pending connections: ${pendingConnections.exception}"))
+                    }
+
+                    else -> {
+                        Result.Error(Exception("Unexpected Error: Both connections and pending connections must be successfully fetched"))
+                    }
+
+                }
+            } catch (
+                e: Exception
+            ) {
+                Result.Error(e)
+            }
+        }
 }
 
 
@@ -519,8 +631,3 @@ class RepositoryImplementation @Inject constructor(
 //    "123" -> User(userId: "123", name: "John"),
 //    "456" -> User(userId: "456", name: "Jane")
 //}
-
-data class Document(
-    val byteArray: ByteArray?,
-    var fileExtension: String,
-)

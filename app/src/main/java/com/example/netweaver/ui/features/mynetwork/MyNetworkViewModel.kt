@@ -22,7 +22,13 @@ class MyNetworkViewModel @Inject constructor(private val handleRequestUseCase: H
 
     fun onEvent(event: MyNetworkEvent) {
         when (event) {
-            is MyNetworkEvent.Refresh -> {}
+            is MyNetworkEvent.Refresh -> {
+                _myNetworkUiState.update {
+                    it.copy(
+                        isRefreshing = true
+                    )
+                }
+            }
 
             is MyNetworkEvent.Accept -> {
                 viewModelScope.launch {
@@ -144,6 +150,7 @@ class MyNetworkViewModel @Inject constructor(private val handleRequestUseCase: H
 
 data class MyNetworkState(
     val isLoading: Boolean = false,
+    val isRefreshing: Boolean = false,
     val error: String? = null,
     val success: String? = null,
     val users: List<User>? = emptyList<User>(),
