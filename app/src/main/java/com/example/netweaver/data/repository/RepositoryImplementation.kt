@@ -85,13 +85,12 @@ class RepositoryImplementation @Inject constructor(
                             (usersResponse is Result.Success) && (likedPostsResponse is Result.Success) -> {
 
                                 val usersMap = usersResponse.data.associateBy { it.userId }
-
                                 val likedPostsIds = likedPostsResponse.data
 
                                 val finalPosts = posts.map { post ->
                                     post.toDomain().copy(
                                         user = usersMap[post.userId],
-                                        isLiked = likedPostsIds.contains(post.id)
+                                        isLiked = post.id in likedPostsIds
                                     )
                                 }
 
