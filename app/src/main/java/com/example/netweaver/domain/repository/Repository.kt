@@ -24,7 +24,7 @@ interface Repository {
     suspend fun getUserPosts(userId: String): Result<List<Post>>
 
     // User
-    suspend fun getUsersByIds(userIds: List<String>): Result<List<User>>
+    suspend fun getUsersByIds(userIds: List<String>?): Result<List<User>>
     suspend fun getUserById(userId: String): Result<User>
     suspend fun upsertUser(user: User): Result<User>
 
@@ -40,7 +40,7 @@ interface Repository {
         fileExtensions: List<String?>
     ): Result<List<String>?>
 
-    suspend fun getRecommendations(): Result<List<User>>
+    suspend fun getRecommendations(count: Long?): Result<List<User>>
 
 //    suspend fun sharePost(postId: String): Result<Unit>
 
@@ -49,8 +49,8 @@ interface Repository {
     suspend fun acceptConnectionRequest(requestId: String): Result<Unit>
     suspend fun rejectConnectionRequest(requestId: String): Result<Unit>
     suspend fun getConnectionsCount(userId: String): Result<Long>
-    suspend fun getConnections(userId: String): Result<List<User>>
-    suspend fun getPendingConnections(type: ConnectionType): Result<List<Connection>>
+    suspend fun getConnections(userId: String): Result<List<Connection>>
+    suspend fun getConnectionRequests(type: ConnectionType): Result<List<Connection>>
     suspend fun getConnectionStatus(userId: String): Result<Connection?>
 }
 

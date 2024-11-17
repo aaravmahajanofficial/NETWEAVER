@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 fun RowScope.CustomActionButton(
     title: String,
     icon: Painter? = null,
+    borderColor: Color = MaterialTheme.colorScheme.secondary,
     containerColor: Color,
     contentColor: Color,
     onClick: () -> Unit,
@@ -36,7 +37,7 @@ fun RowScope.CustomActionButton(
         shape = CircleShape,
         border = BorderStroke(
             width = 1.dp,
-            color = MaterialTheme.colorScheme.secondary
+            color = borderColor
         ),
         colors = ButtonDefaults.textButtonColors(
             containerColor = containerColor,

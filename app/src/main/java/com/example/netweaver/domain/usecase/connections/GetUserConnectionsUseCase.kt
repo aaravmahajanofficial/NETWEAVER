@@ -12,15 +12,12 @@ class GetUserConnectionsUseCase @Inject constructor(private val repository: Repo
     suspend fun getConnectionsCount(userId: String): Result<Long> =
         repository.getConnectionsCount(userId = userId)
 
-    suspend fun getConnections(userId: String): Result<List<User>> =
-        repository.getConnections(userId = userId)
-
     suspend fun getPendingConnections(): Result<List<Connection>> =
-        repository.getPendingConnections(
+        repository.getConnectionRequests(
             ConnectionType.IncomingOnly
         )
 
-    suspend fun getRecommendations(): Result<List<User>> = repository.getRecommendations()
+    suspend fun getRecommendations(): Result<List<User>> = repository.getRecommendations(count = 4)
 
 
 }

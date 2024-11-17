@@ -8,9 +8,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -40,8 +40,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.compose.AsyncImage
 import com.example.netweaver.R
+import com.example.netweaver.domain.model.ConnectionState
 import com.example.netweaver.ui.components.AppScaffold
 import com.example.netweaver.ui.components.CustomOutlinedButton
 import com.example.netweaver.ui.features.mynetwork.components.ArrowNavigationRow
@@ -54,18 +54,20 @@ fun MyNetworkScreen(viewModel: MyNetworkViewModel = hiltViewModel()) {
 
     val uiState by viewModel.myNetworkState.collectAsStateWithLifecycle()
     AppScaffold(
+        isRefreshing = uiState.isRefreshing,
+        onRefresh = { viewModel.onEvent(MyNetworkEvent.Refresh) },
         scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState()),
         content = {
             MyNetworkContent(
                 uiState = uiState,
-                onAccept = { userId ->
-                    viewModel.onEvent(MyNetworkEvent.Accept(userId))
+                onAccept = { requestId ->
+                    viewModel.onEvent(MyNetworkEvent.Accept(requestId))
                 },
                 onConnect = { userId ->
                     viewModel.onEvent(MyNetworkEvent.Connect(userId))
                 },
-                onIgnore = { userId ->
-                    viewModel.onEvent(MyNetworkEvent.Ignore(userId))
+                onIgnore = { requestId ->
+                    viewModel.onEvent(MyNetworkEvent.Ignore(requestId))
                 }
             )
         }
@@ -98,7 +100,7 @@ private fun MyNetworkContent(
                 verticalArrangement = Arrangement.SpaceEvenly
             ) {
                 ArrowNavigationRow(
-                    title = "Invitations (${uiState.pendingInvitations?.size})",
+                    title = "Invitations (${uiState.pendingInvitations?.size ?: 0})",
                     onClick = {}
                 )
                 HorizontalDivider(
@@ -139,7 +141,7 @@ private fun MyNetworkContent(
                                 color = MaterialTheme.colorScheme.onBackground
                             )
                             Text(
-                                item.user?.userId ?: "--",
+                                item.user?.headline ?: "--",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onTertiary,
                                 modifier = Modifier.padding(end = 12.dp),
@@ -162,9 +164,7 @@ private fun MyNetworkContent(
                             borderColor = MaterialTheme.colorScheme.onTertiary,
                             iconColor = MaterialTheme.colorScheme.onTertiary,
                             onClick = {
-                                item.user?.userId?.let {
-                                    onIgnore(it)
-                                }
+                                onIgnore(item.id)
                             }
                         )
 
@@ -176,9 +176,7 @@ private fun MyNetworkContent(
                             borderColor = MaterialTheme.colorScheme.secondary,
                             iconColor = MaterialTheme.colorScheme.secondary,
                             onClick = {
-                                item.user?.userId?.let {
-                                    onAccept(it)
-                                }
+                                onAccept(item.id)
                             }
                         )
 
@@ -206,132 +204,147 @@ private fun MyNetworkContent(
             ) {
 
                 Text(
-                    "People you may know",
+                    text = "People you may know",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier.padding(start = 12.dp, top = 24.dp)
                 )
 
-                Spacer(modifier = Modifier.height(4.dp))
+                FlowRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                    maxItemsInEachRow = 2,
 
-                uiState.recommendations?.forEach { item ->
-                    Row(
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        repeat(2) {
-                            Box(
+                    uiState.recommendations?.forEach { item ->
+                        Box(
+                            modifier = Modifier
+                                .background(
+                                    color = MaterialTheme.colorScheme.surface,
+                                    shape = RoundedCornerShape(8.dp)
+                                )
+                                .height(280.dp)
+                                .fillMaxWidth(0.491f)
+                                .border(
+                                    1.5.dp,
+                                    color = MaterialTheme.colorScheme.outline,
+                                    shape = RoundedCornerShape(8.dp)
+                                )
+                                .clip(shape = RoundedCornerShape(8.dp)),
+                        ) {
+
+                            // Profile Background Image
+                            Image(
+                                painter = if (isSystemInDarkTheme()) painterResource(R.drawable.profile_background_dark) else painterResource(
+                                    R.drawable.profile_background
+                                ),
+                                contentDescription = null,
+                                modifier = Modifier.height(65.dp),
+                                contentScale = ContentScale.Crop
+                            )
+
+                            // Profile Details + Connect button
+                            Column(
                                 modifier = Modifier
-                                    .background(
-                                        color = MaterialTheme.colorScheme.surface,
-                                        shape = RoundedCornerShape(8.dp)
-                                    )
-                                    .weight(1f)
-                                    .aspectRatio(0.6f)
-                                    .border(
-                                        1.5.dp,
-                                        color = MaterialTheme.colorScheme.outline,
-                                        shape = RoundedCornerShape(12.dp)
-                                    )
-                                    .clip(shape = RoundedCornerShape(12.dp)),
+                                    .fillMaxSize()
+                                    .padding(horizontal = 12.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.SpaceBetween
                             ) {
 
-                                // Profile Background Image
-                                if (item.profileImageUrl.isNullOrEmpty()) {
+                                Column(
+                                    modifier = Modifier,
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.SpaceEvenly
+                                ) {
                                     Image(
-                                        painter = if (isSystemInDarkTheme()) painterResource(R.drawable.profile_background_dark) else painterResource(
-                                            R.drawable.profile_background
+                                        painter = if (isSystemInDarkTheme()) painterResource(R.drawable.profile_avatar_dark) else painterResource(
+                                            R.drawable.profile_avatar
                                         ),
                                         contentDescription = null,
-                                        modifier = Modifier.height(65.dp),
+                                        modifier = Modifier
+                                            .size(92.dp)
+                                            .offset(y = 16.dp)
+                                            .clip(CircleShape),
                                         contentScale = ContentScale.Crop
                                     )
-                                } else {
-                                    AsyncImage(
-                                        model = item.profileImageUrl,
-                                        contentDescription = null,
-                                        modifier = Modifier.height(65.dp),
-                                        contentScale = ContentScale.Crop
+
+                                    Text(
+                                        item.fullName,
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        fontWeight = FontWeight.Bold,
+                                        maxLines = 1,
+                                        textAlign = TextAlign.Center,
+                                        overflow = TextOverflow.Ellipsis,
+                                        color = MaterialTheme.colorScheme.onBackground,
+                                        modifier = Modifier.padding(top = 24.dp, bottom = 1.dp)
+                                    )
+
+                                    Text(
+                                        item.headline ?: "--",
+                                        style = MaterialTheme.typography.labelMedium,
+                                        color = MaterialTheme.colorScheme.onTertiary,
+                                        textAlign = TextAlign.Center,
+                                        maxLines = 2,
+                                        overflow = TextOverflow.Ellipsis,
+                                        modifier = Modifier.padding(horizontal = 12.dp)
                                     )
                                 }
 
-                                // Profile Details + Connect button
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(horizontal = 12.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.SpaceBetween
+                                Row(
+                                    modifier = Modifier.padding(bottom = 12.dp),
+                                    horizontalArrangement = Arrangement.Center,
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
+                                    when (uiState.connectionState?.get(item.userId)) {
+                                        is ConnectionState.PendingOutgoing ->
+                                            CustomActionButton(
+                                                title = "Pending",
+                                                icon = painterResource(R.drawable.clock),
+                                                containerColor = MaterialTheme.colorScheme.surface,
+                                                contentColor = MaterialTheme.colorScheme.onTertiary,
+                                                borderColor = MaterialTheme.colorScheme.onTertiary,
+                                                onClick = {}
+                                            )
 
-                                    Column(
-                                        modifier = Modifier,
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                        verticalArrangement = Arrangement.SpaceEvenly
-                                    ) {
-                                        Image(
-                                            painter = if (isSystemInDarkTheme()) painterResource(R.drawable.profile_avatar_dark) else painterResource(
-                                                R.drawable.profile_avatar
-                                            ),
-                                            contentDescription = null,
-                                            modifier = Modifier
-                                                .size(92.dp)
-                                                .offset(y = 16.dp)
-                                                .clip(CircleShape),
-                                            contentScale = ContentScale.Crop
-                                        )
-
-                                        Text(
-                                            item.fullName,
-                                            style = MaterialTheme.typography.bodyLarge,
-                                            fontWeight = FontWeight.Bold,
-                                            maxLines = 1,
-                                            textAlign = TextAlign.Center,
-                                            overflow = TextOverflow.Ellipsis,
-                                            color = MaterialTheme.colorScheme.onBackground,
-                                            modifier = Modifier.padding(top = 24.dp, bottom = 1.dp)
-                                        )
-
-                                        Text(
-                                            item.headline ?: "--",
-                                            style = MaterialTheme.typography.labelMedium,
-                                            color = MaterialTheme.colorScheme.onTertiary,
-                                            textAlign = TextAlign.Center,
-                                            maxLines = 2,
-                                            overflow = TextOverflow.Ellipsis,
-                                            modifier = Modifier.padding(horizontal = 12.dp)
-                                        )
-                                    }
-
-                                    Row(
-                                        modifier = Modifier.padding(bottom = 12.dp),
-                                        horizontalArrangement = Arrangement.Center,
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        CustomActionButton(
-                                            title = "Connect",
-                                            containerColor = MaterialTheme.colorScheme.surface,
-                                            contentColor = MaterialTheme.colorScheme.secondary,
-                                            onClick = {
-                                                onConnect(item.userId)
-                                            })
+                                        else -> {
+                                            CustomActionButton(
+                                                title = "Connect",
+                                                containerColor = MaterialTheme.colorScheme.surface,
+                                                contentColor = MaterialTheme.colorScheme.secondary,
+                                                onClick = {
+                                                    onConnect(item.userId)
+                                                })
+                                        }
                                     }
                                 }
-
                             }
-                        }
 
+                        }
 
                     }
                 }
 
-
+                Text(
+                    text = "See all",
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp, bottom = 16.dp),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontWeight = FontWeight.SemiBold
+                )
             }
+        }
 
+        item {
+            Spacer(modifier = Modifier.height(24.dp))
         }
 
     }
-
 
 }

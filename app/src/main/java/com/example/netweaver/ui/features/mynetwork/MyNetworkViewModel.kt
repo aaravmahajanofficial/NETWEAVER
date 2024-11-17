@@ -1,8 +1,10 @@
 package com.example.netweaver.ui.features.mynetwork
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.netweaver.domain.model.Connection
+import com.example.netweaver.domain.model.ConnectionState
 import com.example.netweaver.domain.model.User
 import com.example.netweaver.domain.usecase.connections.GetUserConnectionsUseCase
 import com.example.netweaver.domain.usecase.connections.HandleRequestUseCase
@@ -57,6 +59,7 @@ class MyNetworkViewModel @Inject constructor(
                                     isLoading = false,
                                     error = null,
                                     success = "Successfully accepted the request.",
+                                    pendingInvitations = null
                                 )
                             }
                         }
@@ -96,6 +99,7 @@ class MyNetworkViewModel @Inject constructor(
                                     isLoading = false,
                                     error = null,
                                     success = "Successfully ignored the request.",
+                                    pendingInvitations = null,
                                 )
                             }
                         }
@@ -134,6 +138,7 @@ class MyNetworkViewModel @Inject constructor(
                                     isLoading = false,
                                     error = null,
                                     success = "Successfully sent the request.",
+                                    connectionState = it.connectionState?.plus((event.userId to ConnectionState.PendingOutgoing))
                                 )
                             }
                         }
@@ -161,7 +166,8 @@ class MyNetworkViewModel @Inject constructor(
             _myNetworkUiState.update {
                 it.copy(
                     isLoading = !isRefreshing,
-                    isRefreshing = isRefreshing
+                    isRefreshing = isRefreshing,
+                    error = null
                 )
             }
 
@@ -203,6 +209,7 @@ class MyNetworkViewModel @Inject constructor(
 
 
             } catch (e: Exception) {
+                Log.d("ERROR WHILE", e.toString())
                 handleError(e.message)
             }
         }
@@ -210,6 +217,8 @@ class MyNetworkViewModel @Inject constructor(
     }
 
     private fun handleError(error: String?) {
+
+        Log.d("ERROR WHILE", error.toString())
 
         _myNetworkUiState.update {
             it.copy(
@@ -229,7 +238,8 @@ data class MyNetworkState(
     val error: String? = null,
     val success: String? = null,
     val recommendations: List<User>? = emptyList<User>(),
-    val pendingInvitations: List<Connection>? = emptyList<Connection>()
+    val pendingInvitations: List<Connection>? = emptyList<Connection>(),
+    val connectionState: Map<String, ConnectionState>? = emptyMap()
 )
 
 sealed class MyNetworkEvent {
