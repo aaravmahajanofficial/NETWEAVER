@@ -92,6 +92,9 @@ dependencies {
     kapt(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
+    // Constraint Layout
+    implementation(libs.androidx.constraintlayout.compose)
+
     // Coil
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
