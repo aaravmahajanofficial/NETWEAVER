@@ -1,8 +1,10 @@
 package com.example.netweaver.domain.repository
 
+import com.example.netweaver.domain.model.Chat
 import com.example.netweaver.domain.model.Connection
 import com.example.netweaver.domain.model.Education
 import com.example.netweaver.domain.model.Experience
+import com.example.netweaver.domain.model.Message
 import com.example.netweaver.domain.model.Post
 import com.example.netweaver.domain.model.User
 import com.example.netweaver.ui.model.Result
@@ -52,6 +54,11 @@ interface Repository {
     suspend fun getConnections(userId: String): Result<List<Connection>>
     suspend fun getConnectionRequests(type: ConnectionType): Result<List<Connection>>
     suspend fun getConnectionStatus(userId: String): Result<Connection?>
+
+    // Messages
+    suspend fun sendMessage(chatId: String, content: String): Result<Unit>
+    suspend fun getChats(): Result<List<Chat>>
+    suspend fun getMessages(chatId: String): Flow<Result<List<Message>>>
 }
 
 data class Document(

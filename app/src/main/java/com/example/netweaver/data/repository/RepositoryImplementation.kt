@@ -1,17 +1,22 @@
 package com.example.netweaver.data.repository
 
+import com.example.netweaver.data.remote.dto.ChatDto
 import com.example.netweaver.data.remote.dto.ConnectionDto
 import com.example.netweaver.data.remote.dto.ConnectionStatus
 import com.example.netweaver.data.remote.dto.EducationDto
 import com.example.netweaver.data.remote.dto.ExperienceDto
 import com.example.netweaver.data.remote.dto.LikeDto
+import com.example.netweaver.data.remote.dto.MessageDto
+import com.example.netweaver.data.remote.dto.ParticipantDto
 import com.example.netweaver.data.remote.dto.PostDto
 import com.example.netweaver.data.remote.dto.UserDto
 import com.example.netweaver.data.remote.dto.toDomain
 import com.example.netweaver.data.remote.dto.toDomainModel
+import com.example.netweaver.domain.model.Chat
 import com.example.netweaver.domain.model.Connection
 import com.example.netweaver.domain.model.Education
 import com.example.netweaver.domain.model.Experience
+import com.example.netweaver.domain.model.Message
 import com.example.netweaver.domain.model.Post
 import com.example.netweaver.domain.model.User
 import com.example.netweaver.domain.repository.ConnectionType
@@ -23,6 +28,7 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.query.Count
+import io.github.jan.supabase.postgrest.query.filter.FilterOperation
 import io.github.jan.supabase.postgrest.query.filter.FilterOperator
 import io.github.jan.supabase.realtime.channel
 import io.github.jan.supabase.realtime.postgresListDataFlow
@@ -33,6 +39,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.transformLatest
@@ -54,17 +61,18 @@ class RepositoryImplementation @Inject constructor(
     private val currentUserId =
         firebaseAuth.currentUser?.uid ?: "0f07b4e0-4eb8-4a9a-be40-07ae8f608b0e"
 
-    private val channel = supabaseClient.channel("postsChannel")
+    private val postChannel = supabaseClient.channel("postsChannel")
+    private val messageChannel = supabaseClient.channel("messagesChannel")
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun getPosts(): Flow<Result<List<Post>>> =
 
-        channel.postgresListDataFlow(
+        postChannel.postgresListDataFlow(
             schema = "public",
             table = "Posts",
             primaryKey = PostDto::id
         ).onStart {
-            channel.subscribe()
+            postChannel.subscribe()
         }
             .transformLatest { posts ->
 
@@ -108,7 +116,7 @@ class RepositoryImplementation @Inject constructor(
             }.catch { e ->
                 emit(Result.Error(Exception(e)))
             }.onCompletion {
-                channel.unsubscribe()
+                postChannel.unsubscribe()
             }
 
     override suspend fun getUsersByIds(userIds: List<String>?): Result<List<User>> =
@@ -643,6 +651,103 @@ class RepositoryImplementation @Inject constructor(
                 Result.Error(e)
             }
         }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override suspend fun getChats(): Result<List<Chat>> =
+        withContext(Dispatchers.IO) {
+
+            try {
+
+                // Fetch chat ids for the current user
+                val chatIds =
+                    postgrest.from("Participants").select(columns = Columns.list("chat_id")) {
+                        filter {
+                            eq("user_id", currentUserId)
+                        }
+                    }.decodeList<String>()
+
+                // Fetch the chat details
+                val chatDetails = postgrest.from("Chats").select {
+                    filter {
+                        filter(column = "id", operator = FilterOperator.IN, value = chatIds)
+                    }
+                }.decodeList<ChatDto>().map { it.toDomain() }
+
+                // Fetch the participant
+                val participants = postgrest.from("Participants").select {
+                    filter {
+                        filter(column = "chat_id", operator = FilterOperator.IN, chatIds)
+                        neq("user_id", currentUserId)
+                    }
+                }.decodeList<ParticipantDto>()
+
+                val participantsByChatId = participants.associateBy { it.chatId }
+
+                // Extract the participant ids
+                val participantIds =
+                    participants.map { it.participantId }
+
+                // Fetch the user details
+                val participantUserDetails = postgrest.from("Users").select {
+                    filter {
+                        filter(column = "id", operator = FilterOperator.IN, participantIds)
+                    }
+                }.decodeList<UserDto>().map { it.toDomain() }.associateBy { it.userId }
+
+                val chats = chatDetails.map {
+                    val participantDto = participantsByChatId[it.id]
+                    val participant = participantUserDetails[participantDto?.participantId]
+
+                    it.copy(
+                        participant = participant
+                    )
+
+                }
+
+                Result.Success(chats)
+            } catch (e: Exception) {
+                Result.Error(e)
+            }
+        }
+
+    override suspend fun sendMessage(chatId: String, content: String): Result<Unit> =
+        withContext(Dispatchers.IO) {
+            try {
+                val messageDto = MessageDto(
+                    id = UUID.randomUUID().toString(),
+                    chatId = chatId,
+                    senderId = currentUserId,
+                    content = content,
+                    createdAt = now()
+                )
+
+                postgrest.from("Messages").insert(messageDto)
+
+                Result.Success(Unit)
+            } catch (e: Exception) {
+                Result.Error(e)
+            }
+        }
+
+    override suspend fun getMessages(chatId: String): Flow<Result<List<Message>>> =
+        messageChannel.postgresListDataFlow(
+            schema = "public",
+            table = "Messages",
+            primaryKey = MessageDto::id,
+            filter = FilterOperation(
+                column = "chat_id",
+                operator = FilterOperator.EQ,
+                value = chatId
+            )
+        ).map { list ->
+            list.map {
+                it.toDomain().copy(fromCurrentUser = it.senderId == currentUserId)
+            }
+        }
+            .map { Result.Success(it) }
+            .onStart { messageChannel.subscribe() }
+            .catch { e -> Result.Error(Exception(e)) }
+            .onCompletion { messageChannel.unsubscribe() }
 }
 
 private fun extractUserIds(
