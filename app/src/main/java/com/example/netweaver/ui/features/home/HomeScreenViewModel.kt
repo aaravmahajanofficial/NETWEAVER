@@ -3,9 +3,7 @@ package com.example.netweaver.ui.features.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.netweaver.domain.model.Post
-import com.example.netweaver.domain.usecase.posts.GetPostsUseCase
-import com.example.netweaver.domain.usecase.posts.LikePostUseCase
-import com.example.netweaver.domain.usecase.posts.UnLikePostUseCase
+import com.example.netweaver.domain.repository.Repository
 import com.example.netweaver.ui.model.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -19,11 +17,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(
-    private val getPostsUseCase: GetPostsUseCase,
-    private val likePostUseCase: LikePostUseCase,
-    private val unLikePostUseCase: UnLikePostUseCase
+    private val repository: Repository
 ) :
     ViewModel() {
+
+    override fun onCleared() {
+        super.onCleared()
+    }
 
     private val _homeUiState = MutableStateFlow(HomeState())
     val homeUiState: StateFlow<HomeState> = _homeUiState.asStateFlow()
@@ -52,7 +52,7 @@ class HomeScreenViewModel @Inject constructor(
 
                     _homeUiState.update { it.copy(reactionQueue = _homeUiState.value.reactionQueue + event.post.id) }
 
-                    when (val result = likePostUseCase(post = event.post)) {
+                    when (val result = repository.likePost(post = event.post)) {
                         is Result.Success -> {
                             _homeUiState.update { it.copy(success = "Successfully liked the post") }
                         }
@@ -77,7 +77,7 @@ class HomeScreenViewModel @Inject constructor(
 
                     _homeUiState.update { it.copy(reactionQueue = _homeUiState.value.reactionQueue + event.post.id) }
 
-                    when (val result = unLikePostUseCase(post = event.post)) {
+                    when (val result = repository.unlikePost(post = event.post)) {
                         is Result.Success -> {
                             _homeUiState.update { it.copy(success = "Successfully unliked the post") }
                         }
@@ -101,7 +101,7 @@ class HomeScreenViewModel @Inject constructor(
             _homeUiState.update { it.copy(isLoading = true, error = null) }
 
             try {
-                getPostsUseCase().flowOn(Dispatchers.IO)
+                repository.getPosts().flowOn(Dispatchers.IO)
                     .collect { result ->
                         when (result) {
                             is Result.Success -> {

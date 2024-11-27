@@ -118,7 +118,8 @@ fun PostCard(
                         ) {
 
                             Text(
-                                "1w • ", style = MaterialTheme.typography.labelSmall,
+                                "${post.createdAt} • ",
+                                style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onTertiary,
                             )
 

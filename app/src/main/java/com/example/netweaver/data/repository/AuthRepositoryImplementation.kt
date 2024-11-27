@@ -3,12 +3,16 @@ package com.example.netweaver.data.repository
 import com.example.netweaver.domain.model.User
 import com.example.netweaver.domain.repository.AuthRepository
 import com.example.netweaver.domain.repository.Repository
+import com.example.netweaver.ui.features.auth.AuthState
 import com.example.netweaver.ui.model.Result
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -97,6 +101,23 @@ class AuthRepositoryImplementation @Inject constructor(
         } catch (e: Exception) {
             Result.Error(e)
         }
+    }
+
+    override fun getAuthState(): Flow<AuthState> = callbackFlow {
+
+        trySend(AuthState.Loading)
+
+        val authStateListener = FirebaseAuth.AuthStateListener { auth ->
+
+            trySend(
+                when {
+                    auth.currentUser == null -> AuthState.Unauthenticated
+                    else -> AuthState.Authenticated
+                }
+            )
+        }
+        firebaseAuth.addAuthStateListener(authStateListener)
+        awaitClose { firebaseAuth.removeAuthStateListener(authStateListener) }
     }
 
     override fun signOut() {

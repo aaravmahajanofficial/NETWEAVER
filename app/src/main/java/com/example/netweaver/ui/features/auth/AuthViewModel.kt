@@ -3,7 +3,6 @@ package com.example.netweaver.ui.features.auth
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.netweaver.domain.repository.AuthRepository
-import com.example.netweaver.ui.model.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,32 +17,11 @@ class AuthViewModel @Inject constructor(private val authRepository: AuthReposito
     val authState: StateFlow<AuthState> = _authState.asStateFlow()
 
     init {
-        checkAuthState()
-    }
-
-    private fun checkAuthState() {
-
         viewModelScope.launch {
-            _authState.value = AuthState.Loading
-
-            when (val result = authRepository.fetchUserDetails()) {
-
-                is Result.Success -> {
-                    _authState.value = AuthState.Success
-                }
-
-                is Result.Error -> {
-                    _authState.value = AuthState.Error(result.exception)
-                }
+            authRepository.getAuthState().collect { state ->
+                _authState.value = state
             }
         }
-
     }
 
-}
-
-sealed interface AuthState {
-    object Loading : AuthState
-    data object Success : AuthState
-    data class Error(val exception: Throwable) : AuthState
 }

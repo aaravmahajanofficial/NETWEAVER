@@ -2,7 +2,7 @@ package com.example.netweaver.ui.features.createPost
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.netweaver.domain.usecase.posts.CreatePostUseCase
+import com.example.netweaver.domain.repository.Repository
 import com.example.netweaver.ui.model.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,7 +11,9 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class CreatePostViewModel @Inject constructor(private val createPostUseCase: CreatePostUseCase) :
+class CreatePostViewModel @Inject constructor(
+    private val repository: Repository
+) :
     ViewModel() {
 
     private val _createPostUiState = MutableStateFlow<CreatePostState>(CreatePostState.Idle)
@@ -20,14 +22,14 @@ class CreatePostViewModel @Inject constructor(private val createPostUseCase: Cre
     fun createPost(
         content: String,
         byteArrayList: List<ByteArray?>?,
-        fileExtensions: List<String?>
+        fileExtensions: List<String?>?
     ) {
 
         viewModelScope.launch {
 
             _createPostUiState.value = CreatePostState.Loading
 
-            when (val result = createPostUseCase(content, byteArrayList, fileExtensions)) {
+            when (val result = repository.createPost(content, byteArrayList, fileExtensions)) {
                 is Result.Success -> {
                     _createPostUiState.value = CreatePostState.Success
                 }

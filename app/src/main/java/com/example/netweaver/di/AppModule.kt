@@ -7,10 +7,6 @@ import com.example.netweaver.domain.repository.Repository
 import com.example.netweaver.domain.usecase.connections.GetConnectionStatusUseCase
 import com.example.netweaver.domain.usecase.connections.GetUserConnectionsUseCase
 import com.example.netweaver.domain.usecase.connections.HandleRequestUseCase
-import com.example.netweaver.domain.usecase.posts.CreatePostUseCase
-import com.example.netweaver.domain.usecase.posts.GetPostsUseCase
-import com.example.netweaver.domain.usecase.posts.LikePostUseCase
-import com.example.netweaver.domain.usecase.posts.UnLikePostUseCase
 import com.example.netweaver.domain.usecase.user.GetEducationUseCase
 import com.example.netweaver.domain.usecase.user.GetExperiencesUseCase
 import com.example.netweaver.domain.usecase.user.GetUserPostsUseCase
@@ -53,18 +49,6 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideGetPostsUseCase(
-        repository: Repository
-    ): GetPostsUseCase =
-        GetPostsUseCase(repository = repository)
-
-//    @Provides
-//    @Singleton
-//    fun provideUserPreferencesRepository(@ApplicationContext context: Context): UserPreferencesRepository =
-//        UserPreferencesRepository(context.datastore)
-
-    @Provides
-    @Singleton
 
     fun provideFirebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()
 
@@ -72,22 +56,6 @@ object AppModule {
     @Singleton
     fun provideAuthRepository(firebaseAuth: FirebaseAuth, repository: Repository): AuthRepository =
         AuthRepositoryImplementation(firebaseAuth = firebaseAuth, repository = repository)
-
-
-    @Provides
-    @Singleton
-    fun provideCreatePostUseCase(repository: Repository) =
-        CreatePostUseCase(repository = repository)
-
-    @Provides
-    @Singleton
-    fun provideLikePostUseCase(repository: Repository) =
-        LikePostUseCase(repository = repository)
-
-    @Provides
-    @Singleton
-    fun provideUnLikePostUseCase(repository: Repository) =
-        UnLikePostUseCase(repository = repository)
 
     @Provides
     @Singleton

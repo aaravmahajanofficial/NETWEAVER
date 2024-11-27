@@ -57,6 +57,8 @@ class AppNavigator(private val navController: NavHostController) {
                     inclusive = true
                 }
             }
+
+            is NavigationEvent.NavigateToRegister -> navController.navigate(route = Routes.Register.route)
         }
     }
 }
@@ -77,16 +79,12 @@ fun NavGraph(
 
     val startDestination =
         when (authState) {
-            is AuthState.Loading -> {
+            is AuthState.Authenticated -> {
                 Routes.Home.route
             }
 
-            is AuthState.Success -> {
-                Routes.Home.route
-            }
-
-            is AuthState.Error -> {
-                Routes.Home.route
+            else -> {
+                Routes.Login.route
             }
         }
 
@@ -141,8 +139,20 @@ fun NavGraph(
                     }
                 )
             }
-            composable(route = Routes.Login.route) { LoginScreen() }
-            composable(route = Routes.Register.route) { RegisterScreen() }
+            composable(route = Routes.Login.route) {
+                LoginScreen(navigateTo = { event ->
+                    appNavigator.navigateTo(
+                        event
+                    )
+                })
+            }
+            composable(route = Routes.Register.route) {
+                RegisterScreen(
+                    navigateTo = { event ->
+                        appNavigator.navigateTo(event)
+                    }
+                )
+            }
             composable(route = Routes.ForgotPassword.route) { ForgotPasswordScreen() }
         }
     }
@@ -157,4 +167,5 @@ sealed class NavigationEvent {
     object NavigationToMessages : NavigationEvent()
     data class NavigationToProfile(val userId: String) : NavigationEvent()
     object NavigateToLogin : NavigationEvent()
+    object NavigateToRegister : NavigationEvent()
 }

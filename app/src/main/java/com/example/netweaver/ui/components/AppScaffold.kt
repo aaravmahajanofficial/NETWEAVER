@@ -60,75 +60,6 @@ import com.example.netweaver.R
 import com.example.netweaver.navigation.LocalAppNavigator
 import com.example.netweaver.navigation.Routes
 
-sealed class BottomNavItem(
-    @DrawableRes val iconRes: Int,
-    @DrawableRes val selectedIconRes: Int,
-    val route: String,
-    val label: String
-) {
-
-    object Home : BottomNavItem(
-        iconRes = R.drawable.home,
-        selectedIconRes = R.drawable.selected_home,
-        route = Routes.Home.route,
-        label = "Home"
-    )
-
-    object MyNetwork : BottomNavItem(
-        iconRes = R.drawable.my_network,
-        selectedIconRes = R.drawable.selected_my_network,
-        route = Routes.MyNetwork.route,
-        label = "My Network"
-    )
-
-    object Post : BottomNavItem(
-        iconRes = R.drawable.post,
-        selectedIconRes = R.drawable.post,
-        route = Routes.Home.route,
-        label = "Post"
-    )
-
-    object Notifications : BottomNavItem(
-        iconRes = R.drawable.notifications,
-        selectedIconRes = R.drawable.selected_notifications,
-        route = Routes.Notifications.route,
-        label = "Notifications"
-    )
-
-    object Jobs : BottomNavItem(
-        iconRes = R.drawable.jobs,
-        selectedIconRes = R.drawable.selected_jobs,
-        route = Routes.Jobs.route,
-        label = "Jobs"
-    )
-
-    companion object {
-        val items = listOf(Home, MyNetwork, Post, Notifications, Jobs)
-    }
-
-    fun navigate(navController: NavController) {
-        when (this) {
-            is Post -> {}
-            else -> {
-                navController.navigate(route) {
-                    // Pop up to the start destination of the graph to
-                    // avoid building up a large stack of destinations
-                    // on the back stack as users select items
-                    popUpTo(navController.graph.findStartDestination().id) {
-                        saveState = true
-                    }
-                    // Avoid multiple copies of the same destination when
-                    // re-selecting the same item
-                    launchSingleTop = true
-                    // Restore state when re-selecting a previously selected item
-                    restoreState = true
-                }
-            }
-        }
-    }
-
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppScaffold(
@@ -176,6 +107,12 @@ fun AppScaffold(
 
                                 }
                         ) {
+
+//                            AsyncImage(
+//                                model = post.user?.profileImageUrl,
+//                                contentDescription = "${post.user?.fullName} Profile Picture",
+//                                contentScale = ContentScale.Fit
+//                            )
 
                         }
 
@@ -395,7 +332,8 @@ fun AppScaffold(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues)
+                    .padding(paddingValues),
+                contentAlignment = Alignment.Center
             ) {
                 PullToRefreshBox(
                     state = rememberPullToRefreshState(),
@@ -405,6 +343,70 @@ fun AppScaffold(
                 }
             }
 
+        }
+    }
+
+}
+
+sealed class BottomNavItem(
+    @DrawableRes val iconRes: Int,
+    @DrawableRes val selectedIconRes: Int,
+    val route: String,
+    val label: String
+) {
+
+    object Home : BottomNavItem(
+        iconRes = R.drawable.home,
+        selectedIconRes = R.drawable.selected_home,
+        route = Routes.Home.route,
+        label = "Home"
+    )
+
+    object MyNetwork : BottomNavItem(
+        iconRes = R.drawable.my_network,
+        selectedIconRes = R.drawable.selected_my_network,
+        route = Routes.MyNetwork.route,
+        label = "My Network"
+    )
+
+    object Post : BottomNavItem(
+        iconRes = R.drawable.post,
+        selectedIconRes = R.drawable.post,
+        route = Routes.CreatePost.route,
+        label = "Post"
+    )
+
+    object Notifications : BottomNavItem(
+        iconRes = R.drawable.notifications,
+        selectedIconRes = R.drawable.selected_notifications,
+        route = Routes.Notifications.route,
+        label = "Notifications"
+    )
+
+    object Jobs : BottomNavItem(
+        iconRes = R.drawable.jobs,
+        selectedIconRes = R.drawable.selected_jobs,
+        route = Routes.Jobs.route,
+        label = "Jobs"
+    )
+
+    companion object {
+        val items = listOf(Home, MyNetwork, Post, Notifications, Jobs)
+    }
+
+    fun navigate(navController: NavController) {
+        navController.navigate(route) {
+            // Pop up to the start destination of the graph to
+            // avoid building up a large stack of destinations
+            // on the back stack as users select items
+            popUpTo(navController.graph.findStartDestination().id) {
+                saveState = true
+            }
+            // Avoid multiple copies of the same destination when
+            // re-selecting the same item
+            launchSingleTop = true
+            // Restore state when re-selecting a previously selected item
+            restoreState = true
         }
     }
 

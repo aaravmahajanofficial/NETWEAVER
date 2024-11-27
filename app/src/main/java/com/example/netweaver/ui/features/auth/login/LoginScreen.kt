@@ -1,5 +1,6 @@
 package com.example.netweaver.ui.features.auth.login
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -15,10 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.text.BasicSecureTextField
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.input.TextObfuscationMode
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -36,9 +33,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -49,20 +44,24 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.netweaver.R
+import com.example.netweaver.navigation.NavigationEvent
 import com.example.netweaver.ui.features.auth.components.Button
 import com.example.netweaver.ui.features.auth.components.ClickButton
-import kotlinx.coroutines.delay
+import com.example.netweaver.ui.features.auth.components.CustomSecureTextField
+import com.example.netweaver.ui.features.auth.components.CustomTextField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(viewModel: LoginViewModel = hiltViewModel()) {
-
-    val focusRequester = remember { FocusRequester() }
+fun LoginScreen(
+    navigateTo: (NavigationEvent) -> Unit,
+    viewModel: LoginViewModel = hiltViewModel()
+) {
     val focusManager = LocalFocusManager.current
     var passwordVisibility by rememberSaveable { mutableStateOf(false) }
     val state = rememberTextFieldState()
 
     val uiState by viewModel.loginUiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     LaunchedEffect(state.text) {
         if (uiState.password != state.text) {
@@ -71,11 +70,12 @@ fun LoginScreen(viewModel: LoginViewModel = hiltViewModel()) {
     }
 
     LaunchedEffect(uiState.error) {
-        if (uiState.error.isNotBlank()) {
-            delay(3000)
+        uiState.error?.let {
+            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
             viewModel.onEvent(LoginEvent.ClearError)
         }
     }
+
 
     Surface(
         modifier = Modifier
@@ -137,7 +137,10 @@ fun LoginScreen(viewModel: LoginViewModel = hiltViewModel()) {
                         Text(
                             text = "Join NetWeaver",
                             style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.W600),
-                            color = MaterialTheme.colorScheme.secondary
+                            color = MaterialTheme.colorScheme.secondary,
+                            modifier = Modifier.clickable {
+                                navigateTo(NavigationEvent.NavigateToRegister)
+                            }
                         )
                     }
                 }
@@ -197,155 +200,40 @@ fun LoginScreen(viewModel: LoginViewModel = hiltViewModel()) {
 
                 Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(),
+                        .fillMaxWidth(),
                     horizontalAlignment = Alignment.Start,
                     verticalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    BasicTextField(
+
+                    CustomTextField(
                         value = uiState.email,
                         onValueChange = {
-                            viewModel.onEvent(LoginEvent.EmailChanged(it))
+                            viewModel.onEvent(
+                                LoginEvent.EmailChanged(it)
+                            )
                         },
-                        keyboardOptions = KeyboardOptions.Default.copy(
-                            imeAction = ImeAction.Next,
-                            keyboardType = KeyboardType.Email
-                        ),
-                        textStyle = MaterialTheme.typography.titleMedium.copy(MaterialTheme.colorScheme.onBackground),
-                        cursorBrush = SolidColor(value = MaterialTheme.colorScheme.onTertiary),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .focusRequester(focusRequester),
-                        decorationBox = { innerTextField ->
-
-                            Column(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalAlignment = Alignment.Start,
-                                verticalArrangement = Arrangement.spacedBy(5.dp)
-                            ) {
-
-                                Box(
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    if (uiState.email.isEmpty()) {
-                                        Text(
-                                            "Email or Phone",
-                                            style = MaterialTheme.typography.titleMedium,
-                                            color = MaterialTheme.colorScheme.onTertiary
-                                        )
-                                    }
-                                    innerTextField()
-                                }
-
-                                if (uiState.email.isEmpty()) {
-
-                                    HorizontalDivider(
-                                        color = MaterialTheme.colorScheme.onTertiary,
-                                        thickness = 1.dp
-                                    )
-                                } else {
-                                    HorizontalDivider(
-                                        color = if (uiState.emailError == null) MaterialTheme.colorScheme.onTertiary else MaterialTheme.colorScheme.onError,
-                                        thickness = 2.dp
-                                    )
-
-                                    if (uiState.emailError != null) {
-                                        Spacer(modifier = Modifier.height(4.dp))
-
-                                        Text(
-                                            text = uiState.emailError!!,
-                                            style = MaterialTheme.typography.labelLarge,
-                                            color = MaterialTheme.colorScheme.onError
-                                        )
-                                    }
-                                }
-                            }
-
-                        }
+                        placeholder = "Email or Phone",
+                        error = uiState.emailError,
+                        keyboardType = KeyboardType.Email,
+                        imeAction = ImeAction.Next
                     )
 
                     Spacer(modifier = Modifier.height(36.dp))
 
-                    BasicSecureTextField(
+                    CustomSecureTextField(
                         state = state,
-                        keyboardOptions = KeyboardOptions.Default.copy(
-                            imeAction = ImeAction.Done,
-                            keyboardType = KeyboardType.Password
-                        ),
-                        textObfuscationMode = if (passwordVisibility) TextObfuscationMode.Visible else TextObfuscationMode.Hidden,
-                        textStyle = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.onBackground),
-                        cursorBrush = SolidColor(value = MaterialTheme.colorScheme.onTertiary),
-                        modifier = Modifier.fillMaxWidth(),
-                        decorator = { innerTextField ->
-
-                            Column(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalAlignment = Alignment.Start,
-                                verticalArrangement = Arrangement.spacedBy(5.dp)
-                            ) {
-
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .weight(1f),
-                                    ) {
-                                        if (state.text.isEmpty()) {
-                                            Text(
-                                                "Password",
-                                                style = MaterialTheme.typography.titleMedium,
-                                                color = MaterialTheme.colorScheme.onTertiary
-                                            )
-                                        }
-                                        innerTextField()
-                                    }
-
-                                    Icon(
-                                        painter = if (passwordVisibility) painterResource(R.drawable.visibility_on) else painterResource(
-                                            R.drawable.visibility_off
-                                        ),
-                                        contentDescription = "Show/Hide Password",
-                                        tint = MaterialTheme.colorScheme.tertiary,
-                                        modifier = Modifier.clickable {
-                                            passwordVisibility = !passwordVisibility
-                                        }
-                                    )
-                                }
-                                if (state.text.isEmpty()) {
-
-                                    HorizontalDivider(
-                                        color = MaterialTheme.colorScheme.onTertiary,
-                                        thickness = 1.dp
-                                    )
-                                } else {
-                                    HorizontalDivider(
-                                        color = if (uiState.passwordError == null) MaterialTheme.colorScheme.onTertiary else MaterialTheme.colorScheme.onError,
-                                        thickness = 2.dp
-                                    )
-
-                                    if (uiState.passwordError != null) {
-                                        Spacer(modifier = Modifier.height(4.dp))
-
-                                        Text(
-                                            text = uiState.passwordError!!,
-                                            style = MaterialTheme.typography.labelLarge,
-                                            color = MaterialTheme.colorScheme.onError
-                                        )
-                                    }
-                                }
-                            }
-
-                        }
+                        isPasswordVisible = passwordVisibility,
+                        onTogglePasswordVisibility = {
+                            passwordVisibility = !passwordVisibility
+                        },
+                        placeholder = "Password",
+                        error = uiState.passwordError,
+                        keyboardType = KeyboardType.Password,
+                        imeAction = ImeAction.Done
                     )
                 }
 
-                Spacer(modifier = Modifier.height(34.dp))
-
+                Spacer(modifier = Modifier.height(36.dp))
 
             }
 

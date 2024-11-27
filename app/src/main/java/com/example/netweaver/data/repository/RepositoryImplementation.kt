@@ -1,5 +1,6 @@
 package com.example.netweaver.data.repository
 
+import android.util.Log
 import com.example.netweaver.data.remote.dto.ChatDto
 import com.example.netweaver.data.remote.dto.ConnectionDto
 import com.example.netweaver.data.remote.dto.ConnectionStatus
@@ -236,39 +237,38 @@ class RepositoryImplementation @Inject constructor(
     override suspend fun createPost(
         content: String,
         byteArrayList: List<ByteArray?>?,
-        fileExtensions: List<String?>
+        fileExtensions: List<String?>?
     ): Result<Unit> = withContext(Dispatchers.IO) {
 
         try {
-            val response =
-                storeMediaToBucket(
-                    byteArrayList = byteArrayList,
-                    fileExtensions = fileExtensions
-                )
 
-            when (response) {
-                is Result.Error -> {
+            var mediaUrl: List<String>? = null
+
+            if (byteArrayList != null && fileExtensions != null) {
+                val response =
+                    storeMediaToBucket(
+                        byteArrayList = byteArrayList,
+                        fileExtensions = fileExtensions
+                    )
+                if (response is Result.Error) {
                     return@withContext Result.Error(response.exception)
                 }
 
-                is Result.Success -> {
-
-                    val postDto = PostDto(
-                        userId = currentUserId,
-                        content = content.trim(),
-                        mediaUrl = response.data,
-                    )
-
-                    try {
-                        postgrest.from("Posts").upsert(postDto)
-                        return@withContext Result.Success(Unit)
-                    } catch (e: Exception) {
-                        return@withContext Result.Error(e)
-                    }
-                }
-
+                mediaUrl = (response as Result.Success<List<String>>).data
             }
+
+            val postDto = PostDto(
+                userId = currentUserId,
+                content = content.trim(),
+                mediaUrl = mediaUrl,
+            )
+
+            postgrest.from("Posts").insert(postDto)
+            Log.d("INSERT", "Successful")
+            return@withContext Result.Success(Unit)
+
         } catch (e: Exception) {
+            Log.d("ERROR", e.message.toString())
             return@withContext Result.Error(e)
         }
 

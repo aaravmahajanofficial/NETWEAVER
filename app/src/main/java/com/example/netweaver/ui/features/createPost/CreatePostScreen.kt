@@ -200,7 +200,13 @@ fun CreatePostScreen(
                                     onNavigateBack()
                                 }
 
-                                null -> {}
+                                null -> {
+                                    viewModel.createPost(
+                                        content = state.text.toString(),
+                                        byteArrayList = null,
+                                        fileExtensions = null
+                                    )
+                                }
                             }
 
                         },

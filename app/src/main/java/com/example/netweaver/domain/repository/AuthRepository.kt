@@ -1,7 +1,9 @@
 package com.example.netweaver.domain.repository
 
 import com.example.netweaver.domain.model.User
+import com.example.netweaver.ui.features.auth.AuthState
 import com.example.netweaver.ui.model.Result
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 interface AuthRepository {
@@ -19,5 +21,9 @@ interface AuthRepository {
 
 
     suspend fun signInWithEmail(email: String, password: String): Result<Unit>
+
+
+    fun getAuthState(): Flow<AuthState>
+
     fun signOut()
 }

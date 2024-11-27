@@ -106,12 +106,12 @@ class LoginViewModel @Inject constructor(
 
 data class LoginState(
     val email: String = "",
-    val emailError: String? = "",
+    val emailError: String? = null,
     val password: String = "",
-    val passwordError: String? = "",
+    val passwordError: String? = null,
     val isLoading: Boolean = false,
-    val error: String = "",
-    val success: String = ""
+    val error: String? = null,
+    val success: String? = null
 )
 
 sealed class LoginEvent {

@@ -20,7 +20,7 @@ interface Repository {
     suspend fun createPost(
         content: String,
         byteArrayList: List<ByteArray?>?,
-        fileExtensions: List<String?>
+        fileExtensions: List<String?>?
     ): Result<Unit>
 
     suspend fun getUserPosts(userId: String): Result<List<Post>>
