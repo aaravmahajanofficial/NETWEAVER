@@ -6,8 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.netweaver.domain.model.Connection
 import com.example.netweaver.domain.model.ConnectionState
 import com.example.netweaver.domain.model.User
-import com.example.netweaver.domain.usecase.connections.GetUserConnectionsUseCase
-import com.example.netweaver.domain.usecase.connections.HandleRequestUseCase
+import com.example.netweaver.domain.repository.ConnectionType
+import com.example.netweaver.domain.repository.Repository
 import com.example.netweaver.ui.model.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
@@ -21,8 +21,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MyNetworkViewModel @Inject constructor(
-    private val handleRequestUseCase: HandleRequestUseCase,
-    private val getUserConnectionsUseCase: GetUserConnectionsUseCase
+    private val repository: Repository
 ) :
     ViewModel() {
 
@@ -50,7 +49,7 @@ class MyNetworkViewModel @Inject constructor(
                     }
 
                     when (val result =
-                        handleRequestUseCase.acceptConnectionRequest(
+                        repository.acceptConnectionRequest(
                             requestId = event.requestId
                         )) {
                         is Result.Success -> {
@@ -90,7 +89,7 @@ class MyNetworkViewModel @Inject constructor(
                     }
 
                     when (val result =
-                        handleRequestUseCase.rejectConnectionRequest(
+                        repository.rejectConnectionRequest(
                             requestId = event.requestId
                         )) {
                         is Result.Success -> {
@@ -131,7 +130,7 @@ class MyNetworkViewModel @Inject constructor(
                     }
 
                     when (val result =
-                        handleRequestUseCase.sendConnectionRequest(userId = event.userId)) {
+                        repository.sendConnectionRequest(userId = event.userId)) {
                         is Result.Success -> {
                             _myNetworkUiState.update {
                                 it.copy(
@@ -175,9 +174,13 @@ class MyNetworkViewModel @Inject constructor(
 
                 val (invitations, recommendations) = coroutineScope {
                     val connectionRequestsDeferred =
-                        async { getUserConnectionsUseCase.getPendingConnections() }
+                        async {
+                            repository.getConnectionRequests(
+                                ConnectionType.IncomingOnly
+                            )
+                        }
                     val recommendationsDeferred =
-                        async { getUserConnectionsUseCase.getRecommendations() }
+                        async { repository.getRecommendations(count = 4) }
                     Pair(connectionRequestsDeferred.await(), recommendationsDeferred.await())
                 }
 

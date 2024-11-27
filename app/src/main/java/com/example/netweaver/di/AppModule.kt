@@ -4,15 +4,6 @@ import com.example.netweaver.data.repository.AuthRepositoryImplementation
 import com.example.netweaver.data.repository.RepositoryImplementation
 import com.example.netweaver.domain.repository.AuthRepository
 import com.example.netweaver.domain.repository.Repository
-import com.example.netweaver.domain.usecase.connections.GetConnectionStatusUseCase
-import com.example.netweaver.domain.usecase.connections.GetUserConnectionsUseCase
-import com.example.netweaver.domain.usecase.connections.HandleRequestUseCase
-import com.example.netweaver.domain.usecase.user.GetEducationUseCase
-import com.example.netweaver.domain.usecase.user.GetExperiencesUseCase
-import com.example.netweaver.domain.usecase.user.GetUserPostsUseCase
-import com.example.netweaver.domain.usecase.user.RegisterWithEmailUseCase
-import com.example.netweaver.domain.usecase.user.SignInWithEmailUseCase
-import com.example.netweaver.domain.usecase.user.UserProfileUseCase
 import com.example.netweaver.domain.usecase.validation.ValidateEmailUseCase
 import com.example.netweaver.domain.usecase.validation.ValidateNameUseCase
 import com.example.netweaver.domain.usecase.validation.ValidatePasswordUseCase
@@ -68,50 +59,5 @@ object AppModule {
     @Provides
     @Singleton
     fun provideValidatePasswordUseCase() = ValidatePasswordUseCase()
-
-    @Provides
-    @Singleton
-    fun provideSignInWithEmailUseCase(authRepository: AuthRepository) =
-        SignInWithEmailUseCase(authRepository = authRepository)
-
-    @Provides
-    @Singleton
-    fun provideRegisterWithEmailUseCase(authRepository: AuthRepository) =
-        RegisterWithEmailUseCase(authRepository = authRepository)
-
-    @Provides
-    @Singleton
-    fun provideUserProfileUseCase(repository: Repository) =
-        UserProfileUseCase(repository = repository)
-
-    @Provides
-    @Singleton
-    fun provideGetUserPostsUseCase(repository: Repository) =
-        GetUserPostsUseCase(repository = repository)
-
-    @Provides
-    @Singleton
-    fun provideGetExperiencesUseCase(repository: Repository) =
-        GetExperiencesUseCase(repository = repository)
-
-    @Provides
-    @Singleton
-    fun provideGetEducationUseCase(repository: Repository) =
-        GetEducationUseCase(repository = repository)
-
-    @Provides
-    @Singleton
-    fun provideGetConnectionStatusUseCase(repository: Repository) =
-        GetConnectionStatusUseCase(repository = repository)
-
-    @Provides
-    @Singleton
-    fun provideHandleRequestUseCase(repository: Repository) =
-        HandleRequestUseCase(repository = repository)
-
-    @Provides
-    @Singleton
-    fun provideGetUserConnectionsUseCase(repository: Repository) =
-        GetUserConnectionsUseCase(repository = repository)
 
 }

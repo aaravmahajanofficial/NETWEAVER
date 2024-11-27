@@ -2,7 +2,7 @@ package com.example.netweaver.ui.features.auth.register
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.netweaver.domain.usecase.user.RegisterWithEmailUseCase
+import com.example.netweaver.domain.repository.AuthRepository
 import com.example.netweaver.domain.usecase.validation.ValidateEmailUseCase
 import com.example.netweaver.domain.usecase.validation.ValidateNameUseCase
 import com.example.netweaver.domain.usecase.validation.ValidatePasswordUseCase
@@ -20,7 +20,7 @@ class RegisterViewModel @Inject constructor(
     private val validateEmail: ValidateEmailUseCase,
     private val validateName: ValidateNameUseCase,
     private val validatePassword: ValidatePasswordUseCase,
-    private val registerWithEmailUseCase: RegisterWithEmailUseCase
+    private val authRepository: AuthRepository
 ) :
     ViewModel() {
 
@@ -73,7 +73,7 @@ class RegisterViewModel @Inject constructor(
 
                     try {
 
-                        when (val result = registerWithEmailUseCase(
+                        when (val result = authRepository.registerWithEmail(
                             email = _registerUiState.value.email,
                             password = _registerUiState.value.password,
                             firstName = _registerUiState.value.firstName,

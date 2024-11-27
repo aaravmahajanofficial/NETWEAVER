@@ -2,7 +2,7 @@ package com.example.netweaver.ui.features.auth.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.netweaver.domain.usecase.user.SignInWithEmailUseCase
+import com.example.netweaver.domain.repository.AuthRepository
 import com.example.netweaver.domain.usecase.validation.ValidateEmailUseCase
 import com.example.netweaver.domain.usecase.validation.ValidatePasswordUseCase
 import com.example.netweaver.ui.model.Result
@@ -18,7 +18,7 @@ import javax.inject.Inject
 class LoginViewModel @Inject constructor(
     private val validateEmail: ValidateEmailUseCase,
     private val validatePassword: ValidatePasswordUseCase,
-    private val signInWithEmailUseCase: SignInWithEmailUseCase
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _loginUiState = MutableStateFlow(LoginState())
@@ -55,7 +55,7 @@ class LoginViewModel @Inject constructor(
 
                 viewModelScope.launch {
                     try {
-                        when (val result = signInWithEmailUseCase(
+                        when (val result = authRepository.signInWithEmail(
                             email = _loginUiState.value.email,
                             password = _loginUiState.value.password
                         )) {

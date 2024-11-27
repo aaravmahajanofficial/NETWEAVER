@@ -9,13 +9,7 @@ import com.example.netweaver.domain.model.Education
 import com.example.netweaver.domain.model.Experience
 import com.example.netweaver.domain.model.Post
 import com.example.netweaver.domain.model.User
-import com.example.netweaver.domain.usecase.connections.GetConnectionStatusUseCase
-import com.example.netweaver.domain.usecase.connections.GetUserConnectionsUseCase
-import com.example.netweaver.domain.usecase.connections.HandleRequestUseCase
-import com.example.netweaver.domain.usecase.user.GetEducationUseCase
-import com.example.netweaver.domain.usecase.user.GetExperiencesUseCase
-import com.example.netweaver.domain.usecase.user.GetUserPostsUseCase
-import com.example.netweaver.domain.usecase.user.UserProfileUseCase
+import com.example.netweaver.domain.repository.Repository
 import com.example.netweaver.ui.model.Result
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,13 +24,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
-    private val userProfileUseCase: UserProfileUseCase,
-    private val getEducationUseCase: GetEducationUseCase,
-    private val getExperiencesUseCase: GetExperiencesUseCase,
-    private val getUserPostsUseCase: GetUserPostsUseCase,
-    private val getConnectionStatusUseCase: GetConnectionStatusUseCase,
-    private val getUserConnectionsUseCase: GetUserConnectionsUseCase,
-    private val handleRequestUseCase: HandleRequestUseCase,
+    private val repository: Repository,
     firebaseAuth: FirebaseAuth,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
@@ -80,7 +68,7 @@ class ProfileViewModel @Inject constructor(
                     }
 
                     when (val result =
-                        handleRequestUseCase.acceptConnectionRequest(
+                        repository.acceptConnectionRequest(
                             requestId = event.requestId
                         )) {
                         is Result.Success -> {
@@ -120,7 +108,7 @@ class ProfileViewModel @Inject constructor(
                     }
 
                     when (val result =
-                        handleRequestUseCase.rejectConnectionRequest(
+                        repository.rejectConnectionRequest(
                             requestId = event.requestId
                         )) {
                         is Result.Success -> {
@@ -161,7 +149,7 @@ class ProfileViewModel @Inject constructor(
                     }
 
                     when (val result =
-                        handleRequestUseCase.sendConnectionRequest(userId = event.userId)) {
+                        repository.sendConnectionRequest(userId = event.userId)) {
                         is Result.Success -> {
                             _profileUiState.update {
                                 it.copy(
@@ -207,14 +195,14 @@ class ProfileViewModel @Inject constructor(
                 // 1. parallel loading
                 // 2. for fast failing, if any one stops others are also cancelled -> Atomic Transaction (All or null)
                 coroutineScope {
-                    val profileDeferred = async { userProfileUseCase(userId = userId!!) }
-                    val postsDeferred = async { getUserPostsUseCase(userId = userId!!) }
-                    val educationDeferred = async { getEducationUseCase(userId = userId!!) }
-                    val experienceDeferred = async { getExperiencesUseCase(userId = userId!!) }
+                    val profileDeferred = async { repository.getUserById(userId = userId!!) }
+                    val postsDeferred = async { repository.getUserPosts(userId = userId!!) }
+                    val educationDeferred = async { repository.getEducation(userId = userId!!) }
+                    val experienceDeferred = async { repository.getExperiences(userId = userId!!) }
                     val connectionsCountDeferred =
-                        async { getUserConnectionsUseCase.getConnectionsCount(userId = userId!!) }
+                        async { repository.getConnectionsCount(userId = userId!!) }
                     val connectionDeferred = if (userId != currentUserId) {
-                        async { getConnectionStatusUseCase(userId = userId!!) }
+                        async { repository.getConnectionStatus(userId = userId!!) }
                     } else null
 
                     // wait for all to complete
